@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>思路 · Sea Data 数据处理平台</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content='sea-docs'/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:100normal,100italic,300normal,300italic,400normal,400italic,500normal,500italic,700normal,700italic,900normal,900italicc" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/groups.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="../lib/foundation/dist/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="../css/page.css"/>
+
+<!--
+<link rel="shortcut icon" href="../images/favicon.ico" />
+-->
+</head>
+
+<body>
+<div class="off-canvas-wrapper">
+<div class="off-canvas-wrapper-inner" data-off-canvas-wrapper>
+
+<div class="off-canvas position-left" id="off-canvas-menu" data-off-canvas>
+<nav class="off-canvas-nav">
+<div class="nav-home">
+<a href="../index.html" >
+<span class="home-icon">⌂</span>Sea Data 数据处理平台
+</a>
+<div class="version-number">
+1.0.0*
+</div>
+</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="../intro/index.html" class="page">概述</a></li>
+  <li><a href="../design/index.html" class="page">设计</a>
+  <ul>
+    <li><a href="../design/thinking.html" class="active page">思路</a></li>
+    <li><a href="../design/sea-design.html" class="page">Sea 设计</a></li>
+  </ul></li>
+  <li><a href="../broker/index.html" class="page">Broker 节点</a>
+  <ul>
+    <li><a href="../broker/engine/engine.html" class="page">Sea 引擎</a></li>
+    <li><a href="../broker/leader/leader.html" class="page">引擎 Leader （协调者）</a></li>
+    <li><a href="../broker/data/data.html" class="page">数据处理子系统</a></li>
+  </ul></li>
+  <li><a href="../console/index.html" class="page">管理控制台</a>
+  <ul>
+    <li><a href="../console/console/console.html" class="page">监、管系统</a></li>
+    <li><a href="../console/choreography/choreography.html" class="page">业务编排系统模块</a></li>
+  </ul></li>
+  <li><a href="../spec/index.html" class="page">规范</a>
+  <ul>
+    <li><a href="../spec/business_spec/business_spec.html" class="page">业务文件规范</a></li>
+    <li><a href="../spec/component_spec/component_spec.html" class="page">数据组件规范</a></li>
+    <li><a href="../spec/ic_spec/ic_spec.html" class="page">系统间通信规范</a></li>
+  </ul></li>
+</ul>
+</div>
+
+</nav>
+</div>
+
+<div class="off-canvas-content" data-off-canvas-content>
+
+<header class="site-header expanded row">
+<div class="small-12 column">
+<a href="#" class="off-canvas-toggle hide-for-medium" data-toggle="off-canvas-menu"><svg class="svg-icon svg-icon-menu" version="1.1" id="Menu" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 20 20" enable-background="new 0 0 20 20" xml:space="preserve"> <path class="svg-icon-menu-path" fill="#53CDEC" d="M16.4,9H3.6C3.048,9,3,9.447,3,10c0,0.553,0.048,1,0.6,1H16.4c0.552,0,0.6-0.447,0.6-1C17,9.447,16.952,9,16.4,9z M16.4,13
+H3.6C3.048,13,3,13.447,3,14c0,0.553,0.048,1,0.6,1H16.4c0.552,0,0.6-0.447,0.6-1C17,13.447,16.952,13,16.4,13z M3.6,7H16.4
+C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.048,7,3.6,7z"/></svg>
+</a>
+<div class="title"><a href="../index.html">Sea Data 数据处理平台</a></div>
+
+<!--
+<a href="https://www.example.com" class="logo show-for-medium">logo</a>
+-->
+</div>
+</header>
+
+<div class="expanded row">
+
+<div class="medium-3 large-2 show-for-medium column">
+<nav class="site-nav">
+<div class="nav-home">
+<a href="../index.html" >
+<span class="home-icon">⌂</span>Sea Data 数据处理平台
+</a>
+<div class="version-number">
+1.0.0*
+</div>
+</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="../intro/index.html" class="page">概述</a></li>
+  <li><a href="../design/index.html" class="page">设计</a>
+  <ul>
+    <li><a href="../design/thinking.html" class="active page">思路</a></li>
+    <li><a href="../design/sea-design.html" class="page">Sea 设计</a></li>
+  </ul></li>
+  <li><a href="../broker/index.html" class="page">Broker 节点</a>
+  <ul>
+    <li><a href="../broker/engine/engine.html" class="page">Sea 引擎</a></li>
+    <li><a href="../broker/leader/leader.html" class="page">引擎 Leader （协调者）</a></li>
+    <li><a href="../broker/data/data.html" class="page">数据处理子系统</a></li>
+  </ul></li>
+  <li><a href="../console/index.html" class="page">管理控制台</a>
+  <ul>
+    <li><a href="../console/console/console.html" class="page">监、管系统</a></li>
+    <li><a href="../console/choreography/choreography.html" class="page">业务编排系统模块</a></li>
+  </ul></li>
+  <li><a href="../spec/index.html" class="page">规范</a>
+  <ul>
+    <li><a href="../spec/business_spec/business_spec.html" class="page">业务文件规范</a></li>
+    <li><a href="../spec/component_spec/component_spec.html" class="page">数据组件规范</a></li>
+    <li><a href="../spec/ic_spec/ic_spec.html" class="page">系统间通信规范</a></li>
+  </ul></li>
+</ul>
+</div>
+
+</nav>
+</div>
+
+<div class="small-12 medium-9 large-10 column">
+<section class="site-content">
+
+<div class="page-header row">
+<div class="medium-12 show-for-medium column">
+<div class="nav-breadcrumbs">
+<ul>
+  <li><a href="../index.html">Sea Data 数据处理平台</a></li>
+  <li><a href="../design/index.html">设计</a></li>
+  <li>思路</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="page-content row">
+<div class="small-12 large-9 column" id="docs">
+<h1><a href="#思路" name="思路" class="anchor"><span class="anchor-link"></span></a>思路</h1>
+<p>在 Sea 开发时有两套设计思路，分别为：*设计B* 和 <em>设计A</em>。</p>
+<h2><a href="#总线-调度服务-引擎-多子系统设计" name="总线-调度服务-引擎-多子系统设计" class="anchor"><span class="anchor-link"></span></a><em>设计B：</em> 总线、调度服务、引擎 多子系统设计</h2>
+<p><strong>主要特性</strong></p>
+<ul>
+  <li>总线：实现服务发现、注册、消息通信功能</li>
+  <li>调度服务：调度节点本身逻辑上是单例，提供多节点实现进行高可用</li>
+  <li>引擎功能同 A 设计</li>
+  <li>传统的分阶段批数据处理能力，读、数据转换、写分别串行执行。</li>
+</ul>
+<p><strong>优点</strong></p>
+<ul>
+  <li>技术难度较低，有较多的成熟组件可利用、实现上相对容易</li>
+  <li>多个子系统有单点故障</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+  <li>处理数据速度较慢</li>
+  <li>不支持流式、实时数据处理</li>
+  <li>部署、运维复杂，需要手动部署多套系统</li>
+</ul>
+<h2><a href="#无中心节点设计-节点功能复用" name="无中心节点设计-节点功能复用" class="anchor"><span class="anchor-link"></span></a><em>设计A：</em> 无中心节点设计、节点功能复用</h2>
+<p><strong>主要特性</strong></p>
+<ul>
+  <li>无中心节点，所有节点（每个节点称为 broker）都是一样的，都具备集群发现、管理功能（基于Akka Cluster）</li>
+  <li>调度
+    <ol>
+      <li>使用 Akka Cluster Singleton 选中一个节点作为协调者（调度），总体控制所有Job的执行，使用 Akka Persistence来持久化  调度过程（推荐）。</li>
+      <li>每个节点即是执行任务的引擎，同时也是调度。</li>
+    </ol>
+  </li>
+  <li>每个节点都是引擎，调度可分配Job的Task到引擎上执行。引擎在获取到Task后解析业务流程并调用相关组件进行实际的业务操作</li>
+  <li>读、数据转换、写，数据处理中的各阶段流式并行执行。基于 Akka Stream 提供流式数据处理能力，同时还可使用 Akka Stream  Kafka 实现更高性能、高可用、高容错、持久化的数据处理能力。</li>
+  <li>结合 Kafka 和 reactive-kafka 实现 <strong>确定1次</strong> 数据处理模型，支持 ELT 等丰富的数据处理模式。</li>
+</ul>
+<p><strong>优点</strong></p>
+<ul>
+  <li>更快的数据处理速度</li>
+  <li>可进行实时数据ETL</li>
+  <li>支持ETL、ELT等丰富的数据处理模式</li>
+  <li>更好的资源利用率</li>
+  <li>架构统一、清晰</li>
+  <li>部署简单，不需要分别部署多套子系统</li>
+  <li>无单点故障问题</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+  <li>技术难度较大</li>
+</ul>
+<div class="source-github">
+The source code for this page can be found <a href="https://github.com/yangbajing/sea-data/tree/master/sea-docs/src/main/paradox/design/thinking.md">here</a>.
+</div>
+
+<div class="nav-next">
+<p><strong>Next:</strong> <a href="../design/sea-design.html">Sea 设计</a></p>
+</div>
+</div>
+<div class="large-3 show-for-large column" data-sticky-container>
+<nav class="sidebar sticky" data-sticky data-anchor="docs" data-sticky-on="large">
+<div class="page-nav">
+<div class="nav-title">On this page:</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="../design/thinking.html#思路" class="header">思路</a>
+  <ul>
+    <li><a href="../design/thinking.html#总线-调度服务-引擎-多子系统设计" class="header"><em>设计B：</em> 总线、调度服务、引擎 多子系统设计</a></li>
+    <li><a href="../design/thinking.html#无中心节点设计-节点功能复用" class="header"><em>设计A：</em> 无中心节点设计、节点功能复用</a></li>
+  </ul></li>
+</ul>
+</div>
+</div>
+</nav>
+</div>
+</div>
+
+</section>
+</div>
+
+</div>
+
+<footer class="site-footer">
+
+<section class="site-footer-nav">
+<div class="expanded row">
+<div class="small-12 large-offset-2 large-10 column">
+<div class="row site-footer-content">
+
+<div class="small-12 medium-4 large-3 text-center column">
+<div class="nav-links">
+<ul>
+<!-- <li><a href="https://www.example.com/products/">Products</a> -->
+</ul>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+
+<section class="site-footer-base">
+<div class="expanded row">
+<div class="small-12 large-offset-2 large-10 column">
+<div class="row site-footer-content">
+
+<div class="small-12 text-center large-9 column">
+
+<!--
+<div class="copyright">
+<span class="text">&copy; 2018</span>
+<a href="https://www.example.com" class="logo">logo</a>
+</div>
+-->
+</div>
+
+</div>
+</div>
+</div>
+</section>
+</footer>
+
+</div>
+</div>
+</div>
+</body>
+
+<script type="text/javascript" src="../lib/foundation/dist/foundation.min.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="../js/magellan.js"></script>
+
+<style type="text/css">@import "../lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">jQuery(function(){window.prettyPrint && prettyPrint()});</script>
+
+</html>

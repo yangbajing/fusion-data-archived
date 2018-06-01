@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<job version="1.0.0">
+    <jobId>job1</jobId>
+    <jobName>job1 name</jobName>
+    <jobVersion>1.0.0</jobVersion>
+    <jobDescription>job1 description</jobDescription>
+    <tasks>
+        <task id="task1" next="task2">
+            <source id="custom"><!-- 数据流ID：custom, jdbc, ftp, sftp -->
+                <properties>
+                    <property>
+                        <key>jdbcUrl</key>
+                        <value>jdbc:postgres://localhost/system</value>
+                    </property>
+                </properties>
+                <className>单sourceId为custom时，通过 className 指定数据流实现类全路径</className>
+            </source>
+            <stages><!-- stage 对应 akka stream Flow -->
+            <stage id="csv"><!-- 组件ID：custom, csv, jdbcRow -->
+                <properties>
+                    <property>
+                        <key>splitter</key>
+                        <value>\t</value>
+                    </property>
+                </properties>
+                <className>单 stageId 为custom时，通过 className 指定组件类全路径</className>
+                <configure>
+                    <!-- 每个阶段特有的配置，根据 stageId 确定。当 stageId 为 custom时，此配置无效 -->
+                </configure>
+            </stage>
+            </stages>
+            <sink>
+                <properties>
+
+                </properties>
+            </sink>
+        </task>
+        <task id="task2">....</task>
+    </tasks>
+</job>

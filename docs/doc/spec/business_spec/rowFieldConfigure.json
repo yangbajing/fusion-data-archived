@@ -1,0 +1,10 @@
+{
+  "fields": [{
+    "field": "字段名",
+    "dataType": "期望的数据类型",
+    // 数据类型不匹配时的转换函数
+    "dataTypeConverter": {},
+    // 字段值进行转换
+    "transfer": {}
+  }]
+}

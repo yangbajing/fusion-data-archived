@@ -1,0 +1,38 @@
+{
+  "jobName": "",
+  "jobVersion": "1.0.0",
+  "jobDescription": "",
+  "tasks": [
+    {
+      "taskId": "task1",
+      "nextTask": "task2",
+      "source": {
+        "sourceId": "数据流ID：custom, jdbc, ftp, sftp",
+        "properties": [
+          {
+            "key": "jdbcUrl",
+            "value": "jdbc:postgres://localhost/system"
+          }
+        ],
+        "className": "单sourceId为custom时，通过 className 指定数据流实现类全路径"
+      },
+      "stages": [
+        {
+          "stageId": "组件ID：custom, csv, jdbcRow",
+          "properties": [
+            {
+              "key": "",
+              "value": ""
+            }
+          ],
+          "className": "单 stageId 为custom时，通过 className 指定组件类全路径",
+          // 不同的组件有不同的配置
+          "configure": {}
+        }
+      ]
+    },
+    {
+      "taskId": "task2"
+    }
+  ]
+}
