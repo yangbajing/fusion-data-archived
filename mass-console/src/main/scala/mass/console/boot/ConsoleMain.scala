@@ -9,5 +9,5 @@ package mass.console.boot
 import mass.core.server.MassBoot
 
 object ConsoleMain extends App {
-   new ConsoleBoot(MassBoot.actorSystem).start()
+  new ConsoleBoot(MassBoot.actorSystem).start()
 }

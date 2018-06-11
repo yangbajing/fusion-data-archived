@@ -6,11 +6,15 @@ object Dependencies {
 
   val _scalaXml = ("org.scala-lang.modules" %% "scala-xml" % "1.1.0").exclude("org.scala-lang", "scala-library")
 
+  //  val _scalaParserCombinators =  ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0").exclude("org.scala-lang", "scala-library")
+
+  val _fastparse = "com.lihaoyi" %% "fastparse" % "1.0.0"
+
   val _scalaJava8Compat = ("org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0").exclude("org.scala-lang", "scala-library")
 
   val _scalatest = "org.scalatest" %% "scalatest" % "3.0.5"
 
-  val versionAkka = "2.5.12"
+  val versionAkka = "2.5.13"
   lazy val _akkaRemote = "com.typesafe.akka" %% "akka-remote" % versionAkka
 
   lazy val _akkas = Seq(
@@ -32,9 +36,11 @@ object Dependencies {
     _akkaMultiNodeTestkit
   )
 
-  lazy val _akkaManagement = "com.lightbend.akka.management" %% "akka-management" % "0.10.0"
+  lazy val _akkaManagements = Seq(
+    ("com.lightbend.akka.management" %% "akka-management" % "0.14.0").excludeAll(ExclusionRule("com.typesafe.akka")).exclude("org.scala-lang", "scala-library")
+  )
 
-  val versionAkkaHttp = "10.1.1"
+  val versionAkkaHttp = "10.1.2"
   val _akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % versionAkkaHttp
 
   val _akkaHttps = Seq(
@@ -172,6 +178,11 @@ object Dependencies {
     "com.github.tminglei" %% "slick-pg" % "0.16.1",
     "com.github.tminglei" %% "slick-pg_circe-json" % "0.16.1"
   )
+
+  private val versionPoi = "3.17"
+  val _pois = Seq(
+    "org.apache.poi" % "poi-scratchpad" % versionPoi,
+    "org.apache.poi" % "poi-ooxml" % versionPoi)
 
   private val versionCassandra = "3.5.0"
   val _cassandraDrivers = Seq(

@@ -4,6 +4,7 @@
 
 @@@ index
 
+* [white_paper](white_paper.md)
 * [business_spec/business_spec](business_spec/business_spec.md)
 * [component_spec/component_spec](component_spec/component_spec.md)
 * [ic_spec/ic_spec](ic_spec/ic_spec.md)

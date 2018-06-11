@@ -5,14 +5,14 @@ import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 
 lazy val root = Project(id = "mass-data-root", base = file("."))
   .aggregate(
-    massApiService,
     massDocs,
     massFunctest,
+    example,
+    massApiService,
     massConsole,
     massBroker,
     massConnector,
     massCoreExt,
-    example,
     massCore,
     massCommon
   )
@@ -38,6 +38,15 @@ lazy val massDocs = _project("mass-docs")
     ))
   .settings(Publishing.noPublish: _*)
 
+lazy val example = _project("example")
+  .settings(Publishing.publishing: _*)
+  .dependsOn(
+    massCoreExt % "compile->compile;test->test",
+    massCore % "compile->compile;test->test")
+  .settings(
+    libraryDependencies ++= _akkaClusters ++ _akkaHttps //++ _kamons
+  )
+
 lazy val massFunctest = _project("mass-functest")
   .dependsOn(massConsole, massBroker,
     massCoreExt % "compile->compile;test->test",
@@ -54,7 +63,9 @@ lazy val massFunctest = _project("mass-functest")
 
 // API Service
 lazy val massApiService = _project("mass-api-service")
-  .dependsOn(massCore % "compile->compile;test->test")
+  .dependsOn(
+    massCoreExt % "compile->compile;test->test",
+    massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
@@ -64,6 +75,22 @@ lazy val massApiService = _project("mass-api-service")
 
     ) ++ _akkaHttps
   )
+
+lazy val massEtl = _project("mass-etl")
+  .dependsOn(
+    massConnector,
+    massCoreExt % "compile->compile;test->test",
+    massCore % "compile->compile;test->test")
+  .enablePlugins(JavaAppPackaging)
+  .settings(Packaging.settings: _*)
+  .settings(Publishing.noPublish: _*)
+  .settings(
+    mainClass in Compile := Some("massdata.etl.boot.EtlMain"),
+    libraryDependencies ++= Seq(
+
+    ) ++ _pois
+  )
+
 
 // 监查、控制、管理
 lazy val massConsole = _project("mass-console")
@@ -118,17 +145,10 @@ lazy val massCoreExt = _project("mass-core-ext")
   .dependsOn(massCore % "compile->compile;test->test")
   .settings(
     libraryDependencies ++= Seq(
+      _fastparse,
       _sigarLoader
     ) ++ _akkaClusters ++ _akkaHttps //++ _kamons
   )
-
-lazy val example = _project("example")
-  .settings(Publishing.publishing: _*)
-  .dependsOn(massCore % "compile->compile;test->test")
-  .settings(
-    libraryDependencies ++= _akkaClusters ++ _akkaHttps //++ _kamons
-  )
-
 
 lazy val massCore = _project("mass-core")
   .dependsOn(massCommon % "compile->compile;test->test")
@@ -139,6 +159,7 @@ lazy val massCore = _project("mass-core")
       _shapeless,
       _postgresql,
       _scopt,
+      _scalaXml,
       _akkaHttpCore % Provided
     ) ++ _catses ++ _circes ++ _slicks
   )
@@ -152,7 +173,6 @@ lazy val massCommon = _project("mass-common")
       _scalaLogging,
       _logbackClassic,
       _config,
-      _scalaXml,
       "org.scala-lang" % "scala-library" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       _scalaJava8Compat,
