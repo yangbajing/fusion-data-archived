@@ -6,7 +6,6 @@
 
 * [engine/engine](engine/engine.md)
 * [leader/leader](leader/leader.md)
-* [data/data](data/data.md)
 
 @@@
 

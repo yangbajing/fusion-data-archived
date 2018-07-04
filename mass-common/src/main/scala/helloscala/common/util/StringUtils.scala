@@ -17,9 +17,9 @@ object StringUtils {
   private val HEX_CHARS: Array[Char] = "0123456789abcdef".toCharArray
   private val HEX_CHAR_SETS = Set.empty[Char] ++ ('0' to '9') ++ ('a' to 'f') ++ ('A' to 'F')
 
-  def isHex(c: Char): Boolean = {
-    HEX_CHAR_SETS.contains(c)
-  }
+  def option(text: String): Option[String] = if (isBlank(text)) None else Some(text)
+
+  @inline def isHex(c: Char): Boolean = HEX_CHAR_SETS.contains(c)
 
   /** Turns an array of Byte into a String representation in hexadecimal. */
   def hex2Str(bytes: Array[Byte]): String = {

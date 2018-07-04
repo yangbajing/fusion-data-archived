@@ -10,6 +10,7 @@ import java.util.Properties
 import java.util.function.Consumer
 
 import com.typesafe.config._
+import com.typesafe.config.impl.ConfigurationHelper
 import helloscala.common.exception.HSException
 import helloscala.common.types.ObjectId
 import helloscala.common.util.StringUtils
@@ -26,7 +27,7 @@ import scala.util.control.NonFatal
  */
 case class Configuration(underlying: Config) {
 
-  // TODO 基于 zookeeper 或 consul 进行重设
+  // TODO 基于 etcd 或 consul 进行重设
   //  underlying.withFallback()
 
   /**
@@ -84,6 +85,8 @@ case class Configuration(underlying: Config) {
   def get[A](path: String)(implicit loader: ConfigLoader[A]): A = {
     loader.load(underlying, path)
   }
+
+  def getOrElse[A](path: String, deft: => A)(implicit loader: ConfigLoader[A]): A = get[Option[A]](path).getOrElse(deft)
 
   /**
    * Get the config at the given path and validate against a set of valid values.
@@ -216,6 +219,9 @@ object Configuration {
   }
 
   def apply(): Configuration = Configuration(ConfigFactory.load())
+
+  def apply(props: Properties): Configuration = ConfigurationHelper.fromProperties(props)
+
 }
 
 /**
@@ -324,7 +330,7 @@ object ConfigLoader {
       }
 
       override def load(config: Config, path: String): Properties = {
-        val obj = if (path == null) config.asInstanceOf[ConfigObject] else config.getObject(path)
+        val obj = if (StringUtils.isBlank(path)) config.root() else config.getObject(path)
         val props = new Properties()
         make(props, "", obj)
         props
@@ -350,7 +356,7 @@ object ConfigLoader {
       }
 
       override def load(config: Config, path: String): Map[String, String] = {
-        val obj = config.getObject(path)
+        val obj = if (StringUtils.isBlank(path)) config.root() else config.getObject(path)
         val props = mutable.Map[String, String]()
         make(props, "", obj)
         props.toMap

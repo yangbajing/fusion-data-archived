@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  mass-mysql:
+    image: mysql:5.7
+    restart: always
+#    networks:
+#      - mass-backend
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: Massdata.2018
+
+  mass-postgres:
+    image: postgres:10.4
+    restart: always
+#    networks:
+#      - mass-backend
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: Massdata.2018
+
+#networks:
+#  mass-backend:
+#    driver: docker0

@@ -13,6 +13,7 @@ object AsString {
   def unapply(v: Any): Option[String] = v match {
     case null      => None
     case s: String => Some(s)
+    case v: AnyRef => Some(v.toString)
     case _         => Some(v.toString)
   }
 }

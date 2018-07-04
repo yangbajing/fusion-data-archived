@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<workflow>
+    <connectors>
+        <connector id="postgres" type="sql">
+            <props>
+                <prop key="poolName" value="postgres"/>
+                <prop key="maximumPoolSize" value="2"/>
+                <prop key="username" value="massdata"/>
+                <prop key="password" value="massdata"/>
+                <prop key="dataSourceClassName" value="org.postgresql.ds.PGSimpleDataSource"/>
+                <prop key="dataSource.serverName" value="localhost"/>
+                <prop key="dataSource.portNumber" value="5432"/>
+                <prop key="dataSource.databaseName" value="massdata"/>
+            </props>
+        </connector>
+        <connector id="mysql" type="sql">
+            <props>
+                <prop key="poolName" value="mysql"/>
+                <prop key="maximumPoolSize" value="2"/>
+                <prop key="jdbcUrl">
+                    <value><![CDATA[jdbc:mysql://localhost:3306/massdata?useSSL=false&characterEncoding=utf8]]></value>
+                </prop>
+                <prop key="username" value="massdata"/>
+                <prop key="password" value="massdata"/>
+            </props>
+        </connector>
+    </connectors>
+    <!-- #graph_example -->
+    <graph>
+        <source id="postgres">
+            <connector ref="postgres"/>
+            <out>flow1</out>
+        </source>
+        <flows>
+            <flow id="flow1">
+                <script type="scala" src=""><![CDATA[]]></script>
+                <out>mysql</out>
+            </flow>
+        </flows>
+        <sink id="mysql">
+            <connector ref="mysql">
+                <prop key="" value=""/>
+            </connector>
+        </sink>
+    </graph>
+    <!-- #graph_example -->
+</workflow>

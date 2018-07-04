@@ -1,6 +1,6 @@
 # Mass Data
 
-*反映式*海量数据资产管理
+*反映式*海量数据资产管理平台（RDP, Reactive mass Data asset management Platform）
 
 - Java 8+
 - Scala 2.12+
@@ -38,10 +38,30 @@ orchestration 编排
 
 ## 开发
 
-**开始、运行 multi-jvm 测试：NodesTest**
+#### 启动数据库
 
 ```
-git clone https://github.com/yangbajing/mass-data
-cd mass-data
-> mass-functest/multi-jvm:testOnly seadata.functest.NodesTest
+sudo docker-compose -f scripts/docker-compose.yml -d up
+```
+
+#### 访问数据库
+
+**Postgres**
+
+```
+sudo docker run -it --rm --net scripts_default --link scripts_mass-postgres_1:postgres postgres:10.4 psql -h postgres -U postgres
+```
+或
+```
+sudo docker run -it --rm --net host postgres:10.4 psql -h 127.0.0.1 -U postgres
+```
+
+**MySQL**
+
+```
+sudo docker run -it --rm --net scripts_default --link scripts_mass-mysql_1:mysql mysql:5.7 mysql -h mysql -u root -D mysql -p
+```
+或
+```
+sudo docker run -it --rm --net host mysql:5.7 mysql -h 127.0.0.1 -u root -D mysql -p
 ```

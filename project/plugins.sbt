@@ -7,7 +7,7 @@ addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.0.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-multi-jvm" % "0.4.0")
 
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.7")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.0")
 
@@ -15,7 +15,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.4")
 
 addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
 
-addSbtPlugin("com.lightbend.paradox" % "sbt-paradox" % "0.3.2")
+addSbtPlugin("com.lightbend.paradox" % "sbt-paradox" % "0.3.5")
 
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "3.0.0")
 

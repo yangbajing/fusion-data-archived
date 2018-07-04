@@ -7,7 +7,7 @@
 package mass.core
 
 object Constants {
-  val BASE_CONF = "massdata"
+  val BASE_CONF = "mass"
 
   object Roles {
     val BROKER = "broker"

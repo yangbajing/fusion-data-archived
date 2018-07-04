@@ -40,7 +40,7 @@ object Dependencies {
     ("com.lightbend.akka.management" %% "akka-management" % "0.14.0").excludeAll(ExclusionRule("com.typesafe.akka")).exclude("org.scala-lang", "scala-library")
   )
 
-  val versionAkkaHttp = "10.1.2"
+  val versionAkkaHttp = "10.1.3"
   val _akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % versionAkkaHttp
 
   val _akkaHttps = Seq(
@@ -50,7 +50,7 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-stream").withCrossVersion(CrossVersion.binary)
     .exclude("com.typesafe.akka", "akka-stream-testkit").withCrossVersion(CrossVersion.binary))
 
-  private val versionAlpakka = "0.19"
+  private val versionAlpakka = "0.20"
   val _alpakkaSimpleCodecs = ("com.lightbend.akka" %% "akka-stream-alpakka-simple-codecs" % versionAlpakka)
     .excludeAll(ExclusionRule("com.typesafe.akka"))
 
@@ -84,7 +84,14 @@ object Dependencies {
   val _alpakkaHbase = ("com.lightbend.akka" %% "akka-stream-alpakka-hbase" % versionAlpakka)
     .excludeAll(ExclusionRule("com.typesafe.akka"))
 
+  val _alpakksHdfs = ("com.lightbend.akka" %% "akka-stream-alpakka-hdfs" % versionAlpakka)
+    .excludeAll(ExclusionRule("com.typesafe.akka"))
+
+  val _alpakkaText = ("com.lightbend.akka" %% "akka-stream-alpakka-text" % versionAlpakka)
+    .excludeAll(ExclusionRule("com.typesafe.akka"))
+
   val _alpakkas = Seq(
+    _alpakkaText,
     _alpakkaSimpleCodecs,
     _alpakkaXml,
     _alpakkaCsv,
@@ -97,7 +104,8 @@ object Dependencies {
     _alpakkaMongodb,
     _alpakkaCassandra,
     _alpakkaElasticsearch,
-    _alpakkaHbase)
+    _alpakkaHbase,
+    _alpakksHdfs)
 
   private val versionAkkaPersistenceCassandra = "0.84"
   val _akkaPersistenceCassandras = Seq(
@@ -105,7 +113,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-persistence-cassandra-launcher" % versionAkkaPersistenceCassandra % Test
   )
 
-  val _akkaStreamKafka = ("com.typesafe.akka" %% "akka-stream-kafka" % "0.20")
+  val _akkaStreamKafka = ("com.typesafe.akka" %% "akka-stream-kafka" % "0.21")
     .exclude("com.typesafe.akka", "akka-slf4j").cross(CrossVersion.binary)
 
   val _config = "com.typesafe" % "config" % "1.3.3"
@@ -160,23 +168,25 @@ object Dependencies {
     "org.typelevel" %% "cats-free"
   ).map(_ % versionCats)
 
-  private val versionCirce = "0.9.3"
-  val _circes = Seq(
-    "io.circe" %% "circe-core",
-    "io.circe" %% "circe-generic",
-    "io.circe" %% "circe-parser",
-    "io.circe" %% "circe-java8"
-  ).map(_ % versionCirce)
+//  private val versionCirce = "0.9.3"
+//  val _circes = Seq(
+//    "io.circe" %% "circe-core",
+//    "io.circe" %% "circe-generic",
+//    "io.circe" %% "circe-parser",
+//    "io.circe" %% "circe-java8"
+//  ).map(_ % versionCirce)
+
+  val _json4s = "org.json4s" %% "json4s-jackson" % "3.5.4"
 
   val _shapeless = "com.chuusai" %% "shapeless" % "2.3.3"
 
   val _scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
 
   val _slicks = Seq(
-    ("com.typesafe.slick" %% "slick-hikaricp" % "3.2.3").exclude("com.zaxxer", "HikariCP"),
+    "com.typesafe.slick" %% "slick" % "3.2.3",
     "com.typesafe.slick" %% "slick-testkit" % "3.2.3" % Test,
-    "com.github.tminglei" %% "slick-pg" % "0.16.1",
-    "com.github.tminglei" %% "slick-pg_circe-json" % "0.16.1"
+    "com.github.tminglei" %% "slick-pg" % "0.16.2",
+    "com.github.tminglei" %% "slick-pg_json4s" % "0.16.2"
   )
 
   private val versionPoi = "3.17"
@@ -199,10 +209,13 @@ object Dependencies {
 
   val _mysql = "mysql" % "mysql-connector-java" % "6.0.6"
 
-  val _hikariCP = "com.zaxxer" % "HikariCP" % "3.1.0"
+  val _hikariCP = "com.zaxxer" % "HikariCP" % "3.2.0" // "2.7.9"
 
   val _protobuf = "com.google.protobuf" % "protobuf-java" % "3.5.1"
 
   val _swaggerAnnotation = "io.swagger.core.v3" % "swagger-annotations" % "2.0.1"
+
+  val _jsch = "com.jcraft" % "jsch" % "0.1.54"
+
 }
 

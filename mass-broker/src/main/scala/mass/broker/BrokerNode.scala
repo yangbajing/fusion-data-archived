@@ -9,7 +9,7 @@ package mass.broker
 import akka.actor.Props
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
-import mass.core.server.MetricActor
+import mass.server.MetricActor
 
 object BrokerNode {
 
