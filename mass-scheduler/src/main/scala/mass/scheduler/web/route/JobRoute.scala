@@ -1,43 +1,31 @@
 package mass.scheduler.web.route
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
-import java.util.zip.ZipFile
+import java.nio.file.Files
 
-import akka.stream.scaladsl.{FileIO, Source}
-import helloscala.common.util.StringUtils
-import mass.server.route.AbstractRoute
+import akka.http.scaladsl.server.Route
+import com.typesafe.scalalogging.StrictLogging
+import mass.http.AbstractRoute
+import mass.scheduler.SchedulerSystem
+import mass.scheduler.business.service.JobService
 
-import scala.collection.JavaConverters._
+class JobRoute(schedulerSystem: SchedulerSystem) extends AbstractRoute with StrictLogging {
+  import schedulerSystem.massSystem.system.dispatcher
 
-class JobRoute extends AbstractRoute {
+  private val jobService = new JobService(schedulerSystem)
 
-  def uploadJobRoute = pathPost("upload_job") {
-    storeUploadedFile("job", createTempFileFunc) { case (fileInfo, file) =>
-      val zip = new ZipFile(file, fileInfo.contentType.charsetOption.map(_.nioCharset()).getOrElse(StandardCharsets.UTF_8))
-      val dest = Paths.get(StringUtils.option(fileInfo.fileName).getOrElse("/tmp/job-001"))
+  override def route: Route = pathPrefix("job") {
+    uploadJobRoute
+  }
 
-      for (entry <- zip.entries().asScala) {
-        val entryName = entry.getName
-        val savePath = dest.resolve(entryName)
-        if (!Files.isDirectory(savePath.getParent)) {
-          Files.createDirectories(savePath.getParent)
+  def uploadJobRoute: Route = pathPost("upload_job") {
+    storeUploadedFile("job", createTempFileFunc(schedulerSystem.massSystem.tempDir)) {
+      case (fileInfo, file) =>
+        val future = jobService
+          .uploadJob(file, fileInfo.fileName, fileInfo.contentType.charset)
+          .andThen { case _ => Files.deleteIfExists(file.toPath) }
+        onSuccess(future) { result =>
+          objectComplete(result)
         }
-        if (!entry.isDirectory) {
-          val in = zip.getInputStream(entry)
-          val out = Files.newOutputStream(savePath)
-          val buf = Array.ofDim[Byte](1024)
-          var len = in.read(buf)
-          while (len > 0) {
-            out.write(buf, 0, len)
-            len = in.read(buf)
-          }
-          in.close()
-          out.close()
-        }
-      }
-
-      completeOk
     }
   }
 

@@ -41,7 +41,7 @@ orchestration 编排
 #### 启动数据库
 
 ```
-sudo docker-compose -f scripts/docker-compose.yml -d up
+sudo docker-compose -f scripts/docker-compose.yml up -d
 ```
 
 #### 访问数据库
@@ -64,4 +64,11 @@ sudo docker run -it --rm --net scripts_default --link scripts_mass-mysql_1:mysql
 或
 ```
 sudo docker run -it --rm --net host mysql:5.7 mysql -h 127.0.0.1 -u root -D mysql -p
+```
+
+**SQL Server**
+
+```
+sudo docker run -it --rm --net host microsoft/mssql-server-linux:2017-latest \
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Massdata.2018
 ```

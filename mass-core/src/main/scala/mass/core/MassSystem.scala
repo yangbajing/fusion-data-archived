@@ -1,5 +1,8 @@
 package mass.core
 
+import java.io.File
+import java.nio.file.{Files, Path, Paths}
+
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import helloscala.common.Configuration
@@ -15,6 +18,17 @@ private[mass] abstract class MassSystem(
   def configuration: Configuration = _configuration
 
   def as[T: ClassTag]: T = this.asInstanceOf[T]
+
+  /**
+   * @return 返回临时目录
+   */
+  def tempDir: Path = {
+    val tempDirectory = Paths.get(configuration.getOrElse[String]("mass.core.temp-dir", System.getProperty("java.io.tmpdir")))
+    if (!Files.isDirectory(tempDirectory)) {
+      Files.createDirectories(tempDirectory)
+    }
+    tempDirectory
+  }
 
   override def toString: String = s"MassSystem($name, $system)"
 }

@@ -14,7 +14,7 @@ class MassSystemExtension(
     private var _configuration: Configuration
 ) extends MassSystem(name, system, _configuration) {
 
-  private val postgresProps = configuration.getConfiguration("mass.persistence.postgres")
+  private val postgresProps = configuration.getConfiguration("mass.core.persistence.postgres")
   val slickDatabase: PgProfile.backend.DatabaseDef = PgProfile.createDatabase(postgresProps)
   val dataSource: DataSource = slickDatabase.source.asInstanceOf[DataSourceJdbcDataSource].ds
   val jdbcTemplate = JdbcTemplate(dataSource, postgresProps)

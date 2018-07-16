@@ -6,6 +6,8 @@
 
 package helloscala.common
 
+import java.nio.file.{Path, Paths}
+import java.time.OffsetDateTime
 import java.util.Properties
 import java.util.function.Consumer
 
@@ -13,7 +15,7 @@ import com.typesafe.config._
 import com.typesafe.config.impl.ConfigurationHelper
 import helloscala.common.exception.HSException
 import helloscala.common.types.ObjectId
-import helloscala.common.util.StringUtils
+import helloscala.common.util.{StringUtils, TimeUtils}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -222,6 +224,8 @@ object Configuration {
 
   def apply(props: Properties): Configuration = ConfigurationHelper.fromProperties(props)
 
+  def parseString(content: String): Configuration = Configuration(ConfigFactory.parseString(content))
+
 }
 
 /**
@@ -364,6 +368,14 @@ object ConfigLoader {
     }
 
   implicit val javaMapLoader: ConfigLoader[java.util.Map[String, String]] = scalaMapLoader.map(v => v.asJava)
+
+  implicit val pathLoader: ConfigLoader[Path] = stringLoader.map(str => Paths.get(str))
+
+  implicit val seqPathLoader: ConfigLoader[Seq[Path]] = seqStringLoader.map(strs => strs.map(str => Paths.get(str)))
+
+  implicit val offsetDateTimeLoader: ConfigLoader[OffsetDateTime] = stringLoader.map { str =>
+    TimeUtils.toOffsetDateTime(str)
+  }
 
   //  implicit def mapLoader[A](implicit valueLoader: ConfigLoader[A]): ConfigLoader[Map[String, A]] =
   //    new ConfigLoader[Map[String, A]] {

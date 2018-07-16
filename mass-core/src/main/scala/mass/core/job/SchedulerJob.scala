@@ -2,6 +2,7 @@ package mass.core.job
 
 import java.time.OffsetDateTime
 
+import helloscala.common.Configuration
 import helloscala.common.util.StringUtils
 
 import scala.concurrent.Future
@@ -32,6 +33,20 @@ trait JobConf {
 object JobConf {
 
   def builder(jobKey: String, triggerKey: String): Builder = new Builder(jobKey, triggerKey)
+
+  def parseConfiguration(configuration: Configuration, path: String = null): JobConf = {
+    val conf = if (StringUtils.isBlank(path)) configuration else configuration.getConfiguration(path)
+
+    val `type` = conf.getOrElse[String]("type", "simple")
+    val b = builder(conf.getString("job"), conf.getString("trigger"))
+    conf.get[Option[OffsetDateTime]]("start-time").foreach(startTime => b.withStartTime(startTime))
+    conf.get[Option[OffsetDateTime]]("end-time").foreach(endTime => b.withStartTime(endTime))
+    if (`type` == "simple") {
+      b.withDuration(conf.get[FiniteDuration]("duration")).withRepeat(conf.getOrElse[Int]("repeat", 0)).result
+    } else {
+      b.withCronExpress(conf.getString("cron-express")).result
+    }
+  }
 
   private[job] class Builder(jobKey: String, triggerKey: String) {
     var startTime: OffsetDateTime = _

@@ -1,5 +1,6 @@
 package mass.scheduler
 
+import java.nio.file.{Files, Path}
 import java.time.OffsetDateTime
 import java.util.Properties
 
@@ -38,10 +39,18 @@ class SchedulerSystem private (
 
   private val props = configuration.get[Properties]("mass.core.scheduler.properties")
   private val scheduler: Scheduler = new StdSchedulerFactory(props).getScheduler
+  val conf = new SchedulerConfig(configuration)
   init()
 
   private def init(): Unit = {
     //    props.forEach((key, value) => logger.info(s"[props] $key = $value"))
+    {
+      val path = conf.jobSavedPath
+      if (!Files.isDirectory(path)) {
+        Files.createDirectories(path)
+      }
+    }
+
     scheduler.start()
     massSystem.system.registerOnTermination {
       scheduler.shutdown(waitForJobsToComplete)

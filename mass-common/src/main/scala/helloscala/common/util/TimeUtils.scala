@@ -173,6 +173,12 @@ object TimeUtils extends StrictLogging {
     else ZoneId.of(str)
   }
 
+  def zoneOffsetOf(str: String): ZoneOffset = {
+    if (str.indexOf('-') >= 0 || str.indexOf('+') >= 0) ZoneOffset.of(str)
+    else if (str == "Z") ZoneOffset.UTC
+    else ZoneOffset.of(str)
+  }
+
   def toZonedDateTime(zdt: String): ZonedDateTime = try {
     zdt.split("""[ Tt]+""") match {
       case Array(date, timezone) =>
@@ -200,6 +206,35 @@ object TimeUtils extends StrictLogging {
 
   def toZonedDateTime(date: String, time: String, zoneId: ZoneId): ZonedDateTime = {
     toLocalDateTime(date, time).atZone(zoneId)
+  }
+
+  def toOffsetDateTime(zdt: String): OffsetDateTime = try {
+    zdt.split("""[ Tt]+""") match {
+      case Array(date, timezone) =>
+        val (time, zone) = timezone.split("""[+-]""") match {
+          case Array(timeStr, zoneStr) =>
+            (timeStr, zoneOffsetOf((if (timezone.indexOf('-') < 0) '+' else '-') + zoneStr))
+          case Array(timeStr) => (timeStr, ZONE_CHINA_OFFSET)
+          case _              => throw new DateTimeException(s"$zdt 无有效的时区信息，推荐格式：yyyy-MM-dd HH:mm:ss[+Z]")
+        }
+        toOffsetDateTime(date, time, zone)
+      case Array(dOrT) =>
+        if (containsDateKeys(dOrT)) toOffsetDateTime(dOrT, "") else toOffsetDateTime("", dOrT)
+      case _ =>
+        throw new DateTimeException(s"$zdt 是无效的日期时间格式，推荐格式：yyyy-MM-dd HH:mm:ss[+Z]")
+    }
+  } catch {
+    case e: Exception =>
+      logger.warn(s"toZonedDateTime error: $zdt")
+      throw e
+  }
+
+  def toOffsetDateTime(date: String, time: String): OffsetDateTime = {
+    toOffsetDateTime(date, time, ZONE_CHINA_OFFSET)
+  }
+
+  def toOffsetDateTime(date: String, time: String, zoneOffset: ZoneOffset): OffsetDateTime = {
+    toLocalDateTime(date, time).atOffset(zoneOffset)
   }
 
   def toDate(ldt: LocalDateTime): Date = Date.from(ldt.toInstant(ZONE_CHINA_OFFSET))

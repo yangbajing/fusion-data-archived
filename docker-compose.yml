@@ -2,6 +2,7 @@ version: '3'
 
 services:
   mass-mysql:
+    container_name: mass-mysql
     image: mysql:5.7
     restart: always
 #    networks:
@@ -12,6 +13,7 @@ services:
       MYSQL_ROOT_PASSWORD: Massdata.2018
 
   mass-postgres:
+    container_name: mass-postgres
     image: postgres:10.4
     restart: always
 #    networks:
@@ -20,6 +22,16 @@ services:
       - 5432:5432
     environment:
       POSTGRES_PASSWORD: Massdata.2018
+
+#  mass-sqlserver:
+#    container_name: mass-sqlserver
+#    image: microsoft/mssql-server-linux:2017-latest
+#    restart: always
+#    ports:
+#      - 1433:1433
+#    environment:
+#      ACCEPT_EULA: Y
+#      SA_PASSWORD: Massdata.2018
 
 #networks:
 #  mass-backend:

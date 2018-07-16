@@ -9,6 +9,11 @@ package mass.core
 object Constants {
   val BASE_CONF = "mass"
 
+  val SHA256_HEX_LENGTH = 64
+
+  val STATUS_DISABLE = 0
+  val STATUS_ENABLE = 1
+
   object Roles {
     val BROKER = "broker"
     val CONSOLE = "console"

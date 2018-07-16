@@ -121,11 +121,12 @@ object Dependencies {
   val _hanlp = "com.hankcs" % "hanlp" % "portable-1.6.3"
 
   private val versionJackson = "2.9.5"
-  val _jacksons = Seq(
+  val _jsons = Seq(
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % versionJackson,
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % versionJackson,
     "com.fasterxml.jackson.module" % "jackson-module-parameter-names" % versionJackson,
-    "com.fasterxml.jackson.module" %% "jackson-module-scala" % versionJackson
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % versionJackson,
+    "org.json4s" %% "json4s-jackson" % "3.5.4"
   )
 
   val _aspectjweaver = "org.aspectj" % "aspectjweaver" % "1.9.1"
@@ -176,8 +177,6 @@ object Dependencies {
 //    "io.circe" %% "circe-java8"
 //  ).map(_ % versionCirce)
 
-  val _json4s = "org.json4s" %% "json4s-jackson" % "3.5.4"
-
   val _shapeless = "com.chuusai" %% "shapeless" % "2.3.3"
 
   val _scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
@@ -208,6 +207,8 @@ object Dependencies {
   val _postgresql = "org.postgresql" % "postgresql" % "42.2.2"
 
   val _mysql = "mysql" % "mysql-connector-java" % "6.0.6"
+
+  val _mssql = "com.microsoft.sqlserver" % "mssql-jdbc" % "6.4.0.jre8"
 
   val _hikariCP = "com.zaxxer" % "HikariCP" % "3.2.0" // "2.7.9"
 

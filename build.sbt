@@ -200,6 +200,7 @@ lazy val massConnector = _project("mass-connector")
     mainClass in Compile := Some("mass.connector.boot.ConnectorMain"),
     libraryDependencies ++= Seq(
       _akkaStreamKafka,
+      _mssql,
       _mysql,
       _postgresql
     ) ++ _alpakkas ++ _alpakkaNoSQLs
@@ -214,7 +215,7 @@ lazy val massCoreExt = _project("mass-core-ext")
       _fastparse,
       _quartz,
       _sigarLoader
-    ) ++ _akkaClusters ++ _akkaHttps ++ _slicks //++ _kamons
+    ) ++ _akkaClusters ++ _slicks //++ _kamons
   )
 
 lazy val massCore = _project("mass-core")
@@ -228,9 +229,8 @@ lazy val massCore = _project("mass-core")
       _scalaXml,
       _hikariCP,
       _postgresql % Test,
-      _quartz % Provided,
-      _akkaHttpCore % Provided
-    ) //++ _catses ++ _circes
+      _quartz % Provided
+    ) ++ _akkas ++ _akkaHttps
   )
 
 lazy val massCommon = _project("mass-common")
@@ -244,10 +244,9 @@ lazy val massCommon = _project("mass-common")
       "org.scala-lang" % "scala-library" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       _scalaJava8Compat,
-      _json4s,
       _quartz % Provided,
       _scalatest % Test
-    ) ++ _jacksons ++ _akkas
+    ) ++ _jsons ++ _akkas
   )
 
 def _project(name: String, _base: String = null) =
