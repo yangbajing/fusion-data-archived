@@ -10,7 +10,7 @@ import org.scalatest.time.{Millis, Seconds, Span}
 import scala.concurrent.Future
 
 trait HelloscalaSpec
-  extends WordSpec
+  extends WordSpecLike
   with MustMatchers
   with OptionValues
   with EitherValues

@@ -9,7 +9,7 @@ package mass.console.boot
 import akka.actor.{ActorRef, ActorSystem}
 import mass.console.ConsoleNode
 import mass.core.Constants
-import mass.core.server.{BaseBoot, MassBoot}
+import mass.server.{BaseBoot, MassBoot}
 
 final class ConsoleBoot(
     val system: ActorSystem,

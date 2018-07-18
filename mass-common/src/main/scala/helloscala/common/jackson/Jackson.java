@@ -133,21 +133,22 @@ public class Jackson {
     }
 
     private static ObjectMapper getObjectMapper() {
-        JavaTimeModule jtm = new JavaTimeModule();
-        jtm.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(TimeUtils.formatterDateTime()));
-        jtm.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(TimeUtils.formatterDateTime()));
-        jtm.addSerializer(ZonedDateTime.class, new ZonedDateTimeSerializer(TimeUtils.formatterDateTime()));
-        jtm.addDeserializer(ZonedDateTime.class, new ZonedDateTimeDeserializer());
+//        JavaTimeModule jtm = new JavaTimeModule();
+//        jtm.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(TimeUtils.formatterDateTime()));
+//        jtm.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(TimeUtils.formatterDateTime()));
+//        jtm.addSerializer(ZonedDateTime.class, new ZonedDateTimeSerializer(TimeUtils.formatterDateTime()));
+//        jtm.addDeserializer(ZonedDateTime.class, new ZonedDateTimeDeserializer());
 
         return new ObjectMapper()
                 .findAndRegisterModules()
                 .registerModule(new HelloscalaModule())
-                .registerModule(jtm)
+//                .registerModule(jtm)
                 .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
 //                    .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
                 .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
                 .enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
                 .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+                .enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)
                 .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)

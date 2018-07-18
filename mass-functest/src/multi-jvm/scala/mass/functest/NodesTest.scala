@@ -25,7 +25,7 @@ object NodesTestMultiNodeConfig extends MultiNodeConfig {
         //      akka.extensions=["akka.cluster.metrics.ClusterMetricsExtension"]
         s"""|akka.cluster.metrics.native-library-extract-folder=target/native/${role.name}
             |akka.remote.artery.enabled = off
-            |massdata.cluster.seeds = ["127.0.0.1:30011"]""".stripMargin)
+            |mass.cluster.seeds = ["127.0.0.1:30011"]""".stripMargin)
     )
   }
 

@@ -11,14 +11,14 @@
 
 **mass** 方案由以下主要部分组成：
 
-- @ref[《数据处理子系统》](../broker/data/data.md)：提供数据处理业务所需支持的各种数据模拟，即可作为单独的程序执行，也可作
+- @ref[《反应式数据处理系统》](../rdp/index.md)：提供数据处理业务所需支持的各种数据模拟，即可作为单独的程序执行，也可作
   为组件供引擎子系统调用执行。
-- @ref[《引擎子系统》](../broker/engine/engine.md)：解析业务流程，执行每个任务（子任务）的所有阶段业务逻辑，包括通用阶段（如
+- @ref[《引擎系统》](../broker/engine/engine.md)：解析业务流程，执行每个任务（子任务）的所有阶段业务逻辑，包括通用阶段（如
   日志、数据库操作、消息通知……），以及业务阶段（如文件采集等）。
 - @ref[《Borker Leader-协调模块》](../broker/leader/leader.md)：加载业务（数据）处理流程文件，生成任务并对任务进行调度，对调度资源和
   策略进行管理。
 - @ref[《业务编排系统模块》](../console/orchestration/orchestration.md)：生成业务（数据）处理流程文件。
-- @ref[《监、管子系统》](../console/console/console.md)：对系统运行状况、任务执行情况进行监查，并可管理系统。
+- @ref[《监、管系统》](../console/console/console.md)：对系统运行状况、任务执行情况进行监查，并可管理系统。
 - @ref[《业务文件规范》](../spec/business_spec/business_spec.md)：业务编排子系统定义的配置文件格式。
 - @ref[《组件规范》](../spec/component_spec/component_spec.md)：采集组件实现规范，SPI。
 - @ref[《系统间通信规范》](../spec/ic_spec/ic_spec.md)：各子系统进程间通信消息规范。

@@ -7,9 +7,10 @@
 * [intro/index](intro/index.md)
 * [design/index](design/index.md)
 * [connector](connector/index.md)
-* [broker/index](broker/index.md)
-* [reactive-flow/index](reactive-flow/index.md)
+* [scheduler](scheduler/index.md)
+* [rdp/index](rdp/index.md)
 * [console/index](console/index.md)
+* [broker/index](broker/index.md)
 * [spec/index](spec/index.md)
 
 @@@

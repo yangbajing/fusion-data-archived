@@ -1,19 +1,15 @@
 import Commons._
 import Dependencies._
-import com.typesafe.sbt.SbtMultiJvm.multiJvmSettings
 import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 
 lazy val root = Project(id = "mass-data-root", base = file("."))
   .aggregate(
-    massDocs,
-    massFunctest,
-    example,
-    massApiService,
-    massConsole,
+    example, massDocs, massFunctest,
+    massRdp, massRdpCli, massRdpCore, massConnector,
+    massGovernance, massScheduler,
+    massApiService, massConsole, massAuth,
     massBroker,
-    massConnector,
-    massCoreExt,
-    massCore,
+    massCoreExt, massCore,
     massCommon
   )
   .settings(Publishing.noPublish: _*)
@@ -22,9 +18,12 @@ lazy val root = Project(id = "mass-data-root", base = file("."))
 lazy val massDocs = _project("mass-docs")
   .enablePlugins(ParadoxPlugin)
   .dependsOn(
-    massFunctest, massConsole, massBroker,
-    massCoreExt % "compile->compile;test->test",
-    massCore % "compile->compile;test->test"
+    massFunctest,
+    massRdp, massRdpCli, massRdpCore, massConnector,
+    massGovernance,
+    massApiService, massConsole, massAuth,
+    massBroker,
+    massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test", massCommon
   )
   .settings(
     name in(Compile, paradox) := "massData",
@@ -70,13 +69,14 @@ lazy val massApiService = _project("mass-api-service")
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
   .settings(
-    mainClass in Compile := Some("massdata.apiservice.boot.ApiServiceMain"),
+    mainClass in Compile := Some("mass.apiservice.boot.ApiServiceMain"),
     libraryDependencies ++= Seq(
 
     ) ++ _akkaHttps
   )
 
-lazy val massEtl = _project("mass-etl")
+// 数据治理
+lazy val massGovernance = _project("mass-governance")
   .dependsOn(
     massConnector,
     massCoreExt % "compile->compile;test->test",
@@ -85,12 +85,11 @@ lazy val massEtl = _project("mass-etl")
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
   .settings(
-    mainClass in Compile := Some("massdata.etl.boot.EtlMain"),
+    mainClass in Compile := Some("mass.governance.boot.GovernanceMain"),
     libraryDependencies ++= Seq(
 
-    ) ++ _pois
+    )
   )
-
 
 // 监查、控制、管理
 lazy val massConsole = _project("mass-console")
@@ -101,13 +100,83 @@ lazy val massConsole = _project("mass-console")
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
   .settings(
-    mainClass in Compile := Some("massdata.console.boot.ConsoleMain"),
+    mainClass in Compile := Some("mass.console.boot.ConsoleMain"),
     libraryDependencies ++= Seq(
 
     )
   )
 
-// 执行引擎
+// Reactive Data Process 反应式数据处理流工具
+lazy val massRdp = _project("mass-rdp")
+  .dependsOn(
+    massCoreExt,
+    massRdpCore,
+    massCoreExt % "compile->compile;test->test",
+    massCore % "compile->compile;test->test")
+  .enablePlugins(JavaAppPackaging)
+  .settings(Packaging.settings: _*)
+  .settings(Publishing.noPublish: _*)
+  .settings(
+    mainClass in Compile := Some("mass.rdp.boot.RdpMain"),
+    libraryDependencies ++= Seq(
+      _quartz
+    ) ++ _pois
+  )
+
+// Reactive Data Processor Cli
+lazy val massRdpCli = _project("mass-rdp-cli")
+  .dependsOn(
+    massCoreExt,
+    massRdpCore,
+    massCore % "compile->compile;test->test")
+  .settings(Publishing.noPublish: _*)
+  .settings(
+    //    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
+    assemblyJarName in assembly := "rdp.jar",
+    mainClass in Compile := Some("mass.rdp.cli.boot.RdpCliMain")
+  )
+
+lazy val massRdpCore = _project("mass-rdp-core")
+  .dependsOn(massConnector, massCore % "compile->compile;test->test")
+  .settings(Publishing.noPublish: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      _quartz % Provided
+    )
+  )
+
+// mass调度任务程序.
+lazy val massScheduler = _project("mass-scheduler")
+  .dependsOn(
+    massCoreExt % "compile->compile;test->test",
+    massCore % "compile->compile;test->test")
+  .enablePlugins(JavaAppPackaging)
+  .settings(Packaging.settings: _*)
+  .settings(Publishing.noPublish: _*)
+  .settings(
+    mainClass in Compile := Some("mass.scheduler.boot.SchedulerMain"),
+    libraryDependencies ++= Seq(
+      _jsch
+    )
+  )
+
+
+// 统一用户，OAuth 2服务
+lazy val massAuth = _project("mass-auth")
+  .dependsOn(
+    massCoreExt % "compile->compile;test->test",
+    massCore % "compile->compile;test->test")
+  .enablePlugins(JavaAppPackaging)
+  .settings(Packaging.settings: _*)
+  .settings(Publishing.noPublish: _*)
+  .settings(
+    mainClass in Compile := Some("mass.auth.boot.AuthMain"),
+    libraryDependencies ++= Seq(
+
+    )
+  )
+
+// 集群代理节点
 lazy val massBroker = _project("mass-broker")
   .dependsOn(
     massCoreExt % "compile->compile;test->test",
@@ -116,9 +185,8 @@ lazy val massBroker = _project("mass-broker")
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
   .settings(
-    mainClass in Compile := Some("massdata.broker.boot.BrokerMain"),
+    mainClass in Compile := Some("mass.broker.boot.BrokerMain"),
     libraryDependencies ++= Seq(
-      _quartz,
       _alpakkaFile,
       _alpakkaFtp
     )
@@ -126,14 +194,13 @@ lazy val massBroker = _project("mass-broker")
 
 // 数据组件（采集、存储）
 lazy val massConnector = _project("mass-connector")
-  .settings(Publishing.noPublish: _*)
   .dependsOn(
     massCore % "compile->compile;test->test")
   .settings(
-    //    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
-    mainClass in Compile := Some("massdata.connector.boot.ConnectorMain"),
+    mainClass in Compile := Some("mass.connector.boot.ConnectorMain"),
     libraryDependencies ++= Seq(
       _akkaStreamKafka,
+      _mssql,
       _mysql,
       _postgresql
     ) ++ _alpakkas ++ _alpakkaNoSQLs
@@ -146,8 +213,9 @@ lazy val massCoreExt = _project("mass-core-ext")
   .settings(
     libraryDependencies ++= Seq(
       _fastparse,
+      _quartz,
       _sigarLoader
-    ) ++ _akkaClusters ++ _akkaHttps //++ _kamons
+    ) ++ _akkaClusters ++ _slicks //++ _kamons
   )
 
 lazy val massCore = _project("mass-core")
@@ -157,11 +225,12 @@ lazy val massCore = _project("mass-core")
     libraryDependencies ++= Seq(
       _protobuf,
       _shapeless,
-      _postgresql,
       _scopt,
       _scalaXml,
-      _akkaHttpCore % Provided
-    ) ++ _catses ++ _circes ++ _slicks
+      _hikariCP,
+      _postgresql % Test,
+      _quartz % Provided
+    ) ++ _akkas ++ _akkaHttps
   )
 
 lazy val massCommon = _project("mass-common")
@@ -169,17 +238,15 @@ lazy val massCommon = _project("mass-common")
   .settings(
     libraryDependencies ++= Seq(
       //      _swaggerAnnotation % Provided,
-      _hikariCP,
       _scalaLogging,
       _logbackClassic,
       _config,
       "org.scala-lang" % "scala-library" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       _scalaJava8Compat,
-      _mysql % Test,
-      _postgresql % Test,
+      _quartz % Provided,
       _scalatest % Test
-    ) ++ _jacksons ++ _akkas
+    ) ++ _jsons ++ _akkas
   )
 
 def _project(name: String, _base: String = null) =

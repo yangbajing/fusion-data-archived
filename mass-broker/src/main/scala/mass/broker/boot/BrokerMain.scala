@@ -11,7 +11,7 @@ import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerS
 import mass.broker.BrokerNode
 import mass.broker.leader.BrokerLeader
 import mass.core.Constants
-import mass.core.server.{BaseBoot, MassBoot}
+import mass.server.{BaseBoot, MassBoot}
 
 final class BrokerBoot(
     val system: ActorSystem,

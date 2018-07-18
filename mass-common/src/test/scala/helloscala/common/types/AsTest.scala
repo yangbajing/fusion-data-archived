@@ -15,6 +15,8 @@ class AsTest extends HelloscalaSpec {
       AsInt.unapply(intNull) mustBe None
       AsInt.unapply(3.3) mustBe None
       AsInt.unapply(9898L) mustBe Some(9898)
+      val s: String = "ss"
+      AsString.unapply(s) mustBe Some("ss")
     }
   }
 

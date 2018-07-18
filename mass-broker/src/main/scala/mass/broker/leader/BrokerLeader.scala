@@ -8,7 +8,7 @@ package mass.broker.leader
 
 import akka.actor.Props
 import akka.cluster.Cluster
-import mass.core.server.MetricActor
+import mass.server.MetricActor
 
 object BrokerLeader {
 

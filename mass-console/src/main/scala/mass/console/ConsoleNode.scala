@@ -7,7 +7,7 @@
 package mass.console
 
 import akka.actor.Props
-import mass.core.server.MetricActor
+import mass.server.MetricActor
 
 object ConsoleNode {
 

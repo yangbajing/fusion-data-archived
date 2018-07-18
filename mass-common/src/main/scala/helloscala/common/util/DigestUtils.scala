@@ -75,7 +75,7 @@ object DigestUtils {
           md.update(buf)
           buf.clear()
         }
-      } while (rsize >= -1)
+      } while (rsize > 0)
       md.digest()
     } finally {
       channel.close()

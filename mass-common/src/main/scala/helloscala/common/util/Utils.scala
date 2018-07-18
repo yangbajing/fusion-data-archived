@@ -6,6 +6,7 @@
 
 package helloscala.common.util
 
+import java.lang.management.ManagementFactory
 import java.nio.ByteBuffer
 import java.nio.file.{Files, Path}
 import java.security.SecureRandom
@@ -14,19 +15,34 @@ import java.util.Properties
 import java.util.concurrent.ThreadLocalRandom
 
 import com.typesafe.config.{Config, ConfigFactory}
-import scala.compat.java8.FunctionConverters._
+import helloscala.common.exception.HSException
 
+import scala.compat.java8.FunctionConverters._
 import scala.util.Try
+import scala.util.control.NonFatal
 import scala.util.matching.Regex
 
 object Utils {
-
   val REGEX_DIGIT: Regex = """[\d,]+""".r
   val RANDOM_CHARS: IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
 
   val random: SecureRandom = new SecureRandom()
 
   def swap[X, Y](x: X, y: Y): (Y, X) = (y, x)
+
+  /**
+   * 获取当前进程 pid
+   */
+  @inline def getPid: Long =
+    java.lang.Long.parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
+
+  def either[R](func: => R): Either[Throwable, R] = try {
+    val result = func
+    Right(result)
+  } catch {
+    case NonFatal(e) =>
+      Left(e)
+  }
 
   /**
    * 将字符串解析为数字

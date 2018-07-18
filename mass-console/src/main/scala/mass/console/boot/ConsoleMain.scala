@@ -6,7 +6,7 @@
 
 package mass.console.boot
 
-import mass.core.server.MassBoot
+import mass.server.MassBoot
 
 object ConsoleMain extends App {
   new ConsoleBoot(MassBoot.actorSystem).start()

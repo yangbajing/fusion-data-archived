@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<workflow>
+    <connectors>
+        <connector name="postgres" type="jdbc">
+            <props>
+                <prop key="poolName" value="postgres"/>
+                <prop key="maximumPoolSize" value="2"/>
+                <prop key="username" value="massdata"/>
+                <prop key="password" value="Massdata.2018"/>
+                <prop key="dataSourceClassName" value="org.postgresql.ds.PGSimpleDataSource"/>
+                <prop key="dataSource.serverName" value="localhost"/>
+                <prop key="dataSource.portNumber" value="5432"/>
+                <prop key="dataSource.databaseName" value="massdata"/>
+            </props>
+        </connector>
+        <connector name="mysql" type="jdbc">
+            <props>
+                <prop key="poolName" value="mysql"/>
+                <prop key="maximumPoolSize" value="2"/>
+                <prop key="jdbcUrl">
+                    <value><![CDATA[jdbc:mysql://127.0.0.1:3306/massdata?useSSL=false&characterEncoding=utf8]]></value>
+                </prop>
+                <prop key="username" value="massdata"/>
+                <prop key="password" value="Massdata.2018"/>
+            </props>
+        </connector>
+        <connector name="dm" type="jdbc">
+            <props>
+                <prop key="poolName" value="dm"/>
+                <prop key="maximumPoolSize" value="2"/>
+                <prop key="driverClassName" value="dm.jdbc.driver.DmDriver"/>
+                <prop key="jdbcUrl">
+                    <value><![CDATA[jdbc:dm://centos7-001:5236/MASSDATA]]></value>
+                </prop>
+                <prop key="username" value="massdata"/>
+                <prop key="password" value="Massdata.2018"/>
+            </props>
+        </connector>
+    </connectors>
+    <!-- #graph_example -->
+    <graph name="mysql2pg-test">
+        <source name="source">
+            <connector ref="mysql"/>
+            <script type="sql" src=""><![CDATA[
+                select id, isbn, title, description, publish_at, created_at from t_book
+            ]]></script>
+            <out>flow1</out>
+        </source>
+        <flows>
+            <flow name="flow1">
+                <script type="javascript" src=""><![CDATA[
+                    event.data().values()
+                ]]></script>
+                <out>sink</out>
+            </flow>
+        </flows>
+        <sink name="sink">
+            <!--<connector ref="postgres"/>-->
+            <connector ref="postgres"/>
+            <script type="sql" src=""><![CDATA[
+                insert into t_book(id, isbn, title, description, publish_at, created_at) values(?, ?, ?, ?, ?, ?)
+            ]]></script>
+        </sink>
+    </graph>
+    <!-- #graph_example -->
+</workflow>

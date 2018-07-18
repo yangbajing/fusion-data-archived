@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  mass-mysql:
+    container_name: mass-mysql
+    build:
+      context: ./scripts/software/mysql
+      dockerfile: Dockerfile
+    restart: always
+#    networks:
+#      - mass-backend
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: Massdata.2018
+
+  mass-postgres:
+    container_name: mass-postgres
+    build:
+      context: ./scripts/software/postgres
+      dockerfile: Dockerfile
+    restart: always
+#    networks:
+#      - mass-backend
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: Massdata.2018
+
+  mass-sqlserver:
+    container_name: mass-sqlserver
+    build:
+      context: ./scripts/software/sqlserver
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 1433:1433
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Massdata.2018
+
+  mass-dameng:
+    container_name: mass-dameng
+    build:
+      context: ./scripts/software/dameng
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 5236:5236
+    environment:
+      SYSDBA_PWD: Massdata.2018
+
+#networks:
+#  mass-backend:
+#    driver: docker0
