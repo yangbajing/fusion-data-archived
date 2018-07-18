@@ -7,9 +7,9 @@ import akka.testkit.TestKit
 import helloscala.common.test.HelloscalaSpec
 import mass.connector.ConnectorSystem
 import mass.core.MassSystem
+import mass.core.job.JobConf
 import mass.rdp.RdpSystem
 import mass.rdp.etl.EtlJob
-import mass.core.job.JobConf
 import mass.scheduler.SchedulerSystem
 import mass.server.MassSystemExtension
 import org.scalatest.BeforeAndAfterAll

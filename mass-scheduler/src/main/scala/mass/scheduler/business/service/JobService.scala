@@ -12,7 +12,6 @@ import helloscala.common.util.{DigestUtils, FileUtils, Utils}
 import mass.core.job.JobConf
 import mass.scheduler.SchedulerSystem
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class JobService(schedulerSystem: SchedulerSystem) extends StrictLogging {
@@ -46,6 +45,8 @@ class JobService(schedulerSystem: SchedulerSystem) extends StrictLogging {
   }
 
   def parseJobZip(file: File, charset: Charset): Either[Throwable, JobZipTO] = Utils.either {
+    import scala.collection.JavaConverters._
+
     val zip = new ZipFile(file, charset)
     val fileSha = DigestUtils.sha256Hex(file.toPath)
     val (confEntries, entries) = zip.entries().asScala.filterNot(entry => entry.isDirectory).span(entry => entry.getName == JOB_CONF && !entry.isDirectory)
@@ -65,6 +66,6 @@ class JobService(schedulerSystem: SchedulerSystem) extends StrictLogging {
   }
 }
 
-private case class JobZipTO(zip: ZipFile, sha: String, conf: Configuration, entries: Vector[ZipEntry])
+private[mass] case class JobZipTO(zip: ZipFile, sha: String, conf: Configuration, entries: Vector[ZipEntry])
 
 case class JobZip(sha: String, conf: JobConf, entries: Vector[Path])

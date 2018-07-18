@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import helloscala.common.types.ObjectId
 import mass.scheduler.model.JobScheduleStatus.JobScheduleStatus
-import mass.slick.PgProfile.api._
+import mass.slick.SlickProfile.api._
 import org.json4s.JValue
 
 import scala.concurrent.duration.FiniteDuration

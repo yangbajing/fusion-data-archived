@@ -2,7 +2,7 @@ package mass.workflow.model
 
 import java.time.OffsetDateTime
 
-import mass.slick.PgProfile.api._
+import mass.slick.SlickProfile.api._
 
 object WorkflowSchemas extends WorkflowSchemas
 

@@ -6,6 +6,5 @@
 
 * [thinking](thinking.md)
 * [mass-design](mass-design.md)
-* [scheduler](scheduler.md)
 
 @@@

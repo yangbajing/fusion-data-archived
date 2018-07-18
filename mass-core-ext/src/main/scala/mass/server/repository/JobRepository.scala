@@ -4,21 +4,20 @@ import java.time.OffsetDateTime
 
 import helloscala.common.types.ObjectId
 import mass.scheduler.model.JobScheduleStatus.JobScheduleStatus
+import mass.scheduler.model.JobSchemas._
 import mass.scheduler.model.{JobDetail, JobLog, JobSchedule, JobTrigger}
-import mass.slick.PgProfile
-import mass.slick.PgProfile.api._
+import mass.slick.SlickProfile
+import mass.slick.SlickProfile.api._
 
 import scala.concurrent.Future
 
 object JobRepository {
 
-  def apply(db: PgProfile.backend.DatabaseDef): JobRepository = new JobRepository(db)
+  def apply(db: SlickProfile.backend.DatabaseDef): JobRepository = new JobRepository(db)
 
 }
 
-class JobRepository private (db: PgProfile.backend.DatabaseDef) {
-
-  import mass.scheduler.model.JobSchemas._
+class JobRepository private (db: SlickProfile.backend.DatabaseDef) {
 
   def saveJobDetail(jobDetail: JobDetail): Future[Option[JobDetail]] =
     db.run(JobDetailRow returning JobDetailRow insertOrUpdate jobDetail)

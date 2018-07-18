@@ -1,13 +1,12 @@
 package mass.scheduler
 
-import java.nio.file.{Files, Path}
+import java.nio.file.Files
 import java.time.OffsetDateTime
 import java.util.Properties
 
 import com.typesafe.scalalogging.LazyLogging
 import helloscala.common.Configuration
 import helloscala.common.util.TimeUtils
-import mass.core.MassSystem
 import mass.core.job._
 import mass.server.MassSystemExtension
 
@@ -43,12 +42,10 @@ class SchedulerSystem private (
   init()
 
   private def init(): Unit = {
-    //    props.forEach((key, value) => logger.info(s"[props] $key = $value"))
-    {
-      val path = conf.jobSavedPath
-      if (!Files.isDirectory(path)) {
-        Files.createDirectories(path)
-      }
+    props.forEach((key, value) => logger.info(s"[props] $key = $value"))
+
+    if (!Files.isDirectory(conf.jobSavedPath)) {
+      Files.createDirectories(conf.jobSavedPath)
     }
 
     scheduler.start()

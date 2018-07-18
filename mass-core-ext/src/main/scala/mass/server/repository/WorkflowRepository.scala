@@ -1,18 +1,18 @@
 package mass.server.repository
 
-import mass.slick.PgProfile
+import mass.slick.SlickProfile
 import mass.workflow.model.WfDetail
-import PgProfile.api._
+import SlickProfile.api._
 
 import scala.concurrent.Future
 
 object WorkflowRepository {
 
-  def apply(db: PgProfile.backend.DatabaseDef): WorkflowRepository = new WorkflowRepository(db)
+  def apply(db: SlickProfile.backend.DatabaseDef): WorkflowRepository = new WorkflowRepository(db)
 
 }
 
-class WorkflowRepository(db: PgProfile.backend.DatabaseDef) {
+class WorkflowRepository(db: SlickProfile.backend.DatabaseDef) {
 
   import mass.workflow.model.WorkflowSchemas._
 

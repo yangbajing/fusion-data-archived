@@ -41,7 +41,7 @@ orchestration 编排
 #### 启动数据库
 
 ```
-sudo docker-compose -f scripts/docker-compose.yml up -d
+sudo docker-compose up --build -d
 ```
 
 #### 访问数据库
@@ -49,11 +49,11 @@ sudo docker-compose -f scripts/docker-compose.yml up -d
 **Postgres**
 
 ```
-sudo docker run -it --rm --net scripts_default --link scripts_mass-postgres_1:postgres postgres:10.4 psql -h postgres -U postgres
+sudo docker run -it --rm --net scripts_default --link scripts_mass-postgres_1:postgres postgres:10.4 psql -h postgres -U massdata -d massdata
 ```
 或
 ```
-sudo docker run -it --rm --net host postgres:10.4 psql -h 127.0.0.1 -U postgres
+sudo docker run -it --rm --net host postgres:10.4 psql -h 127.0.0.1 -U massdata -d massdata
 ```
 
 **MySQL**

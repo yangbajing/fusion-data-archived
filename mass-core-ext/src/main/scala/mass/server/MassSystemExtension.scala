@@ -5,7 +5,7 @@ import helloscala.common.Configuration
 import javax.sql.DataSource
 import mass.core.MassSystem
 import mass.core.jdbc.JdbcTemplate
-import mass.slick.PgProfile
+import mass.slick.SlickProfile
 import slick.jdbc.DataSourceJdbcDataSource
 
 class MassSystemExtension(
@@ -15,7 +15,7 @@ class MassSystemExtension(
 ) extends MassSystem(name, system, _configuration) {
 
   private val postgresProps = configuration.getConfiguration("mass.core.persistence.postgres")
-  val slickDatabase: PgProfile.backend.DatabaseDef = PgProfile.createDatabase(postgresProps)
+  val slickDatabase: SlickProfile.backend.DatabaseDef = SlickProfile.createDatabase(postgresProps)
   val dataSource: DataSource = slickDatabase.source.asInstanceOf[DataSourceJdbcDataSource].ds
   val jdbcTemplate = JdbcTemplate(dataSource, postgresProps)
   init()

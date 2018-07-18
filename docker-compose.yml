@@ -3,7 +3,9 @@ version: '3'
 services:
   mass-mysql:
     container_name: mass-mysql
-    image: mysql:5.7
+    build:
+      context: ./scripts/software/mysql
+      dockerfile: Dockerfile
     restart: always
 #    networks:
 #      - mass-backend
@@ -14,7 +16,9 @@ services:
 
   mass-postgres:
     container_name: mass-postgres
-    image: postgres:10.4
+    build:
+      context: ./scripts/software/postgres
+      dockerfile: Dockerfile
     restart: always
 #    networks:
 #      - mass-backend
@@ -23,15 +27,28 @@ services:
     environment:
       POSTGRES_PASSWORD: Massdata.2018
 
-#  mass-sqlserver:
-#    container_name: mass-sqlserver
-#    image: microsoft/mssql-server-linux:2017-latest
-#    restart: always
-#    ports:
-#      - 1433:1433
-#    environment:
-#      ACCEPT_EULA: Y
-#      SA_PASSWORD: Massdata.2018
+  mass-sqlserver:
+    container_name: mass-sqlserver
+    build:
+      context: ./scripts/software/sqlserver
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 1433:1433
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Massdata.2018
+
+  mass-dameng:
+    container_name: mass-dameng
+    build:
+      context: ./scripts/software/dameng
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 5236:5236
+    environment:
+      SYSDBA_PWD: Massdata.2018
 
 #networks:
 #  mass-backend:
