@@ -4,6 +4,7 @@ import java.nio.file.Files
 import java.time.OffsetDateTime
 import java.util.Properties
 
+import akka.actor.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
 import helloscala.common.Configuration
 import helloscala.common.util.TimeUtils
@@ -57,7 +58,9 @@ class SchedulerSystem private (
   // TODO 定义 SchedulerSystem 自有的线程执行器
   override implicit def dispatcher: ExecutionContext = massSystem.system.dispatcher
 
-  def configuration: Configuration = massSystem.configuration
+  override def system: ActorSystem = massSystem.system
+
+  override def configuration: Configuration = massSystem.configuration
 
   def schedulerJob[T <: SchedulerJob](conf: JobConf, jobClass: Class[T], data: Map[String, String]): OffsetDateTime =
     schedulerJob(conf, jobClass.getName, data)

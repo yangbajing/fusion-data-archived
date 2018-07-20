@@ -1,4 +1,4 @@
-# 管理控制台
+# 管理控制台（mass-console）
 
 @@toc { depth=2 }
 

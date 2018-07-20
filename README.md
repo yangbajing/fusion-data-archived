@@ -1,6 +1,6 @@
-# Mass Data
+# MassData
 
-*反映式*海量数据资产管理平台（RDP, Reactive mass Data asset management Platform）
+*反映式*海量数据平台（mass-rdp, Reactive MassData asset management Platform）
 
 - Java 8+
 - Scala 2.12+

@@ -11,7 +11,7 @@
 
 ## Connectors
 
-See @ref:[数据连接器](../connector/index.md)
+见 @ref:[数据连接器](../connector/index.md)
 
 ## Graph
 
@@ -21,7 +21,7 @@ See @ref:[数据连接器](../connector/index.md)
 - flow: 数据流元素将流经的处理过程。flow至少有一个in和out。
 - sink: 数据收集汇，它只有一个in。用来决定数据流最终被被存储到哪里。
 
-@@snip [pg2mysql-graph.xml](code/workflow/pg2mysql-graph.xml) { #graph_example }
+@@snip [pg2mysql-graph.xml](../../../../../mass-rdp-core/src/test/resources/mass/core/workflow/etl/EtlWorkflowTest.xml) { #graph_example }
 
 **graph.source**
 

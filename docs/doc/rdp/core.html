@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>核心概念 · Mass Data（海量数据资产管理平台）</title>
+<title>核心概念 · MassData（海量数据平台）</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content='mass-docs'/>
@@ -28,7 +28,7 @@
 <nav class="off-canvas-nav">
 <div class="nav-home">
 <a href="../index.html" >
-<span class="home-icon">⌂</span>Mass Data（海量数据资产管理平台）
+<span class="home-icon">⌂</span>MassData（海量数据平台）
 </a>
 <div class="version-number">
 1.0.0*
@@ -40,32 +40,29 @@
   <li><a href="../design/index.html" class="page">设计</a>
   <ul>
     <li><a href="../design/thinking.html" class="page">思路</a></li>
-    <li><a href="../design/mass-design.html" class="page">mass 设计</a></li>
+    <li><a href="../design/mass-design.html" class="page">MassData 设计</a></li>
   </ul></li>
-  <li><a href="../connector/index.html" class="page">数据连接器</a></li>
-  <li><a href="../scheduler/index.html" class="page">任务</a></li>
-  <li><a href="../rdp/index.html" class="page">反映式数据处理（RDP）</a>
+  <li><a href="../connector/index.html" class="page">数据连接器（mass-connector）</a>
+  <ul>
+    <li><a href="../connector/core.html" class="page">数据连接器</a></li>
+    <li><a href="../connector/connector.html" class="page">扩展连接器</a></li>
+  </ul></li>
+  <li><a href="../scheduler/index.html" class="page">调度（mass-scheduler）</a></li>
+  <li><a href="../rdp/index.html" class="page">反映式数据处理（mass-rdp）</a>
   <ul>
     <li><a href="../rdp/core.html" class="active page">核心概念</a></li>
     <li><a href="../rdp/workflow.html" class="page">工作流</a></li>
     <li><a href="../rdp/extension.html" class="page">扩展</a></li>
   </ul></li>
-  <li><a href="../console/index.html" class="page">管理控制台</a>
+  <li><a href="../console/index.html" class="page">管理控制台（mass-console）</a>
   <ul>
     <li><a href="../console/console/console.html" class="page">监、管系统</a></li>
     <li><a href="../console/orchestration/orchestration.html" class="page">业务编排系统模块</a></li>
   </ul></li>
   <li><a href="../broker/index.html" class="page">Broker 节点</a>
   <ul>
-    <li><a href="../broker/engine/engine.html" class="page">mass 引擎</a></li>
-    <li><a href="../broker/leader/leader.html" class="page">Broker Leader （协调者）</a></li>
-  </ul></li>
-  <li><a href="../spec/index.html" class="page">规范</a>
-  <ul>
-    <li><a href="../spec/white_paper.html" class="page">白皮书</a></li>
-    <li><a href="../spec/business_spec/business_spec.html" class="page">业务文件规范</a></li>
-    <li><a href="../spec/component_spec/component_spec.html" class="page">数据组件规范</a></li>
-    <li><a href="../spec/ic_spec/ic_spec.html" class="page">系统间通信规范</a></li>
+    <li><a href="../broker/core.html" class="page">mass-broker</a></li>
+    <li><a href="../broker/leader.html" class="page">Broker Leader （协调者）</a></li>
   </ul></li>
 </ul>
 </div>
@@ -81,7 +78,7 @@
 H3.6C3.048,13,3,13.447,3,14c0,0.553,0.048,1,0.6,1H16.4c0.552,0,0.6-0.447,0.6-1C17,13.447,16.952,13,16.4,13z M3.6,7H16.4
 C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.048,7,3.6,7z"/></svg>
 </a>
-<div class="title"><a href="../index.html">Mass Data（海量数据资产管理平台）</a></div>
+<div class="title"><a href="../index.html">MassData（海量数据平台）</a></div>
 
 <!--
 <a href="https://www.example.com" class="logo show-for-medium">logo</a>
@@ -95,7 +92,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <nav class="site-nav">
 <div class="nav-home">
 <a href="../index.html" >
-<span class="home-icon">⌂</span>Mass Data（海量数据资产管理平台）
+<span class="home-icon">⌂</span>MassData（海量数据平台）
 </a>
 <div class="version-number">
 1.0.0*
@@ -107,32 +104,29 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
   <li><a href="../design/index.html" class="page">设计</a>
   <ul>
     <li><a href="../design/thinking.html" class="page">思路</a></li>
-    <li><a href="../design/mass-design.html" class="page">mass 设计</a></li>
+    <li><a href="../design/mass-design.html" class="page">MassData 设计</a></li>
   </ul></li>
-  <li><a href="../connector/index.html" class="page">数据连接器</a></li>
-  <li><a href="../scheduler/index.html" class="page">任务</a></li>
-  <li><a href="../rdp/index.html" class="page">反映式数据处理（RDP）</a>
+  <li><a href="../connector/index.html" class="page">数据连接器（mass-connector）</a>
+  <ul>
+    <li><a href="../connector/core.html" class="page">数据连接器</a></li>
+    <li><a href="../connector/connector.html" class="page">扩展连接器</a></li>
+  </ul></li>
+  <li><a href="../scheduler/index.html" class="page">调度（mass-scheduler）</a></li>
+  <li><a href="../rdp/index.html" class="page">反映式数据处理（mass-rdp）</a>
   <ul>
     <li><a href="../rdp/core.html" class="active page">核心概念</a></li>
     <li><a href="../rdp/workflow.html" class="page">工作流</a></li>
     <li><a href="../rdp/extension.html" class="page">扩展</a></li>
   </ul></li>
-  <li><a href="../console/index.html" class="page">管理控制台</a>
+  <li><a href="../console/index.html" class="page">管理控制台（mass-console）</a>
   <ul>
     <li><a href="../console/console/console.html" class="page">监、管系统</a></li>
     <li><a href="../console/orchestration/orchestration.html" class="page">业务编排系统模块</a></li>
   </ul></li>
   <li><a href="../broker/index.html" class="page">Broker 节点</a>
   <ul>
-    <li><a href="../broker/engine/engine.html" class="page">mass 引擎</a></li>
-    <li><a href="../broker/leader/leader.html" class="page">Broker Leader （协调者）</a></li>
-  </ul></li>
-  <li><a href="../spec/index.html" class="page">规范</a>
-  <ul>
-    <li><a href="../spec/white_paper.html" class="page">白皮书</a></li>
-    <li><a href="../spec/business_spec/business_spec.html" class="page">业务文件规范</a></li>
-    <li><a href="../spec/component_spec/component_spec.html" class="page">数据组件规范</a></li>
-    <li><a href="../spec/ic_spec/ic_spec.html" class="page">系统间通信规范</a></li>
+    <li><a href="../broker/core.html" class="page">mass-broker</a></li>
+    <li><a href="../broker/leader.html" class="page">Broker Leader （协调者）</a></li>
   </ul></li>
 </ul>
 </div>
@@ -149,8 +143,8 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="medium-12 show-for-medium column">
 <div class="nav-breadcrumbs">
 <ul>
-  <li><a href="../index.html">Mass Data（海量数据资产管理平台）</a></li>
-  <li><a href="../rdp/index.html">反映式数据处理（RDP）</a></li>
+  <li><a href="../index.html">MassData（海量数据平台）</a></li>
+  <li><a href="../rdp/index.html">反映式数据处理（mass-rdp）</a></li>
   <li>核心概念</li>
 </ul>
 </div>
@@ -160,19 +154,21 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="page-content row">
 <div class="small-12 large-9 column" id="docs">
 <h1><a href="#核心概念" name="核心概念" class="anchor"><span class="anchor-link"></span></a>核心概念</h1>
-<p>Reactive Data Process，简称：RDP</p>
-<p>RDP 是一个基于akka架构上构建的分布式高可用ETL调度工具，可以把一个job中子任务按照拓扑关系在集群中不同的节点上并行执行， 高效利用集群资源；提供多个工具节点，可监控文件数据情况，对数据及任务进行监控告警，异常处理等。其中工作流定义相对简洁轻量级， 可作为构建数据仓库、或大数据平台上的调度工具。</p>
-<p>整个 RDP 架构目前包含有四个节点角色：Master-Active、Master-Standby、Worker、 Console，每个角色可以独立部署于不同机器上，支持高可用性（HA），节点中包含以下模块：调度模块，执行模块，告警模块，日志模块，持久化模块。工作流定义文档参考这里。</p>
-<p><strong>节点角色关系</strong></p>
-<ul>
-  <li>Master-Active: 活动主节点，调度触发工作流、分发任务</li>
-  <li>Master-Standby: 热备份主节点，当主节点挂掉后立刻切换为活动主节点</li>
-  <li>Worker: 任务节点，可部署在多个机器上，运行主节点分发过来的任务，并反馈运行结果</li>
-  <li>Console: 提供Web界面的管理控制台，可查询、配置工作流任务，系统管理和监控运行状况</li>
-</ul>
-<p><em>由 Akka/Akka Stream 强力驱动</em></p>
+<p>Reactive Data Process，简称：mass-rdp</p>
+<p>mass-rdp 是一个基于akka架构上构建的分布式高可用ETL平台，可以把一个job中子任务按照拓扑关系在集群中不同的节点上并行执行， 高效利用集群资源；提供多个工具节点，可监控文件数据情况，对数据及任务进行监控告警，异常处理等。其中工作流定义相对简洁轻量级， 可作为构建数据仓库、或大数据平台上的调度工具。</p>
+<h2><a href="#技术架构" name="技术架构" class="anchor"><span class="anchor-link"></span></a>技术架构</h2>
+<p><img src="../static/RDPTechArchitecture.svg" alt="mass-rdp 技术架构图" /><br/><code>MassData 平台架构图</code></p>
+<p>整个 mass-rdp 架构采用伪去中心化的设计，使用角色来区分节点所拥有的功能。当前已有角色有：</p>
+<ol>
+  <li>leader: 用于整个RDP集群管理，节点加入、退出，任务分配、调度</li>
+  <li>worker: 实际执行数据处理任务</li>
+  <li>console: 管理控制台，包括：任务管理、任务编排、监控等功能</li>
+</ol>
+<p>每个节点都拥有完整的功能，通过启动时设置role（节点角色）来指明当前节点启用的功能组。这意味着，一个节点可以同时担任多种角色（推荐每个节点角色功能单一）。 每个角色可以独立部署于不同机器上，支持高可用性（HA）。</p>
+<p>// 节点中包含以下模块：调度模块，执行模块，告警模块，日志模块，持久化模块。</p>
+<p><em>由 <a href="https://akka.io" target="_blank">Akka</a> 强力驱动</em></p>
 <p><img src="img/Reactive-Flow.png" alt="Reactive Flow简单流程" /></p>
-<p>支持数据源或目的地：</p>
+<p>支持数据源或存储：</p>
 <ol>
   <li>RMDBs: PostgreSQL、MySQL、Oracle、DM（达梦数据库）</li>
   <li>HDFS、Hive、HBase</li>
@@ -207,7 +203,8 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
   <li>集成基于Web的数据清洗、转换代码编辑器</li>
 </ol>
 <h4><a href="#数据处理可视化" name="数据处理可视化" class="anchor"><span class="anchor-link"></span></a>数据处理可视化</h4>
-<p>可视化显示数据流处理过程</p>
+<p>可视化显示数据流处理过程，可对数据处理过程、状态、处理数据量进行实时监控</p>
+<p><img src="../static/DataProcessVisual.svg" alt="数据处理可视化" /></p>
 <div class="source-github">
 The source code for this page can be found <a href="https://github.com/yangbajing/mass-data/tree/master/mass-docs/src/main/paradox/rdp/core.md">here</a>.
 </div>
@@ -224,6 +221,7 @@ The source code for this page can be found <a href="https://github.com/yangbajin
 <ul>
   <li><a href="../rdp/core.html#核心概念" class="header">核心概念</a>
   <ul>
+    <li><a href="../rdp/core.html#技术架构" class="header">技术架构</a></li>
     <li><a href="../rdp/core.html#功能" class="header">功能</a></li>
   </ul></li>
 </ul>

@@ -4,8 +4,8 @@
 
 @@@ index
 
-* [engine/engine](engine/engine.md)
-* [leader/leader](leader/leader.md)
+* [core](core.md)
+* [leader](leader.md)
 
 @@@
 

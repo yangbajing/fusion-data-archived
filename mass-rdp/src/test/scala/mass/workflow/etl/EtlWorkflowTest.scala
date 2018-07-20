@@ -19,7 +19,7 @@ class EtlWorkflowTest extends TestKit(ActorSystem("etl-test")) with HelloscalaSp
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     val massSystem = MassSystem("mass", system)
-    rdpSystem = RdpSystem("rdp-test", massSystem, ConnectorSystem(massSystem))
+    rdpSystem = RdpSystem("rdp-test", massSystem, ConnectorSystem("connector", massSystem))
     etlWorkflow = EtlWorkflow.fromXML(TestStub.graphXmlConfig, rdpSystem).get
   }
 

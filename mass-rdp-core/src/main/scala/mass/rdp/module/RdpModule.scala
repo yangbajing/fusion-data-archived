@@ -1,9 +1,9 @@
-package mass.rdp.extension
+package mass.rdp.module
 
-import mass.core.extension.Extension
+import mass.core.Module.Module
 import mass.rdp.etl.graph.{EtlGraphParserFactory, EtlStreamFactory}
 
-trait RdpExtension extends Extension {
+trait RdpModule extends Module {
 
   def `type`: String
 

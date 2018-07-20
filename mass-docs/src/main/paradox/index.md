@@ -1,4 +1,6 @@
-# Mass Data（海量数据资产管理平台）
+# MassData（海量数据平台）
+
+*数据处理、治理、管理*
 
 @@toc { depth=2 }
 
@@ -11,7 +13,7 @@
 * [rdp/index](rdp/index.md)
 * [console/index](console/index.md)
 * [broker/index](broker/index.md)
-* [spec/index](spec/index.md)
+<!--* [spec/index](spec/index.md)-->
 
 @@@
 

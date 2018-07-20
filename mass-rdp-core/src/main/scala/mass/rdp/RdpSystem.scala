@@ -1,15 +1,15 @@
 package mass.rdp
 
+import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.StrictLogging
+import helloscala.common.Configuration
 import mass.connector.ConnectorSystem
-import mass.core.MassSystem
+import mass.core.{BaseSystem, MassSystem}
 import mass.rdp.etl.graph.{EtlGraphParserFactory, EtlStreamFactory}
-import mass.rdp.extension.RdpExtension
+import mass.rdp.module.RdpModule
 
-trait RdpRefFactory {
-  val name: String
-
+trait RdpRefFactory extends BaseSystem {
   def massSystem: MassSystem
 
   def connectorSystem: ConnectorSystem
@@ -17,10 +17,10 @@ trait RdpRefFactory {
 
 private[rdp] class RdpSetup(val massSystem: MassSystem, val connectorSystem: ConnectorSystem) extends StrictLogging {
 
-  val extensions: Vector[RdpExtension] =
+  val extensions: Vector[RdpModule] =
     massSystem.configuration.get[Seq[String]]("mass.rdp.extensions").flatMap { className =>
       Class.forName(className).newInstance() match {
-        case v: RdpExtension => Some(v)
+        case v: RdpModule => Some(v)
         case unknown =>
           logger.warn(s"初始化找到未知RdpExtension: $unknown")
           None
@@ -100,6 +100,10 @@ private[rdp] class RdpSystemImpl(
     protected var _streamFactories: Map[String, EtlStreamFactory],
     protected var _graphParerFactories: Map[String, EtlGraphParserFactory]
 ) extends RdpSystem {
+
+  override def system: ActorSystem = massSystem.system
+
+  override def configuration: Configuration = massSystem.configuration
 
   override implicit def materializer: ActorMaterializer = ActorMaterializer()(massSystem.system)
 

@@ -40,5 +40,11 @@ class Demo2 extends HelloscalaSpec {
 
   "2dim array" in {
     val arrArr: Array[Array[Int]] = Array.fill(3, 4)(0)
+
+    System.nanoTime()
+  }
+
+  "csvread" in {
+    val arr2: Array[Int] = scala.io.Source.fromResource("word.csv").getLines().flatMap(str => str.split(',').map(_.toInt)).toArray
   }
 }

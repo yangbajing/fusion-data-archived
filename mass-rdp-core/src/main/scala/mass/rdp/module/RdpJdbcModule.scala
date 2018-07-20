@@ -1,9 +1,11 @@
-package mass.rdp.extension
+package mass.rdp.module
 
 import mass.connector.ConnectorType
 import mass.rdp.etl.graph.{EtlGraphParserFactory, EtlGraphXmlParserFactory, EtlStreamFactory, EtlStreamJdbcFactory}
 
-class RdpJdbcExtension extends RdpExtension {
+class RdpJdbcModule extends RdpModule {
+  override val name: String = "jdbc"
+
   override def `type`: String = ConnectorType.JDBC.toString
 
   override def etlStreamBuilders: Vector[EtlStreamFactory] = Vector(
@@ -13,5 +15,4 @@ class RdpJdbcExtension extends RdpExtension {
   override def graphParserFactories: Vector[EtlGraphParserFactory] = Vector(
     new EtlGraphXmlParserFactory()
   )
-
 }

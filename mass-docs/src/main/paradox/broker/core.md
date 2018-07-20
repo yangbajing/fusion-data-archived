@@ -1,9 +1,9 @@
-# mass 引擎
+# mass-broker
 
-**mass-engine** 作为 mass 的集群化的核心节点，每一个节点都具备调度、执行的完整能力。同时，部署到任一节点的组件资源（数据
+**mass-broker** 作为 mass 的集群化的核心节点，每一个节点都具备调度、执行的完整能力。同时，部署到任一节点的组件资源（数据
 处理组件）都将被自动分发到所有节点。
 
-![mass 引擎架构图](../../static/SeaBrokerArchitecture.png) <br/>*mass 引擎架构图*
+![mass 引擎架构图](../../static/BrokerAppSystem.png) <br/>*mass 引擎架构图*
 
 Sea引擎分3大部分：
 

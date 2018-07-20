@@ -22,7 +22,7 @@ class EtlSchedulerWorkflowTest extends TestKit(ActorSystem("etl-test")) with Hel
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     val massSystem = MassSystem("mass", system).as[MassSystemExtension]
-    rdpSystem = RdpSystem("rdp-test", massSystem, ConnectorSystem(massSystem))
+    rdpSystem = RdpSystem("rdp-test", massSystem, ConnectorSystem("connector", massSystem))
     schedulerSystem = SchedulerSystem(massSystem)
     //    etlWorkflow = EtlWorkflow.fromXML(TestStub.graphXmlConfig, rdpSystem).get
   }

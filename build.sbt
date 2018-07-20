@@ -156,7 +156,7 @@ lazy val massScheduler = _project("mass-scheduler")
   .settings(
     mainClass in Compile := Some("mass.scheduler.boot.SchedulerMain"),
     libraryDependencies ++= Seq(
-      _jsch
+
     )
   )
 
@@ -214,6 +214,7 @@ lazy val massCoreExt = _project("mass-core-ext")
     libraryDependencies ++= Seq(
       _fastparse,
       _quartz,
+      _jsch,
       _sigarLoader
     ) ++ _akkaClusters ++ _slicks //++ _kamons
   )

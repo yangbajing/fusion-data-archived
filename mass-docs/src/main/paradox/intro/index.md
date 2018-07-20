@@ -1,34 +1,28 @@
 # 概述
 
-**mass Data 数据处理平台提供了强大的提取、转换和加载（ETL）功能，基于Akka提供了无中心化的集群处理能力。** mass Data
+**MassData 数据平台提供了强大的提取、转换和加载（ETL）功能，基于Akka提供了无中心化的集群处理能力。** MassData
 基于 Akka 框架构建。
 
-![mass Data 数据处理平台架构图](../static/SeaPlatformArchitecture.png)
+## 系统、组件
 
-`mass Data 数据处理平台架构图`
+**MassData** 由以下主要系统、组件组成：
 
-## 方案组成
+- @ref[**数据连接器**](../connector/index.md)：基于 <a href="https://doc.akka.io/docs/akka/current/stream/index.html?language=scala" target="_blank">Akka Stream</a>，Massdata提供各种数据源的连接器。包括：读取、转换、写入等功能。Akka Stream 提供了功能强大的反应式流处理，Massdata数据连接器构建在 Akka Stream 之上。可提供批量、流式ETL数据处理。
+- @ref[**任务调度**](../scheduler/index.md)：MassData提供完善的任务调度功能，支持间隔调度和日历调度，支持任务依赖控制。
+- @ref[**mass-rdp（反应式数据处理）**](../rdp/index.md)：提供数据处理业务所需支持的各种数据模拟，即可作为单独的程序执行，也可作为组件供引擎子系统调用执行。
+- @ref[**Broker**](../broker/core.md)：解析业务流程，执行每个任务（子任务）的所有阶段业务逻辑，包括通用阶段（如日志、数据库操作、消息通知……），以及业务阶段（如文件采集等）。
+- @ref[**Broker Leader-协调模块**](../broker/leader.md)：加载业务（数据）处理流程文件，生成任务并对任务进行调度，对调度资源和策略进行管理。
+- @ref[**业务编排系统模块**](../console/orchestration/orchestration.md)：生成业务（数据）处理流程文件。
+- @ref[**监、管系统**](../console/console/console.md)：对系统运行状况、任务执行情况进行监查，并可管理系统。
+- **元数据管理系统**
+- **数据治理**
 
-**mass** 方案由以下主要部分组成：
-
-- @ref[《反应式数据处理系统》](../rdp/index.md)：提供数据处理业务所需支持的各种数据模拟，即可作为单独的程序执行，也可作
-  为组件供引擎子系统调用执行。
-- @ref[《引擎系统》](../broker/engine/engine.md)：解析业务流程，执行每个任务（子任务）的所有阶段业务逻辑，包括通用阶段（如
-  日志、数据库操作、消息通知……），以及业务阶段（如文件采集等）。
-- @ref[《Borker Leader-协调模块》](../broker/leader/leader.md)：加载业务（数据）处理流程文件，生成任务并对任务进行调度，对调度资源和
-  策略进行管理。
-- @ref[《业务编排系统模块》](../console/orchestration/orchestration.md)：生成业务（数据）处理流程文件。
-- @ref[《监、管系统》](../console/console/console.md)：对系统运行状况、任务执行情况进行监查，并可管理系统。
-- @ref[《业务文件规范》](../spec/business_spec/business_spec.md)：业务编排子系统定义的配置文件格式。
-- @ref[《组件规范》](../spec/component_spec/component_spec.md)：采集组件实现规范，SPI。
-- @ref[《系统间通信规范》](../spec/ic_spec/ic_spec.md)：各子系统进程间通信消息规范。
-
-基于 Akka Cluster 和 Akka Cluster role，各子系统以不同的角色存在于 **mass** ，子系统之间基于 Akka/Akka Cluster 实现服务发现、
+基于 Akka Cluster 和 Akka Cluster role，各子系统以不同的角色存在于 **MassData** ，子系统之间基于 Akka/Akka Cluster 实现服务发现、
 注册，消息通信，并提供丰富的引擎路由和负载均衡能力。
 
 ## 使用对象
 
-**mass** 产品最终使用对象为：
+**MassData** 产品最终使用对象为：
 
 - 开发人员：根据方案制定的标准，格式，二次开发手册，进行业务开发。
 - 测试人员：使用产品提供的工具，对开发人员的开发成果进行验证。

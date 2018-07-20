@@ -39,16 +39,16 @@ services:
       ACCEPT_EULA: Y
       SA_PASSWORD: Massdata.2018
 
-  mass-dameng:
-    container_name: mass-dameng
-    build:
-      context: ./scripts/software/dameng
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - 5236:5236
-    environment:
-      SYSDBA_PWD: Massdata.2018
+#  mass-dameng:
+#    container_name: mass-dameng
+#    build:
+#      context: ./scripts/software/dameng
+#      dockerfile: Dockerfile
+#    restart: always
+#    ports:
+#      - 5236:5236
+#    environment:
+#      SYSDBA_PWD: Massdata.2018
 
 #networks:
 #  mass-backend:

@@ -12,19 +12,12 @@ final case class SQLConnector(name: String, setting: ConnectorSetting) extends C
 
   override def `type`: ConnectorType = ConnectorType.JDBC
 
-  override type SourceType = JdbcResultSet
-  override type SinkType = JdbcSinkResult
-
-  override def createSource: SourceType = ???
-
-  override def createSink: SinkType = ???
-
   lazy val dataSource: HikariDataSource = JdbcUtils.createHikariDataSource(configuration)
   lazy val jdbcTemplate = JdbcTemplate(
     dataSource,
-    configuration.get[Option[Boolean]]("use-transaction").getOrElse(true),
-    configuration.get[Option[Boolean]]("ignore-warnings").getOrElse(true),
-    configuration.get[Option[Boolean]]("allow-print-log").getOrElse(false))
+    configuration.getOrElse("use-transaction", true),
+    configuration.getOrElse("ignore-warnings", true),
+    configuration.getOrElse("allow-print-log", false))
 
   override def close(): Unit = dataSource.close()
 }

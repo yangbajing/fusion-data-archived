@@ -21,6 +21,7 @@ object ConnectorType extends Enumeration {
   val Cassandra = Value("cassandra")
 }
 
+// #Connector
 /**
  * Connector
  *  -> SQL, CSV, Excel ……
@@ -30,9 +31,6 @@ object ConnectorType extends Enumeration {
  * 数据连接
  */
 trait Connector extends AutoCloseable {
-  type SourceType
-  type SinkType
-
   /**
    * 连接名，由用户设置。在整个应用业务生命周期内应保持唯一。
    */
@@ -46,8 +44,5 @@ trait Connector extends AutoCloseable {
   def setting: ConnectorSetting
 
   def configuration: Configuration = setting.parameters
-
-  def createSource: SourceType
-
-  def createSink: SinkType
 }
+// #Connector

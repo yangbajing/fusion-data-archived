@@ -2,16 +2,18 @@ package mass.connector
 
 import java.nio.file.Path
 
+import akka.actor.ActorSystem
 import com.typesafe.scalalogging.StrictLogging
-import mass.core.MassSystem
+import helloscala.common.Configuration
+import mass.core.{BaseSystem, MassSystem}
 
 object ConnectorSystem {
 
-  def apply(massSystem: MassSystem): ConnectorSystem = new ConnectorSystem(massSystem)
+  def apply(name: String, massSystem: MassSystem): ConnectorSystem = new ConnectorSystem(name, massSystem)
 
 }
 
-class ConnectorSystem private (val massSystem: MassSystem) extends StrictLogging {
+class ConnectorSystem private (val name: String, val massSystem: MassSystem) extends BaseSystem with StrictLogging {
   private var _parsers = Map.empty[String, ConnectorParser]
   private var _connectors = Map.empty[String, Connector]
   init()
@@ -27,6 +29,10 @@ class ConnectorSystem private (val massSystem: MassSystem) extends StrictLogging
       connectors.foreach { case (_, c) => c.close() }
     }
   }
+
+  override def system: ActorSystem = massSystem.system
+
+  override def configuration: Configuration = massSystem.configuration
 
   def getConnector(name: String): Option[Connector] = _connectors.get(name)
 

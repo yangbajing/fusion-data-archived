@@ -1,6 +1,5 @@
 package mass.core
 
-import java.io.File
 import java.nio.file.{Files, Path, Paths}
 
 import akka.actor.ActorSystem
@@ -9,11 +8,17 @@ import helloscala.common.Configuration
 
 import scala.reflect.ClassTag
 
+trait BaseSystem {
+  def name: String
+  def system: ActorSystem
+  def configuration: Configuration
+}
+
 private[mass] abstract class MassSystem(
     val name: String,
     val system: ActorSystem,
     private var _configuration: Configuration
-) {
+) extends BaseSystem {
 
   def configuration: Configuration = _configuration
 
