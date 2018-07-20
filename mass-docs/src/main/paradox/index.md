@@ -2,6 +2,14 @@
 
 *数据处理、治理、管理*
 
+## 特性
+
+- **反应式**设计，高性能、高可用、容错、回压（流控）、可扩展
+- 丰富的数据源连接器，支持RDBMS、NoSQL、BigData、TEXT(csv、txt、JSON、XML）、Excel、FTP/sFTP……
+- 分布式任务调度
+- ETL/ELT
+- 工作流
+
 @@toc { depth=2 }
 
 @@@ index

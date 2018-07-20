@@ -229,6 +229,7 @@ lazy val massCore = _project("mass-core")
       _scopt,
       _scalaXml,
       _hikariCP,
+      _h2,
       _postgresql % Test,
       _quartz % Provided
     ) ++ _akkas ++ _akkaHttps

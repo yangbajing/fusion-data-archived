@@ -153,7 +153,24 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="page-content row">
 <div class="small-12 large-9 column" id="docs">
 <h1><a href="#反映式数据处理-mass-rdp-" name="反映式数据处理-mass-rdp-" class="anchor"><span class="anchor-link"></span></a>反映式数据处理（mass-rdp）</h1>
-<p><strong>MassData</strong> 的数据处理部分将基于 Reactive Extension 的思想进行设计，采集 <strong>Akka Stream</strong> 做为实现框架， 基于 <strong>Alpakka</strong> 进行落地实现。</p>
+<p><strong>mass-rdp</strong> 的数据处理部分将基于 Reactive Extension 的思想进行设计，采集 <strong>Akka Stream</strong> 做为实现框架，基于 <strong>Alpakka</strong> 进行落地实现。</p>
+<h2><a href="#特性" name="特性" class="anchor"><span class="anchor-link"></span></a>特性</h2>
+<p><strong>有效提供工作效率</strong></p>
+<p>mass-rdp可数据工程师**提高**对复杂数据的处理能力，**提高**对各种数据来源、数据格式的数据的入库效率，**提高**对业务快速变化的响应。</p>
+<p><strong>丰富的数据源支持</strong></p>
+<p>mass-rdp 支持结构化、非结构化数据处理，支持对文本格式数据（csv、XML、JSON等）处理。支持传统关系型数据库：PostgreSQL、MySQL、Oracle、SQL Server， 支持NoSQL数据存储：HDFS、Hive、HBase、Cassandra、MongoDB。同时，mass-rdp还支持国产数据库：达梦数据库、GBase。</p>
+<p><strong>反应式架构设计</strong></p>
+<p>mass-rdp 采用 ReactiveStreams（反映式流处理） 设计数据处理功能（ETL/ELT），拥有高性、能吞吐、可扩展、容错、回压（流速控制）等特性。</p>
+<p><strong>适用性</strong></p>
+<p>mass-rdp 做为一款全方位的数据处理工具，适用于多种业务产场。</p>
+<ul>
+  <li>数据采集</li>
+  <li>数据清洗</li>
+  <li>任务调度管理</li>
+</ul>
+<p>mass-rdp 可以单独使用，也可以集成到其它业务系统里面。</p>
+<p><strong>可扩展</strong></p>
+<p>mass-rdp 提供了完善的接口和丰富的扩展点，支持对 mass-rdp 进行二次开发，或将其嵌入到特定的应用系统中。</p>
 <div class="toc ">
 <ul>
   <li><a href="../rdp/core.html" class="page">核心概念</a></li>
@@ -170,6 +187,19 @@ The source code for this page can be found <a href="https://github.com/yangbajin
 </div>
 </div>
 <div class="large-3 show-for-large column" data-sticky-container>
+<nav class="sidebar sticky" data-sticky data-anchor="docs" data-sticky-on="large">
+<div class="page-nav">
+<div class="nav-title">On this page:</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="../rdp/index.html#反映式数据处理-mass-rdp-" class="header">反映式数据处理（mass-rdp）</a>
+  <ul>
+    <li><a href="../rdp/index.html#特性" class="header">特性</a></li>
+  </ul></li>
+</ul>
+</div>
+</div>
+</nav>
 </div>
 </div>
 

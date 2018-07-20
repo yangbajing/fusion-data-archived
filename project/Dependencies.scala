@@ -20,8 +20,10 @@ object Dependencies {
   lazy val _akkas = Seq(
     "com.typesafe.akka" %% "akka-slf4j" % versionAkka,
     "com.typesafe.akka" %% "akka-stream" % versionAkka,
+    "com.typesafe.akka" %% "akka-stream-typed" % versionAkka,
     "com.typesafe.akka" %% "akka-testkit" % versionAkka % Test,
-    "com.typesafe.akka" %% "akka-stream-testkit" % versionAkka % Test
+    "com.typesafe.akka" %% "akka-actor-testkit-typed" % versionAkka % Test,
+  "com.typesafe.akka" %% "akka-stream-testkit" % versionAkka % Test
   ).map(_.exclude("org.scala-lang.modules", s"scala-java8-compat").cross(CrossVersion.binary))
 
   lazy val _akkaPersistence = "com.typesafe.akka" %% "akka-persistence-query" % versionAkka
@@ -30,9 +32,11 @@ object Dependencies {
 
   lazy val _akkaClusters = Seq(
     "com.typesafe.akka" %% "akka-cluster" % versionAkka,
+    "com.typesafe.akka" %% "akka-cluster-typed" % versionAkka,
     "com.typesafe.akka" %% "akka-cluster-tools" % versionAkka,
     "com.typesafe.akka" %% "akka-cluster-metrics" % versionAkka,
     "com.typesafe.akka" %% "akka-cluster-sharding" % versionAkka,
+    "com.typesafe.akka" %% "akka-cluster-sharding-typed" % versionAkka,
     _akkaMultiNodeTestkit
   )
 
@@ -200,6 +204,8 @@ object Dependencies {
   ).map(_.excludeAll(ExclusionRule("io.netty")))
 
   val _logbackClassic = "ch.qos.logback" % "logback-classic" % "1.2.3"
+
+  val _h2 = "com.h2database" % "h2" % "1.4.197"
 
   private val versionQuartz = "2.2.3"
   val _quartz = "org.quartz-scheduler" % "quartz" % versionQuartz
