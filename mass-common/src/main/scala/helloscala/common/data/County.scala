@@ -23,7 +23,8 @@ object Province {
   lazy val provinces: ProvinceData = getProvinces()
 
   def getProvinces(): ProvinceData = {
-    val in = Thread.currentThread().getContextClassLoader.getResource("province.json")
+    val in =
+      Thread.currentThread().getContextClassLoader.getResource("province.json")
     try {
       Jackson.defaultObjectMapper.readValue(in, classOf[ProvinceData])
     } catch {

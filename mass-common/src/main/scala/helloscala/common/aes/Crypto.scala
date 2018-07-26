@@ -30,7 +30,9 @@ object Crypto {
     val key = secret.getBytes("UTF-8")
     val mac = Mac.getInstance("HmacSHA256")
     mac.init(new SecretKeySpec(key, "HmacSHA256"))
-    Base64.getUrlEncoder.withoutPadding().encodeToString(mac.doFinal(message.getBytes(StandardCharsets.UTF_8)))
+    Base64.getUrlEncoder
+      .withoutPadding()
+      .encodeToString(mac.doFinal(message.getBytes(StandardCharsets.UTF_8)))
   }
 
   def encryptAES(value: String, secret: String): String = {

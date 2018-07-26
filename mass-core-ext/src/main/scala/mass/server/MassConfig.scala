@@ -12,14 +12,19 @@ import mass.core.Constants
 
 class MassConfig(configuration: Configuration) {
 
-  def clusterName: String = configuration.getString(Constants.BASE_CONF + ".cluster.name")
+  def clusterName: String =
+    configuration.getString(Constants.BASE_CONF + ".cluster.name")
 
-  def clusterProtocol: String = configuration.getString(Constants.BASE_CONF + ".cluster.protocol")
+  def clusterProtocol: String =
+    configuration.getString(Constants.BASE_CONF + ".cluster.protocol")
 
-  def clusterSeeds: List[Address] = configuration.get[Seq[String]](Constants.BASE_CONF + ".cluster.seeds")
-    .map { seed =>
-      val Array(host, port) = seed.split(':')
-      Address(clusterProtocol, clusterName, host, port.toInt)
-    }.toList
+  def clusterSeeds: List[Address] =
+    configuration
+      .get[Seq[String]](Constants.BASE_CONF + ".cluster.seeds")
+      .map { seed =>
+        val Array(host, port) = seed.split(':')
+        Address(clusterProtocol, clusterName, host, port.toInt)
+      }
+      .toList
 
 }

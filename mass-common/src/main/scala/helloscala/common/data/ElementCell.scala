@@ -9,8 +9,8 @@ import helloscala.common.types._
 import scala.beans.BeanProperty
 
 /**
- * 数据单元
- */
+  * 数据单元
+  */
 trait Cell {
   // 数据值
   val value: AnyRef
@@ -51,10 +51,8 @@ trait IndexCell extends Cell {
 }
 
 case class ElementCell(
-    // 数据例索引号，从0开始（Jdbc ResultSet的索引号是从1开始）
-    @BeanProperty idx: Int,
-    // 数据值
-    @BeanProperty value: AnyRef
-) extends IndexCell {
-
-}
+                       // 数据例索引号，从0开始（Jdbc ResultSet的索引号是从1开始）
+                       @BeanProperty idx: Int,
+                       // 数据值
+                       @BeanProperty value: AnyRef)
+    extends IndexCell {}

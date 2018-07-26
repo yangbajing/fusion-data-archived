@@ -8,7 +8,11 @@ package mass.connector.sql
 
 import java.sql.{Connection, PreparedStatement}
 
-import akka.stream.stage.{GraphStageLogic, GraphStageWithMaterializedValue, InHandler}
+import akka.stream.stage.{
+  GraphStageLogic,
+  GraphStageWithMaterializedValue,
+  InHandler
+}
 import akka.stream.{Attributes, Inlet, SinkShape}
 import javax.sql.DataSource
 import mass.core.jdbc.{ConnectionPreparedStatementCreator, JdbcUtils}
@@ -21,12 +25,14 @@ class JdbcSinkStage[T](
     creator: ConnectionPreparedStatementCreator,
     actionBinder: (T, PreparedStatement) => Unit,
     batchSize: Int = 100
-) extends GraphStageWithMaterializedValue[SinkShape[T], Future[JdbcSinkResult]] {
+) extends GraphStageWithMaterializedValue[SinkShape[T],
+                                            Future[JdbcSinkResult]] {
   val in: Inlet[T] = Inlet("JdbcSink.in")
 
   override def shape: SinkShape[T] = SinkShape(in)
 
-  override def createLogicAndMaterializedValue(inheritedAttributes: Attributes): (GraphStageLogic, Future[JdbcSinkResult]) = {
+  override def createLogicAndMaterializedValue(inheritedAttributes: Attributes)
+    : (GraphStageLogic, Future[JdbcSinkResult]) = {
     val promise = Promise[JdbcSinkResult]()
 
     val logic = new GraphStageLogic(shape) with InHandler {
@@ -94,7 +100,8 @@ class JdbcSinkStage[T](
           try {
             val batchs = stmt.executeBatch().toVector
             conn.commit()
-            results = results.copy(count = results.count + batchs.size, results = results.results :+ batchs)
+            results = results.copy(count = results.count + batchs.size,
+                                   results = results.results :+ batchs)
           } catch {
             case NonFatal(e) =>
               conn.rollback()

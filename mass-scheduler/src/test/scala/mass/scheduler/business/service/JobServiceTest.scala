@@ -12,7 +12,8 @@ class JobServiceTest extends SchedulerSpec {
       val job = new JobService(schedulerSystem)
       val file = Paths.get("/opt/Documents/SSL.zip").toFile
       val fileName = "SSL.zip"
-      val result = job.uploadJob(file, fileName, StandardCharsets.UTF_8).futureValue
+      val result =
+        job.uploadJob(file, fileName, StandardCharsets.UTF_8).futureValue
       println(result)
     }
   }

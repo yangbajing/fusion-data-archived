@@ -13,7 +13,8 @@ object TestSchema {
     "dataSource.portNumber" -> "5432",
     "dataSource.databaseName" -> "massdata",
     "dataSource.user" -> "massdata",
-    "dataSource.password" -> "massdata")
+    "dataSource.password" -> "massdata"
+  )
 
   lazy val mysql: HikariDataSource = JdbcUtils.createHikariDataSource(
     "poolName" -> "mysql",
@@ -23,6 +24,7 @@ object TestSchema {
     "password" -> "Massdata.2018",
     "dataSource.cachePrepStmts" -> "true",
     "dataSource.prepStmtCacheSize" -> "250",
-    "dataSource.prepStmtCacheSqlLimit" -> "2048")
+    "dataSource.prepStmtCacheSqlLimit" -> "2048"
+  )
 
 }

@@ -1,6 +1,6 @@
 /**
- * http://blog.colinbreck.com/patterns-for-streaming-measurement-data-with-akka-streams/
- */
+  * http://blog.colinbreck.com/patterns-for-streaming-measurement-data-with-akka-streams/
+  */
 package example.motivating
 
 import java.security.SecureRandom
@@ -46,10 +46,12 @@ object Demo extends App with StrictLogging {
 
   // -------------------------------------------------------------------------------------------------------------------
   val status =
-    Source.tick(0.minute, 10.seconds, ())
+    Source
+      .tick(0.minute, 10.seconds, ())
       .map(_ => Status())
 
-  Source.tick(0.milliseconds, 1.second, ())
+  Source
+    .tick(0.milliseconds, 1.second, ())
     .map(_ => Sample(System.currentTimeMillis(), random.nextFloat()))
     .merge(status)
     .runWith(Sink.foreach(println))

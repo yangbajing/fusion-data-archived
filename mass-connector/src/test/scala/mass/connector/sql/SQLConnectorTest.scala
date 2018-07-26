@@ -42,10 +42,14 @@ class SQLConnectorTest extends HelloscalaSpec with BeforeAndAfterAll {
     val parser = new SQLConnectorParser()
 
     postgresConnector = parser.parseFromXML(XML.loadString(postgresConfig))
-    postgresConnector.setting.parameters.get[Map[String, String]](null).foreach(println)
+    postgresConnector.setting.parameters
+      .get[Map[String, String]](null)
+      .foreach(println)
 
     mysqlConnector = parser.parseFromXML(XML.loadString(mysqlConfig))
-    mysqlConnector.setting.parameters.get[Map[String, String]](null).foreach(println)
+    mysqlConnector.setting.parameters
+      .get[Map[String, String]](null)
+      .foreach(println)
   }
 
   override protected def afterAll(): Unit = {
@@ -58,8 +62,6 @@ class SQLConnectorTest extends HelloscalaSpec with BeforeAndAfterAll {
     super.afterAll()
   }
 
-  "SQLConnector" should {
-
-  }
+  "SQLConnector" should {}
 
 }

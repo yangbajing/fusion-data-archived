@@ -12,13 +12,13 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import helloscala.common.Colors
 
 /**
- * A logback converter generating colored, lower-case level names.
- *
- * Used for example as:
- * {{{
- * %coloredLevel %logger{15} - %message%n%xException{5}
- * }}}
- */
+  * A logback converter generating colored, lower-case level names.
+  *
+  * Used for example as:
+  * {{{
+  * %coloredLevel %logger{15} - %message%n%xException{5}
+  * }}}
+  */
 class ColoredLevel extends ClassicConverter {
 
   def convert(event: ILoggingEvent): String = {

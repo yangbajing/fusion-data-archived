@@ -8,7 +8,8 @@ import scala.concurrent.Future
 
 object WorkflowRepository {
 
-  def apply(db: SlickProfile.backend.DatabaseDef): WorkflowRepository = new WorkflowRepository(db)
+  def apply(db: SlickProfile.backend.DatabaseDef): WorkflowRepository =
+    new WorkflowRepository(db)
 
 }
 

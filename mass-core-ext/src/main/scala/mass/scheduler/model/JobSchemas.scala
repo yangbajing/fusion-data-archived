@@ -44,14 +44,18 @@ abstract class JobSchemas {
 
     def createdAt = column[OffsetDateTime]("created_at")
 
-    def * = (key, cronExpress, duration, repeat, startTime, endTime, conf, createdAt).mapTo[JobTrigger]
+    def * =
+      (key, cronExpress, duration, repeat, startTime, endTime, conf, createdAt)
+        .mapTo[JobTrigger]
   }
 
   val JobTriggerRow = TableQuery[JobTriggerRow]
 
-  implicit val JobScheduleStatusColumnType = MappedColumnType.base[JobScheduleStatus, Int](_.id, id => JobScheduleStatus(id))
+  implicit val JobScheduleStatusColumnType = MappedColumnType
+    .base[JobScheduleStatus, Int](_.id, id => JobScheduleStatus(id))
 
-  class JobScheduleRow(tag: Tag) extends Table[JobSchedule](tag, "job_schedule") {
+  class JobScheduleRow(tag: Tag)
+      extends Table[JobSchedule](tag, "job_schedule") {
     def id = column[ObjectId]("id", O.PrimaryKey, O.SqlTypeObjectId)
 
     def detailKey = column[String]("detail_key")
@@ -78,11 +82,19 @@ abstract class JobSchemas {
 
     def completionStatus = column[Option[Int]]("completion_status")
 
-    def completionValue = column[Option[String]]("completion_value", O.SqlType("text"))
+    def completionValue =
+      column[Option[String]]("completion_value", O.SqlType("text"))
 
     def createdAt = column[OffsetDateTime]("created_at")
 
-    def * = (id, jobId, startTime, completionTime, completionStatus, completionValue, createdAt).mapTo[JobLog]
+    def * =
+      (id,
+       jobId,
+       startTime,
+       completionTime,
+       completionStatus,
+       completionValue,
+       createdAt).mapTo[JobLog]
   }
 
   val JobLogRow = TableQuery[JobLogRow]

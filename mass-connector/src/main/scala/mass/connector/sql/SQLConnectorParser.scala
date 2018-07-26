@@ -32,6 +32,7 @@ class SQLConnectorParser extends ConnectorParser {
     SQLConnector(node.attr("name"), setting)
   }
 
-  @inline private def getText(prop: Node): String = prop.getAttr("value").getOrElse(XmlUtils.text(prop \ "value"))
+  @inline private def getText(prop: Node): String =
+    prop.getAttr("value").getOrElse(XmlUtils.text(prop \ "value"))
 
 }

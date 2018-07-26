@@ -1,11 +1,21 @@
 package sample.remote.benchmark
 
-import akka.actor.{Actor, ActorIdentity, ActorRef, ActorSystem, Identify, Props, ReceiveTimeout, Terminated}
+import akka.actor.{
+  Actor,
+  ActorIdentity,
+  ActorRef,
+  ActorSystem,
+  Identify,
+  Props,
+  ReceiveTimeout,
+  Terminated
+}
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.duration._
 
-class Sender(path: String, totalMessages: Int, burstSize: Int, payloadSize: Int) extends Actor {
+class Sender(path: String, totalMessages: Int, burstSize: Int, payloadSize: Int)
+    extends Actor {
   import Sender._
   val payload: Array[Byte] = Vector.fill(payloadSize)("a").mkString.getBytes
   println(s"payload bytes: ${payload.length}")
@@ -61,14 +71,17 @@ class Sender(path: String, totalMessages: Int, burstSize: Int, payloadSize: Int)
       else if (duration >= 500) // 一个批次的数量已发完
         actor ! Continue(nextRemaining, now, now, burstSize)
       else // 间隔时间不足500ms，更新 剩余数量、（分帧）起始时间、分帧发送数量
-        actor ! c.copy(remaining = nextRemaining, burstStartTime = now, n = n + burstSize)
+        actor ! c.copy(remaining = nextRemaining,
+                       burstStartTime = now,
+                       n = n + burstSize)
 
     case Done =>
       val took = (System.nanoTime - startTime).nanos.toMillis
       val throughtput = (totalMessages * 1000.0 / took).toInt
-      println(s"一共花费 ${took}ms 发送了 ${totalMessages}消息, 吞吐量 ${throughtput}msg/s, " +
-        s"最大往返时间 ${maxRoundTripMillis}ms, 分帧数据大小 $burstSize, " +
-        s"有效负载 $payloadSize")
+      println(
+        s"一共花费 ${took}ms 发送了 ${totalMessages}消息, 吞吐量 ${throughtput}msg/s, " +
+          s"最大往返时间 ${maxRoundTripMillis}ms, 分帧数据大小 $burstSize, " +
+          s"有效负载 $payloadSize")
       actor ! Shutdown
 
     case Terminated(`actor`) =>
@@ -77,11 +90,11 @@ class Sender(path: String, totalMessages: Int, burstSize: Int, payloadSize: Int)
   }
 
   /**
-   *
-   * @param actor 无端actor
-   * @param remaining 还剩多少数据量未发送
-   * @return 剩余未发送数据量
-   */
+    *
+    * @param actor 无端actor
+    * @param remaining 还剩多少数据量未发送
+    * @return 剩余未发送数据量
+    */
   private def sendBatch(actor: ActorRef, remaining: Int): Int = {
     // 取实际的发送消息数，从预设的burstSize和传入的remaining中取最小的一个
     val batchSize = math.min(remaining, burstSize)
@@ -101,20 +114,24 @@ object Sender {
   case object Shutdown
 
   /**
-   * 控制指令
-   */
+    * 控制指令
+    */
   sealed trait Echo
   case object Start extends Echo
   case object Done extends Echo
 
   /**
-   *
-   * @param remaining 容量
-   * @param startTime 开始时间
-   * @param burstStartTime （塞满）时间
-   * @param n （塞满）数量
-   */
-  case class Continue(remaining: Int, startTime: Long, burstStartTime: Long, n: Int) extends Echo
+    *
+    * @param remaining 容量
+    * @param startTime 开始时间
+    * @param burstStartTime （塞满）时间
+    * @param n （塞满）数量
+    */
+  case class Continue(remaining: Int,
+                      startTime: Long,
+                      burstStartTime: Long,
+                      n: Int)
+      extends Echo
 
   def main(args: Array[String]): Unit = {
     val system = ActorSystem("Sys", ConfigFactory.load("calculator"))
@@ -124,10 +141,15 @@ object Sender {
     val burstSize = if (args.length >= 3) args(2).toInt else 5000
     val payloadSize = if (args.length >= 4) args(3).toInt else 100
 
-    system.actorOf(Sender.props(remotePath, totalMessages, burstSize, payloadSize), "snd")
+    system.actorOf(
+      Sender.props(remotePath, totalMessages, burstSize, payloadSize),
+      "snd")
   }
 
-  def props(path: String, totalMessages: Int, burstSize: Int, payloadSize: Int) =
+  def props(path: String,
+            totalMessages: Int,
+            burstSize: Int,
+            payloadSize: Int) =
     Props(new Sender(path, totalMessages, burstSize, payloadSize))
 
 }

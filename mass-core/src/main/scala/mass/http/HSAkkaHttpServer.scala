@@ -23,9 +23,12 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 /**
- * Created by yangbajing(yangbajing@gmail.com) on 2017-03-08.
- */
-trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with StrictLogging {
+  * Created by yangbajing(yangbajing@gmail.com) on 2017-03-08.
+  */
+trait HSAkkaHttpServer
+    extends BaseExceptionPF
+    with BaseRejectionBuilder
+    with StrictLogging {
   def actorSystem: ActorSystem
 
   def actorMaterializer: ActorMaterializer
@@ -76,11 +79,13 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
   }
 
   def afterHttpBindingSuccess(binding: ServerBinding): Unit = {
-    logger.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
+    logger.info(
+      s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
   }
 
   def afterHttpsBindingSuccess(binding: ServerBinding): Unit = {
-    logger.info(s"Server online at https://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
+    logger.info(
+      s"Server online at https://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
   }
 
   def afterHttpBindingFailure(cause: Throwable): Unit = {
@@ -96,20 +101,25 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
       //    val password = "abcdef".toCharArray // do not store passwords in code, read them from somewhere safe!
 
       val ks = KeyStore.getInstance("PKCS12")
-      val keystore = getClass.getClassLoader.getResourceAsStream("ssl-keys/server.p12")
+      val keystore =
+        getClass.getClassLoader.getResourceAsStream("ssl-keys/server.p12")
 
       require(keystore != null, "Keystore required!")
       ks.load(keystore, password)
 
-      val keyManagerFactory: KeyManagerFactory = KeyManagerFactory.getInstance("SunX509")
+      val keyManagerFactory: KeyManagerFactory =
+        KeyManagerFactory.getInstance("SunX509")
       keyManagerFactory.init(ks, password)
 
       val tmf: TrustManagerFactory = TrustManagerFactory.getInstance("SunX509")
       tmf.init(ks)
 
       val sslContext: SSLContext = SSLContext.getInstance("TLS")
-      sslContext.init(keyManagerFactory.getKeyManagers, tmf.getTrustManagers, new SecureRandom)
-      hcc = ConnectionContext.https(sslContext, Some(AkkaSSLConfig(actorSystem)))
+      sslContext.init(keyManagerFactory.getKeyManagers,
+                      tmf.getTrustManagers,
+                      new SecureRandom)
+      hcc =
+        ConnectionContext.https(sslContext, Some(AkkaSSLConfig(actorSystem)))
     } catch {
       case NonFatal(e) =>
         e.printStackTrace()
@@ -123,9 +133,9 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
   }
 
   /**
-   * 启动基于Akka HTTP的服务
-   * @return
-   */
+    * 启动基于Akka HTTP的服务
+    * @return
+    */
   def startServer(): (Future[ServerBinding], Option[Future[ServerBinding]]) //=
   //    startServer(
   //      configuration.getString("server.host"),
@@ -133,12 +143,14 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
   //      configuration.get[Option[Int]]("server.https-port"))
 
   /**
-   * 根据设置的host:绑定主机名和port:绑定网络端口 启动Akka HTTP服务
-   */
-  def startServer(host: String, port: Int, httpsPort: Option[Int]): (Future[ServerBinding], Option[Future[ServerBinding]]) = {
+    * 根据设置的host:绑定主机名和port:绑定网络端口 启动Akka HTTP服务
+    */
+  def startServer(host: String, port: Int, httpsPort: Option[Int])
+    : (Future[ServerBinding], Option[Future[ServerBinding]]) = {
     implicit val system: ActorSystem = actorSystem
     implicit val mat: ActorMaterializer = actorMaterializer
-    implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
+    implicit val executionContext: ExecutionContextExecutor =
+      actorSystem.dispatcher
 
     serverHost = host
     serverPort = port
@@ -148,15 +160,14 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
     val flow: Flow[HttpRequest, HttpResponse, Any] =
       (handleRejections(rejectionHandler) &
         handleExceptions(exceptionHandler)) {
-          routes.route
-        }
+        routes.route
+      }
     val handler = flow.map(handleMapResponse)
 
-    bindingFuture = Http().bindAndHandle(
-      handler,
-      interface = host,
-      port = port,
-      settings = ServerSettings(actorSystem))
+    bindingFuture = Http().bindAndHandle(handler,
+                                         interface = host,
+                                         port = port,
+                                         settings = ServerSettings(actorSystem))
 
     bindingFuture.onComplete {
       case Success(binding) ⇒
@@ -169,12 +180,11 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
     }
 
     httpsBindingFuture = httpsPort.map { portSsl =>
-      val f = Http().bindAndHandle(
-        handler,
-        interface = host,
-        port = portSsl,
-        connectionContext = generateHttps(),
-        settings = ServerSettings(actorSystem))
+      val f = Http().bindAndHandle(handler,
+                                   interface = host,
+                                   port = portSsl,
+                                   connectionContext = generateHttps(),
+                                   settings = ServerSettings(actorSystem))
       f.onComplete {
         case Success(binding) ⇒
           //setting the server binding for possible future uses in the client
@@ -200,7 +210,8 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
       .orNull
     try {
       if (StringUtils.isNoneBlank(pidfilePath)) {
-        PidFile(Utils.getPid).create(Paths.get(pidfilePath), deleteOnExit = true)
+        PidFile(Utils.getPid)
+          .create(Paths.get(pidfilePath), deleteOnExit = true)
       } else {
         logger.warn("-Dpidfile.path 未设置，将不写入 .pid 文件。")
       }

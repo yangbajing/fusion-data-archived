@@ -13,11 +13,14 @@ import scala.collection.immutable
 
 object StringUtils {
   val BLACK_CHAR: Char = ' '
-  val PRINTER_CHARS: immutable.IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
+  val PRINTER_CHARS
+    : immutable.IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
   private val HEX_CHARS: Array[Char] = "0123456789abcdef".toCharArray
-  private val HEX_CHAR_SETS = Set.empty[Char] ++ ('0' to '9') ++ ('a' to 'f') ++ ('A' to 'F')
+  private val HEX_CHAR_SETS = Set
+    .empty[Char] ++ ('0' to '9') ++ ('a' to 'f') ++ ('A' to 'F')
 
-  def option(text: String): Option[String] = if (isBlank(text)) None else Some(text)
+  def option(text: String): Option[String] =
+    if (isBlank(text)) None else Some(text)
 
   @inline def isHex(c: Char): Boolean = HEX_CHAR_SETS.contains(c)
 
@@ -72,13 +75,14 @@ object StringUtils {
   }
 
   /**
-   * 字符串从属性形式转换为下划线形式
-   *
-   * @param name    待转字符串
-   * @param isLower 转换成下划线形式后是否使用小写，false将完全使用大写
-   * @return 转换后字符串
-   */
-  def convertPropertyToUnderscore(name: String, isLower: Boolean = true): String =
+    * 字符串从属性形式转换为下划线形式
+    *
+    * @param name    待转字符串
+    * @param isLower 转换成下划线形式后是否使用小写，false将完全使用大写
+    * @return 转换后字符串
+    */
+  def convertPropertyToUnderscore(name: String,
+                                  isLower: Boolean = true): String =
     if (isBlank(name)) {
       name
     } else {
@@ -87,18 +91,21 @@ object StringUtils {
         if (Character.isUpperCase(c)) {
           sb.append('_')
         }
-        sb.append(if (isLower) Character.toLowerCase(c) else Character.toUpperCase(c.toUpper))
+        sb.append(
+          if (isLower) Character.toLowerCase(c)
+          else Character.toUpperCase(c.toUpper)
+        )
       }
       sb.toString()
     }
 
   /**
-   * Convert a column name with underscores to the corresponding property name using "camel case".  A name
-   * like "customer_number" would match a "customerNumber" property name.
-   *
-   * @param name the column name to be converted
-   * @return the name using "camel case"
-   */
+    * Convert a column name with underscores to the corresponding property name using "camel case".  A name
+    * like "customer_number" would match a "customerNumber" property name.
+    *
+    * @param name the column name to be converted
+    * @return the name using "camel case"
+    */
   def convertUnderscoreToProperty(name: String): String = {
     if (isBlank(name)) {
       ""

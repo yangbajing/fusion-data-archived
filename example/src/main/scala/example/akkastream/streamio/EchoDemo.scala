@@ -38,7 +38,8 @@ object EchoClient extends App {
   val connection = Tcp().outgoingConnection("localhost", 8888)
 
   val replParser =
-    Flow[String].takeWhile(_ != "q")
+    Flow[String]
+      .takeWhile(_ != "q")
       .concat(Source.single("BYE"))
       .map { elem ⇒
         println(s"send msg: $elem")
@@ -46,10 +47,10 @@ object EchoClient extends App {
       }
 
   val repl = Flow[ByteString]
-    .via(Framing.delimiter(
-      ByteString("\n"),
-      maximumFrameLength = 256,
-      allowTruncation = true))
+    .via(
+      Framing.delimiter(ByteString("\n"),
+                        maximumFrameLength = 256,
+                        allowTruncation = true))
     .map(_.utf8String)
     .map(text ⇒ println("Server: " + text))
     .map(_ ⇒ StdIn.readLine("> "))
@@ -61,6 +62,4 @@ object EchoClient extends App {
   //  system.terminate()
 }
 
-object EchoDemo {
-
-}
+object EchoDemo {}

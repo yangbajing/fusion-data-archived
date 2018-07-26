@@ -10,11 +10,13 @@ object XmlUtils {
 
     @inline def attr(attr: String): String = (node \ s"@$attr").text.trim
 
-    @inline def getAttr(attr: String): Option[String] = StringUtils.option(this.attr(attr)).map(_.trim)
+    @inline def getAttr(attr: String): Option[String] =
+      StringUtils.option(this.attr(attr)).map(_.trim)
 
     @inline def text: String = node.text.trim
 
-    @inline def getText: Option[String] = StringUtils.option(node.text).map(_.trim)
+    @inline def getText: Option[String] =
+      StringUtils.option(node.text).map(_.trim)
 
   }
 

@@ -3,8 +3,8 @@ package mass.http
 import akka.http.scaladsl.model.headers.RawHeader
 
 /**
- * Created by yangbajing(yangbajing@gmail.com) on 2017-05-03.
- */
+  * Created by yangbajing(yangbajing@gmail.com) on 2017-05-03.
+  */
 object ServerHeader {
   val name: String = "HS-Server"
 

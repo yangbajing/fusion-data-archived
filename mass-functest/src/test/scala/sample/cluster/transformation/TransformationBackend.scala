@@ -22,7 +22,8 @@ class TransformationBackend extends Actor {
   override def postStop(): Unit = cluster.unsubscribe(self)
 
   def receive = {
-    case TransformationJob(text) => sender() ! TransformationResult(text.toUpperCase)
+    case TransformationJob(text) =>
+      sender() ! TransformationResult(text.toUpperCase)
     case state: CurrentClusterState =>
       state.members.filter(_.status == MemberStatus.Up) foreach register
     case MemberUp(m) => register(m)
@@ -30,7 +31,8 @@ class TransformationBackend extends Actor {
 
   def register(member: Member): Unit =
     if (member.hasRole("frontend"))
-      context.actorSelection(RootActorPath(member.address) / "user" / "frontend") !
+      context.actorSelection(
+        RootActorPath(member.address) / "user" / "frontend") !
         BackendRegistration
 }
 //#backend
@@ -39,7 +41,8 @@ object TransformationBackend {
   def main(args: Array[String]): Unit = {
     // Override the configuration of the port when specified as program argument
     val port = if (args.isEmpty) "0" else args(0)
-    val config = ConfigFactory.parseString(s"""
+    val config = ConfigFactory
+      .parseString(s"""
         akka.remote.netty.tcp.port=$port
         akka.remote.artery.canonical.port=$port
         """)

@@ -6,7 +6,8 @@ import org.json4s.{DefaultFormats, Serializer}
 import org.json4s.jackson.JsonMethods
 
 trait Json4sFormats extends DefaultFormats {
-  override val customSerializers: List[Serializer[_]] = JavaTimeSerializers.defaults
+  override val customSerializers: List[Serializer[_]] =
+    JavaTimeSerializers.defaults
 }
 
 object Json4sFormats extends Json4sFormats

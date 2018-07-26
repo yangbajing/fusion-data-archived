@@ -1,5 +1,3 @@
 package mass.apiservice.boot
 
-object ApiServiceMain extends App {
-
-}
+object ApiServiceMain extends App {}

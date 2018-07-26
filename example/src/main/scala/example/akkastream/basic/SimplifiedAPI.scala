@@ -21,9 +21,12 @@ object SimplifiedAPI extends App {
   val mergedResult = merged.runWith(Sink.fold(0)(_ + _))
   mergedResult.foreach(println)
 
-  val sendRemotely = Sink.actorRef(system.actorOf(Props[Remotely], "remotely"), "Done")
+  val sendRemotely =
+    Sink.actorRef(system.actorOf(Props[Remotely], "remotely"), "Done")
   val localProcessing = Sink.foreach[Int](v => println(s"foreach($v)"))
-  Source(List(0, 1, 1)).runWith(Sink.combine(sendRemotely, localProcessing)(strategy => Broadcast[Int](strategy)))
+  Source(List(0, 1, 1))
+    .runWith(Sink.combine(sendRemotely, localProcessing)(strategy =>
+      Broadcast[Int](strategy)))
 
   StdIn.readLine()
   system.terminate()

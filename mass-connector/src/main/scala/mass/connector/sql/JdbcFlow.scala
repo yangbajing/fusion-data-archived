@@ -14,7 +14,8 @@ case class JdbcResultSet(rs: ResultSet, values: immutable.IndexedSeq[AnyRef])
 
 object JdbcFlow {
 
-  def flowToText(valueSeparator: Char = ','): Flow[immutable.IndexedSeq[AnyRef], String, NotUsed] =
+  def flowToText(valueSeparator: Char = ',')
+    : Flow[immutable.IndexedSeq[AnyRef], String, NotUsed] =
     Flow[immutable.IndexedSeq[AnyRef]].map { values =>
       val builder = new java.lang.StringBuilder()
       var i = 0
@@ -40,7 +41,9 @@ object JdbcFlow {
       }
     }
 
-  def flowToByteString(valueSeparator: Char = ',', charset: Charset = StandardCharsets.UTF_8): Flow[immutable.IndexedSeq[AnyRef], ByteString, NotUsed] =
+  def flowToByteString(valueSeparator: Char = ',',
+                       charset: Charset = StandardCharsets.UTF_8)
+    : Flow[immutable.IndexedSeq[AnyRef], ByteString, NotUsed] =
     Flow[immutable.IndexedSeq[AnyRef]].map { values =>
       val builder = ByteString.newBuilder
       var i = 0
@@ -54,9 +57,11 @@ object JdbcFlow {
       builder.result()
     }
 
-  def flowJdbcResultSet: Flow[ResultSet, JdbcResultSet, NotUsed] = Flow[ResultSet].map { rs =>
-    val metaData = rs.getMetaData
-    JdbcResultSet(rs, (1 to metaData.getColumnCount).map(i => rs.getObject(i)))
-  }
+  def flowJdbcResultSet: Flow[ResultSet, JdbcResultSet, NotUsed] =
+    Flow[ResultSet].map { rs =>
+      val metaData = rs.getMetaData
+      JdbcResultSet(rs,
+                    (1 to metaData.getColumnCount).map(i => rs.getObject(i)))
+    }
 
 }

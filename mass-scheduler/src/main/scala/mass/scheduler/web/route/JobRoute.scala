@@ -8,7 +8,9 @@ import mass.http.AbstractRoute
 import mass.scheduler.SchedulerSystem
 import mass.scheduler.business.service.JobService
 
-class JobRoute(schedulerSystem: SchedulerSystem) extends AbstractRoute with StrictLogging {
+class JobRoute(schedulerSystem: SchedulerSystem)
+    extends AbstractRoute
+    with StrictLogging {
   import schedulerSystem.massSystem.system.dispatcher
 
   private val jobService = new JobService(schedulerSystem)
@@ -18,7 +20,8 @@ class JobRoute(schedulerSystem: SchedulerSystem) extends AbstractRoute with Stri
   }
 
   def uploadJobRoute: Route = pathPost("upload_job") {
-    storeUploadedFile("job", createTempFileFunc(schedulerSystem.massSystem.tempDir)) {
+    storeUploadedFile("job",
+                      createTempFileFunc(schedulerSystem.massSystem.tempDir)) {
       case (fileInfo, file) =>
         val future = jobService
           .uploadJob(file, fileInfo.fileName, fileInfo.contentType.charset)

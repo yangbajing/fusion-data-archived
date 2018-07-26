@@ -19,8 +19,8 @@ object SessionUtil {
   }
 
   /**
-   * Utility method for generating a good server secret.
-   */
+    * Utility method for generating a good server secret.
+    */
   def randomServerSecret(): String = randomString(128)
 
   // Do not change this unless you understand the security issues behind timing attacks.

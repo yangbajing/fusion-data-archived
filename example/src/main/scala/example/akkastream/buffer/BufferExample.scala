@@ -11,17 +11,32 @@ object BufferExample extends App {
   implicit val mat = ActorMaterializer()
 
   Source(1 to 3)
-    .map { i => println(s"A: $i"); i }.async
-    .map { i => println(s"B: $i"); i }.async
-    .map { i => println(s"C: $i"); i }.async
+    .map { i =>
+      println(s"A: $i"); i
+    }
+    .async
+    .map { i =>
+      println(s"B: $i"); i
+    }
+    .async
+    .map { i =>
+      println(s"C: $i"); i
+    }
+    .async
     .runWith(Sink.ignore)
 
   Thread.sleep(1000)
   println("------------------------------------")
   Source(1 to 3)
-    .map { i => println(s"A: $i"); i }
-    .map { i => println(s"B: $i"); i }
-    .map { i => println(s"C: $i"); i }
+    .map { i =>
+      println(s"A: $i"); i
+    }
+    .map { i =>
+      println(s"B: $i"); i
+    }
+    .map { i =>
+      println(s"C: $i"); i
+    }
     .runWith(Sink.ignore)
 
   StdIn.readLine()

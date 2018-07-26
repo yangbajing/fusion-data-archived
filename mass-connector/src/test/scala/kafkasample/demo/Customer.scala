@@ -7,9 +7,7 @@ import java.util
 import helloscala.common.util.StringUtils
 import org.apache.kafka.common.serialization.Serializer
 
-case class Customer(customerId: Int, customerName: String) {
-
-}
+case class Customer(customerId: Int, customerName: String) {}
 
 class CustomerSerializer extends Serializer[Customer] {
   private val EMPTY_NAME = Array[Byte]()

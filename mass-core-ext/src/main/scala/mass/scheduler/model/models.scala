@@ -9,21 +9,19 @@ import org.json4s.JValue
 
 import scala.concurrent.duration.FiniteDuration
 
-case class JobDetail(
-    key: String,
-    data: Map[String, String],
-    conf: Option[JValue],
-    createdAt: OffsetDateTime)
+case class JobDetail(key: String,
+                     data: Map[String, String],
+                     conf: Option[JValue],
+                     createdAt: OffsetDateTime)
 
-case class JobTrigger(
-    key: String,
-    cronExpress: Option[String],
-    duration: Option[FiniteDuration],
-    repeat: Option[Int],
-    startTime: Option[OffsetDateTime],
-    endTime: Option[OffsetDateTime],
-    conf: Option[JValue],
-    createdAt: OffsetDateTime)
+case class JobTrigger(key: String,
+                      cronExpress: Option[String],
+                      duration: Option[FiniteDuration],
+                      repeat: Option[Int],
+                      startTime: Option[OffsetDateTime],
+                      endTime: Option[OffsetDateTime],
+                      conf: Option[JValue],
+                      createdAt: OffsetDateTime)
 
 object JobScheduleStatus extends Enumeration {
   type JobScheduleStatus = Value
@@ -41,22 +39,19 @@ object JobScheduleStatus extends Enumeration {
 
 }
 
-case class JobSchedule(
-    id: ObjectId,
-    detailKey: String,
-    triggerKey: String,
-    status: JobScheduleStatus,
-    createdAt: OffsetDateTime)
+case class JobSchedule(id: ObjectId,
+                       detailKey: String,
+                       triggerKey: String,
+                       status: JobScheduleStatus,
+                       createdAt: OffsetDateTime)
 
-case class JobLog(
-    id: ObjectId,
-
-    /**
-     * FK [[JobSchedule.id]]
-     */
-    jobId: ObjectId,
-    startTime: OffsetDateTime,
-    completionTime: Option[OffsetDateTime],
-    completionStatus: Option[Int],
-    completionValue: Option[String],
-    createdAt: OffsetDateTime)
+case class JobLog(id: ObjectId,
+                  /**
+                    * FK [[JobSchedule.id]]
+                    */
+                  jobId: ObjectId,
+                  startTime: OffsetDateTime,
+                  completionTime: Option[OffsetDateTime],
+                  completionStatus: Option[Int],
+                  completionValue: Option[String],
+                  createdAt: OffsetDateTime)

@@ -27,7 +27,8 @@ class JdbcSourceStage(
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) with OutHandler {
-      var maybeConn = Option.empty[(Connection, Boolean, PreparedStatement, ResultSet)]
+      var maybeConn =
+        Option.empty[(Connection, Boolean, PreparedStatement, ResultSet)]
 
       setHandler(out, this)
 
