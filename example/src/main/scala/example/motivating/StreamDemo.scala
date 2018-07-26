@@ -1,6 +1,6 @@
 /**
- * http://blog.colinbreck.com/akka-streams-a-motivating-example/
- */
+  * http://blog.colinbreck.com/akka-streams-a-motivating-example/
+  */
 package example.motivating
 
 import akka.actor.ActorSystem
@@ -25,13 +25,15 @@ object StreamDemo extends App {
   val measurementsWebSocketService =
     Flow[Message]
       .collect {
-        case TextMessage.Strict(text)         => Future.successful(text)
-        case TextMessage.Streamed(textStream) => textStream.runFold("")(_ + _).flatMap(Future.successful)
+        case TextMessage.Strict(text) => Future.successful(text)
+        case TextMessage.Streamed(textStream) =>
+          textStream.runFold("")(_ + _).flatMap(Future.successful)
       }
       .mapAsync(1)(identity)
       .map(InsertMessage.parse)
       .groupedWithin(1000, 1.second)
-      .mapAsync(10)(messages => database.bulkInsertAsync(messages.map(_.message)))
+      .mapAsync(10)(messages =>
+        database.bulkInsertAsync(messages.map(_.message)))
       .map(messages => InsertMessage.ack(messages.last))
 
   val route = path("measurements") {

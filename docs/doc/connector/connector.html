@@ -48,11 +48,11 @@
     <li><a href="../connector/connector.html" class="active page">扩展连接器</a></li>
   </ul></li>
   <li><a href="../scheduler/index.html" class="page">调度（mass-scheduler）</a></li>
-  <li><a href="../rdp/index.html" class="page">反映式数据处理（mass-rdp）</a>
+  <li><a href="../rdi/index.html" class="page">反映式数据处理（mass-rdi）</a>
   <ul>
-    <li><a href="../rdp/core.html" class="page">核心概念</a></li>
-    <li><a href="../rdp/workflow.html" class="page">工作流</a></li>
-    <li><a href="../rdp/extension.html" class="page">扩展</a></li>
+    <li><a href="../rdi/core.html" class="page">核心概念</a></li>
+    <li><a href="../rdi/workflow.html" class="page">工作流</a></li>
+    <li><a href="../rdi/extension.html" class="page">扩展</a></li>
   </ul></li>
   <li><a href="../console/index.html" class="page">管理控制台（mass-console）</a>
   <ul>
@@ -112,11 +112,11 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
     <li><a href="../connector/connector.html" class="active page">扩展连接器</a></li>
   </ul></li>
   <li><a href="../scheduler/index.html" class="page">调度（mass-scheduler）</a></li>
-  <li><a href="../rdp/index.html" class="page">反映式数据处理（mass-rdp）</a>
+  <li><a href="../rdi/index.html" class="page">反映式数据处理（mass-rdi）</a>
   <ul>
-    <li><a href="../rdp/core.html" class="page">核心概念</a></li>
-    <li><a href="../rdp/workflow.html" class="page">工作流</a></li>
-    <li><a href="../rdp/extension.html" class="page">扩展</a></li>
+    <li><a href="../rdi/core.html" class="page">核心概念</a></li>
+    <li><a href="../rdi/workflow.html" class="page">工作流</a></li>
+    <li><a href="../rdi/extension.html" class="page">扩展</a></li>
   </ul></li>
   <li><a href="../console/index.html" class="page">管理控制台（mass-console）</a>
   <ul>
@@ -159,28 +159,29 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <h2><a href="#connector" name="connector" class="anchor"><span class="anchor-link"></span></a><code>Connector</code></h2>
 <p><code>Connector</code> trait是数据连接器的基础接口，设置自定义数据连接器是需要实现这个接口。</p>
 <pre class="prettyprint"><code class="language-scala">/**
- * Connector
- *  -&gt; SQL, CSV, Excel ……
- *    Connector2(Source) -&gt;
- *                       &lt;-&gt; Flow1, Flow2, .... &lt;-&gt; 算是DataElement
- *  -&gt; Connector2(Sink)
- * 数据连接
- */
+  * Connector
+  *  -&gt; SQL, CSV, Excel ……
+  *    Connector2(Source) -&gt;
+  *                       &lt;-&gt; Flow1, Flow2, .... &lt;-&gt; 算是DataElement
+  *  -&gt; Connector2(Sink)
+  * 数据连接
+  */
 trait Connector extends AutoCloseable {
+
   /**
-   * 连接名，由用户设置。在整个应用业务生命周期内应保持唯一。
-   */
+    * 连接名，由用户设置。在整个应用业务生命周期内应保持唯一。
+    */
   def name: String
 
   /**
-   * 连接类型。不同的连接类型具有不同的配置选项，数据存取方式
-   */
+    * 连接类型。不同的连接类型具有不同的配置选项，数据存取方式
+    */
   def `type`: ConnectorType
 
   def setting: ConnectorSetting
 
   def configuration: Configuration = setting.parameters
-}</code></pre><a href="https://github.com/yangbajing/mass-data/tree/master/mass-connector/src/main/scala/mass/connector/Connector.scala#L25-L47">Full source at GitHub</a>
+}</code></pre><a href="https://github.com/yangbajing/mass-data/tree/master/mass-connector/src/main/scala/mass/connector/Connector.scala#L25-L48">Full source at GitHub</a>
 <div class="source-github">
 The source code for this page can be found <a href="https://github.com/yangbajing/mass-data/tree/master/mass-docs/src/main/paradox/connector/connector.md">here</a>.
 </div>

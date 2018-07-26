@@ -33,4 +33,3 @@ object MergeHubDemo extends App with StrictLogging {
   StdIn.readLine()
   system.terminate()
 }
-

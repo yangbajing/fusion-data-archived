@@ -9,7 +9,11 @@ import mass.core.MassSystem
 import mass.server.MassSystemExtension
 import org.scalatest.BeforeAndAfterAll
 
-abstract class SchedulerSpec extends TestKit(ActorSystem("mass")) with HelloscalaSpec with BeforeAndAfterAll with StrictLogging {
+abstract class SchedulerSpec
+    extends TestKit(ActorSystem("mass"))
+    with HelloscalaSpec
+    with BeforeAndAfterAll
+    with StrictLogging {
 
   var schedulerSystem: SchedulerSystem = _
 

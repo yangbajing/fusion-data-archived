@@ -24,32 +24,35 @@ import scala.util.matching.Regex
 
 object Utils {
   val REGEX_DIGIT: Regex = """[\d,]+""".r
-  val RANDOM_CHARS: IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
+  val RANDOM_CHARS
+    : IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
 
   val random: SecureRandom = new SecureRandom()
 
   def swap[X, Y](x: X, y: Y): (Y, X) = (y, x)
 
   /**
-   * 获取当前进程 pid
-   */
+    * 获取当前进程 pid
+    */
   @inline def getPid: Long =
-    java.lang.Long.parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
+    java.lang.Long
+      .parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
 
-  def either[R](func: => R): Either[Throwable, R] = try {
-    val result = func
-    Right(result)
-  } catch {
-    case NonFatal(e) =>
-      Left(e)
-  }
+  def either[R](func: => R): Either[Throwable, R] =
+    try {
+      val result = func
+      Right(result)
+    } catch {
+      case NonFatal(e) =>
+        Left(e)
+    }
 
   /**
-   * 将字符串解析为数字
-   *
-   * @param s 字符串
-   * @return
-   */
+    * 将字符串解析为数字
+    *
+    * @param s 字符串
+    * @return
+    */
   def parseInt(s: CharSequence): Option[Int] =
     REGEX_DIGIT.findFirstIn(s).map(_.replaceAll(",", "").toInt)
 
@@ -105,16 +108,21 @@ object Utils {
   }
 
   /**
-   * 从目录读取所有文件的所有行，并过滤掉空行（包括空白字符行）
-   *
-   * @param dir 目录
-   * @return
-   */
+    * 从目录读取所有文件的所有行，并过滤掉空行（包括空白字符行）
+    *
+    * @param dir 目录
+    * @return
+    */
   def readAllLinesFromPath(dir: Path): java.util.stream.Stream[String] = {
     val filterNoneBlank: String => Boolean = s => StringUtils.isNoneBlank(s)
     val trim: String => String = s => s.trim
-    val trans: Path => java.util.stream.Stream[String] = path => Files.readAllLines(path).stream()
-    Files.list(dir).flatMap(trans.asJava).map[String](trim.asJava).filter(filterNoneBlank.asJava)
+    val trans: Path => java.util.stream.Stream[String] = path =>
+      Files.readAllLines(path).stream()
+    Files
+      .list(dir)
+      .flatMap(trans.asJava)
+      .map[String](trim.asJava)
+      .filter(filterNoneBlank.asJava)
   }
 
   def randomBytes(size: Int): Array[Byte] = {
@@ -152,12 +160,13 @@ object Utils {
     case o                  => o.asInstanceOf[Object]
   }
 
-  def boxedSQL(v: Any): Object = try {
-    boxed(v)
-  } catch {
-    case _: Throwable =>
-      sqlBoxed(v)
-  }
+  def boxedSQL(v: Any): Object =
+    try {
+      boxed(v)
+    } catch {
+      case _: Throwable =>
+        sqlBoxed(v)
+    }
 
   def isEmail(account: String): Boolean = {
     // TODO
@@ -165,21 +174,25 @@ object Utils {
   }
 
   @inline
-  def option(s: String): Option[String] = Some(s).filter(str => StringUtils.isNoneBlank(str))
+  def option(s: String): Option[String] =
+    Some(s).filter(str => StringUtils.isNoneBlank(str))
 
   @inline
   def option[V](v: V): Option[V] = Option(v)
 
   def propertiesToMap(props: Properties): Map[String, String] = {
     import scala.collection.JavaConverters._
-    props.stringPropertyNames().asScala
+    props
+      .stringPropertyNames()
+      .asScala
       .map(name => name -> props.getProperty(name))
       .toMap
   }
 
-  def getClusterName(config: Config): String = option(System.getProperty("mass.cluster.name"))
-    .orElse(Try(config.getString("mass.cluster.name")).toOption)
-    .getOrElse("mass")
+  def getClusterName(config: Config): String =
+    option(System.getProperty("mass.cluster.name"))
+      .orElse(Try(config.getString("mass.cluster.name")).toOption)
+      .getOrElse("mass")
 
   def getClusterName(): String = getClusterName(ConfigFactory.load())
 }

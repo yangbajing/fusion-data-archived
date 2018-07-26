@@ -24,17 +24,18 @@ object PartialGraph extends App {
 
   val resultSink = Sink.head[Int]
 
-  val g = RunnableGraph.fromGraph(GraphDSL.create(resultSink) { implicit b => sink =>
-    import GraphDSL.Implicits._
+  val g = RunnableGraph.fromGraph(GraphDSL.create(resultSink) {
+    implicit b => sink =>
+      import GraphDSL.Implicits._
 
-    val pm3 = b.add(pickMaxOfThree)
+      val pm3 = b.add(pickMaxOfThree)
 
-    Source.single(4) ~> pm3.in(0)
-    Source.single(2) ~> pm3.in(1)
-    Source.single(3) ~> pm3.in(2)
-    pm3.out ~> sink.in
+      Source.single(4) ~> pm3.in(0)
+      Source.single(2) ~> pm3.in(1)
+      Source.single(3) ~> pm3.in(2)
+      pm3.out ~> sink.in
 
-    ClosedShape
+      ClosedShape
   })
 
   val result = Await.result(g.run, 300.millis)

@@ -172,8 +172,11 @@ object AsLocalDateTime {
     //    case null                 => None
     case ldt: LocalDateTime   => Some(ldt)
     case AsZonedDateTime(zdt) => Some(zdt.toLocalDateTime)
-    case s: String            => Try(TimeUtils.toLocalDateTime(s)).orElse(Try(LocalDateTime.parse(s))).toOption
-    case _                    => None
+    case s: String =>
+      Try(TimeUtils.toLocalDateTime(s))
+        .orElse(Try(LocalDateTime.parse(s)))
+        .toOption
+    case _ => None
   }
 }
 

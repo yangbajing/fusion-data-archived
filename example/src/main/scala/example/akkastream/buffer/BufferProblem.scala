@@ -16,13 +16,17 @@ object BufferProblem extends App {
     import akka.stream.scaladsl.GraphDSL.Implicits._
 
     // this is the asynchronous stage in this graph
-    val zipper = b.add(ZipWith[Tick, Int, Int]((tick, count) ⇒ count).async.addAttributes(Attributes.inputBuffer(1, 1)))
+    val zipper = b.add(
+      ZipWith[Tick, Int, Int]((tick, count) ⇒ count).async
+        .addAttributes(Attributes.inputBuffer(1, 1)))
     // 用默认缓冲区设置时将只打印 1
     //    val zipper = b.add(ZipWith[Tick, Int, Int]((tick, count) ⇒ count).async)
 
-    Source.tick(initialDelay = 3.second, interval = 3.second, Tick()) ~> zipper.in0
+    Source
+      .tick(initialDelay = 3.second, interval = 3.second, Tick()) ~> zipper.in0
 
-    Source.tick(initialDelay = 1.second, interval = 1.second, "message!")
+    Source
+      .tick(initialDelay = 1.second, interval = 1.second, "message!")
       .conflateWithSeed(seed = (_) ⇒ 1)((count, _) ⇒ count + 1) ~> zipper.in1
 
     zipper.out ~> Sink.foreach(println)

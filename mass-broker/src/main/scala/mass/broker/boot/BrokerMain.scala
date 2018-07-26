@@ -7,7 +7,10 @@
 package mass.broker.boot
 
 import akka.actor.{ActorRef, ActorSystem, PoisonPill}
-import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings}
+import akka.cluster.singleton.{
+  ClusterSingletonManager,
+  ClusterSingletonManagerSettings
+}
 import mass.broker.BrokerNode
 import mass.broker.leader.BrokerLeader
 import mass.core.Constants
@@ -28,9 +31,11 @@ final class BrokerBoot(
       ClusterSingletonManager.props(
         singletonProps = BrokerLeader.props,
         terminationMessage = PoisonPill,
-        settings = ClusterSingletonManagerSettings(system).withRole(Constants.Roles.BROKER)
+        settings = ClusterSingletonManagerSettings(system).withRole(
+          Constants.Roles.BROKER)
       ),
-      Constants.Nodes.BROKER_LEADER)
+      Constants.Nodes.BROKER_LEADER
+    )
 
     if (initBrokerLeaderProxy) {
       startBrokerLeaderProxy()

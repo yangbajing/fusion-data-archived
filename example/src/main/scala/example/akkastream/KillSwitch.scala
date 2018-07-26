@@ -13,7 +13,8 @@ object KillSwitch extends App with StrictLogging {
   implicit val mat = ActorMaterializer()
   import system.dispatcher
 
-  val countingSrc = Source(Stream.from(1)).delay(1.second, DelayOverflowStrategy.backpressure)
+  val countingSrc =
+    Source(Stream.from(1)).delay(1.second, DelayOverflowStrategy.backpressure)
 
   countingSrc.runForeach(i => logger.info(s"run: $i"))
 

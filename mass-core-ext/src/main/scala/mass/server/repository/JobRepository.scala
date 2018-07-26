@@ -13,7 +13,8 @@ import scala.concurrent.Future
 
 object JobRepository {
 
-  def apply(db: SlickProfile.backend.DatabaseDef): JobRepository = new JobRepository(db)
+  def apply(db: SlickProfile.backend.DatabaseDef): JobRepository =
+    new JobRepository(db)
 
 }
 
@@ -46,14 +47,14 @@ class JobRepository private (db: SlickProfile.backend.DatabaseDef) {
   def insertJobLog(jobLog: JobLog): Future[JobLog] =
     db.run(JobLogRow returning JobLogRow += jobLog)
 
-  def completionJobLog(
-      id: ObjectId,
-      completionTime: Option[OffsetDateTime],
-      completionStatus: Option[Int],
-      completionValue: Option[String]): Future[Int] =
-    db.run(JobLogRow
-      .filter(_.id === id)
-      .map(r => (r.completionTime, r.completionStatus, r.completionValue))
-      .update((completionTime, completionStatus, completionValue)))
+  def completionJobLog(id: ObjectId,
+                       completionTime: Option[OffsetDateTime],
+                       completionStatus: Option[Int],
+                       completionValue: Option[String]): Future[Int] =
+    db.run(
+      JobLogRow
+        .filter(_.id === id)
+        .map(r => (r.completionTime, r.completionStatus, r.completionValue))
+        .update((completionTime, completionStatus, completionValue)))
 
 }

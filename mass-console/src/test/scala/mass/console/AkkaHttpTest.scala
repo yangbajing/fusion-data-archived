@@ -8,15 +8,14 @@ import akka.stream.ActorMaterializer
 
 import scala.concurrent.Future
 
-case class SpidFacebookData(
-    AppId: String,
-    Type: String,
-    Application: String,
-    ExpiresAt: Long,
-    IsValid: Boolean,
-    IssuedAt: Long,
-    Scopes: Array[String],
-    UserId: String)
+case class SpidFacebookData(AppId: String,
+                            Type: String,
+                            Application: String,
+                            ExpiresAt: Long,
+                            IsValid: Boolean,
+                            IssuedAt: Long,
+                            Scopes: Array[String],
+                            UserId: String)
 
 class AkkaHttpTest {
   implicit val system = ActorSystem()
@@ -29,7 +28,9 @@ class AkkaHttpTest {
       HttpMethods.POST,
       "/api/signin",
       headers = List(headers.`Content-Type`(ContentTypes.`application/json`)),
-      entity = """{"account":"yangbajing@gmail.com", "password": "yangbajing"}"""))
+      entity =
+        """{"account":"yangbajing@gmail.com", "password": "yangbajing"}"""
+    ))
 
   resultFuture
     .flatMap(httpResponse => Unmarshal(httpResponse.entity).to[String])

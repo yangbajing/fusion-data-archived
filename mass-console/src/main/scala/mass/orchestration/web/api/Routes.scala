@@ -6,6 +6,4 @@
 
 package mass.orchestration.web.api
 
-class Routes {
-
-}
+class Routes {}

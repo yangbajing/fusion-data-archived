@@ -17,7 +17,8 @@ class Database {
 
   //  def bulkInsertAsync(insert: Seq[InsertMessage])(implicit ec: ExecutionContext): Future[Seq[String]] = bulkInsertAsync(insert.map(_.message))
 
-  def bulkInsertAsync(insert: Seq[String])(implicit ec: ExecutionContext): Future[Seq[String]] = Future {
+  def bulkInsertAsync(insert: Seq[String])(
+      implicit ec: ExecutionContext): Future[Seq[String]] = Future {
     TimeUnit.MILLISECONDS.sleep(50)
     insert
   }

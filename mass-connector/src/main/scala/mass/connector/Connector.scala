@@ -4,8 +4,8 @@ import helloscala.common.Configuration
 import mass.connector.ConnectorType.ConnectorType
 
 /**
- * 连接类型
- */
+  * 连接类型
+  */
 object ConnectorType extends Enumeration {
   type ConnectorType = Value
   val JDBC = Value(1, "jdbc")
@@ -23,22 +23,23 @@ object ConnectorType extends Enumeration {
 
 // #Connector
 /**
- * Connector
- *  -> SQL, CSV, Excel ……
- *    Connector2(Source) ->
- *                       <-> Flow1, Flow2, .... <-> 算是DataElement
- *  -> Connector2(Sink)
- * 数据连接
- */
+  * Connector
+  *  -> SQL, CSV, Excel ……
+  *    Connector2(Source) ->
+  *                       <-> Flow1, Flow2, .... <-> 算是DataElement
+  *  -> Connector2(Sink)
+  * 数据连接
+  */
 trait Connector extends AutoCloseable {
+
   /**
-   * 连接名，由用户设置。在整个应用业务生命周期内应保持唯一。
-   */
+    * 连接名，由用户设置。在整个应用业务生命周期内应保持唯一。
+    */
   def name: String
 
   /**
-   * 连接类型。不同的连接类型具有不同的配置选项，数据存取方式
-   */
+    * 连接类型。不同的连接类型具有不同的配置选项，数据存取方式
+    */
   def `type`: ConnectorType
 
   def setting: ConnectorSetting

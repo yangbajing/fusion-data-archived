@@ -22,7 +22,10 @@ class BrokerNode extends MetricActor {
   val cluster = Cluster(context.system)
 
   override def preStart(): Unit = {
-    cluster.subscribe(self, InitialStateAsEvents, classOf[MemberEvent], classOf[UnreachableMember])
+    cluster.subscribe(self,
+                      InitialStateAsEvents,
+                      classOf[MemberEvent],
+                      classOf[UnreachableMember])
   }
 
   override def postStop(): Unit = {
@@ -30,13 +33,13 @@ class BrokerNode extends MetricActor {
   }
 
   override def metricReceive: Receive = {
-    case MemberUp(member)                      =>
+    case MemberUp(member) =>
     //      logger.info("Member is Up: {}, roles: {}", member, member.roles)
-    case UnreachableMember(member)             =>
+    case UnreachableMember(member) =>
     //      logger.info("Member detected as unreachable: {}", member)
     case MemberRemoved(member, previousStatus) =>
     //      logger.info("Member is Removed: {} after {}", member, previousStatus)
-    case _: MemberEvent                        => // ignore
+    case _: MemberEvent => // ignore
   }
 
 }

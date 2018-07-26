@@ -9,7 +9,11 @@ object ConfigurationHelper {
 
   def fromProperties(props: Properties): Configuration = {
     ConfigFactory.systemProperties()
-    val config = Parseable.newProperties(props, ConfigParseOptions.defaults()).parse().asInstanceOf[AbstractConfigObject].toConfig
+    val config = Parseable
+      .newProperties(props, ConfigParseOptions.defaults())
+      .parse()
+      .asInstanceOf[AbstractConfigObject]
+      .toConfig
     Configuration(config)
   }
 

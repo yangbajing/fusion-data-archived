@@ -10,16 +10,17 @@ import org.scalatest.time.{Millis, Seconds, Span}
 import scala.concurrent.Future
 
 trait HelloscalaSpec
-  extends WordSpecLike
-  with MustMatchers
-  with OptionValues
-  with EitherValues
-  with ScalaFutures {
+    extends WordSpecLike
+    with MustMatchers
+    with OptionValues
+    with EitherValues
+    with ScalaFutures {
   this: Suite =>
 
   val defaultObjectMapper: ObjectMapper = Jackson.defaultObjectMapper
 
-  implicit val defaultPatience: PatienceConfig = PatienceConfig(Span(90, Seconds), Span(100, Millis))
+  implicit val defaultPatience: PatienceConfig =
+    PatienceConfig(Span(90, Seconds), Span(100, Millis))
 
   def jsonPrettyString[T](f: Future[T]): String = {
     val results = f.futureValue

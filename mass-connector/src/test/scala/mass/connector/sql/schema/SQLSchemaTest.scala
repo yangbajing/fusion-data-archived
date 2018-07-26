@@ -25,7 +25,8 @@ class SQLSchemaTest extends HelloscalaSpec with BeforeAndAfterAll {
     }
 
     "listColumn" in {
-      val columns = schema.listColumn(tables.head.tableName, tables.head.schemaName)
+      val columns =
+        schema.listColumn(tables.head.tableName, tables.head.schemaName)
       columns must not be empty
       columns.foreach(println)
     }

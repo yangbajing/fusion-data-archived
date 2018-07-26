@@ -11,20 +11,18 @@ class StatsService extends Actor {
   // This router is used both with lookup and deploy of routees. If you
   // have a router with only lookup of routees you can use Props.empty
   // instead of Props[StatsWorker.class].
-  val workerRouter = context.actorOf(
-    FromConfig.props(Props[StatsWorker]),
-    name = "workerRouter")
+  val workerRouter =
+    context.actorOf(FromConfig.props(Props[StatsWorker]), name = "workerRouter")
 
   def receive = {
     case StatsJob(text) if text != "" =>
       val words = text.split(" ")
       val replyTo = sender() // important to not close over sender()
       // create actor that collects replies from workers
-      val aggregator = context.actorOf(Props(
-        classOf[StatsAggregator], words.size, replyTo))
+      val aggregator =
+        context.actorOf(Props(classOf[StatsAggregator], words.size, replyTo))
       words foreach { word =>
-        workerRouter.tell(
-          ConsistentHashableEnvelope(word, word), aggregator)
+        workerRouter.tell(ConsistentHashableEnvelope(word, word), aggregator)
       }
   }
 }

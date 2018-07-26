@@ -20,7 +20,8 @@ import scala.collection.{immutable, mutable}
 
 object JdbcUtils extends StrictLogging {
   def columnLables(metadata: ResultSetMetaData): immutable.IndexedSeq[String] =
-    (1 to metadata.getColumnCount).map(i => Option(metadata.getColumnLabel(i)).getOrElse(metadata.getColumnName(i)))
+    (1 to metadata.getColumnCount).map(i =>
+      Option(metadata.getColumnLabel(i)).getOrElse(metadata.getColumnName(i)))
 
   @throws[SQLException]("if thrown by the JDBC API")
   def getResultSetValue(rs: ResultSet, index: Int): AnyRef = {
@@ -34,7 +35,8 @@ object JdbcUtils extends StrictLogging {
         blob.getBytes(1, blob.length().toInt)
       case clob: Clob =>
         clob.getSubString(1, clob.length().toInt)
-      case _ if "oracle.sql.TIMESTAMP" == className || "oracle.sql.TIMESTAMPTZ" == className =>
+      case _
+          if "oracle.sql.TIMESTAMP" == className || "oracle.sql.TIMESTAMPTZ" == className =>
         rs.getTimestamp(index)
       case _ if className.startsWith("oracle.sql.DATE") =>
         val metaDataClassName = rs.getMetaData.getColumnClassName(index)
@@ -42,7 +44,8 @@ object JdbcUtils extends StrictLogging {
           rs.getTimestamp(index)
         else
           rs.getDate(index)
-      case _: Date if "java.sql.Timestamp" == rs.getMetaData.getColumnClassName(index) =>
+      case _: Date
+          if "java.sql.Timestamp" == rs.getMetaData.getColumnClassName(index) =>
         rs.getTimestamp(index)
       case other =>
         other
@@ -58,11 +61,12 @@ object JdbcUtils extends StrictLogging {
   }
 
   /**
-   * 将所有 ?name 命名参数替换成 ?
-   * @param sql 采用命名参数编写的SQL语句
-   * @return (转换后SQL语句，提取出的参数和索引)，索引从1开始编号
-   */
-  def namedParameterToQuestionMarked(sql: String): (String, Map[String, Int]) = {
+    * 将所有 ?name 命名参数替换成 ?
+    * @param sql 采用命名参数编写的SQL语句
+    * @return (转换后SQL语句，提取出的参数和索引)，索引从1开始编号
+    */
+  def namedParameterToQuestionMarked(
+      sql: String): (String, Map[String, Int]) = {
     val sqlBuf = new java.lang.StringBuilder()
     var paramBuf = new java.lang.StringBuilder()
     val params = mutable.Map.empty[String, Int]
@@ -86,62 +90,68 @@ object JdbcUtils extends StrictLogging {
     (sqlBuf.toString, params.toMap)
   }
 
-  def preparedStatementCreator(sql: String, namedSql: String = ""): ConnectionPreparedStatementCreator =
+  def preparedStatementCreator(
+      sql: String,
+      namedSql: String = ""): ConnectionPreparedStatementCreator =
     new ConnectionPreparedStatementCreatorImpl(sql, namedSql)
 
-  def preparedStatementAction[R](args: Iterable[Any], func: PreparedStatementAction[R]): PreparedStatementAction[R] =
+  def preparedStatementAction[R](
+      args: Iterable[Any],
+      func: PreparedStatementAction[R]): PreparedStatementAction[R] =
     new PreparedStatementActionImpl(args, func)
 
-  def preparedStatementActionUseUpdate(args: Iterable[Any]): PreparedStatementAction[Int] =
-    new PreparedStatementActionImpl(
-      args,
-      pstmt => {
-        setStatementParameters(pstmt, args)
-        pstmt.executeUpdate()
-      })
+  def preparedStatementActionUseUpdate(
+      args: Iterable[Any]): PreparedStatementAction[Int] =
+    new PreparedStatementActionImpl(args, pstmt => {
+      setStatementParameters(pstmt, args)
+      pstmt.executeUpdate()
+    })
 
-  def preparedStatementActionUseUpdate(args: Map[String, Any], paramIndex: Map[String, Int]): PreparedStatementAction[Int] =
-    new PreparedStatementActionImpl(
-      args,
-      pstmt => {
+  def preparedStatementActionUseUpdate(
+      args: Map[String, Any],
+      paramIndex: Map[String, Int]): PreparedStatementAction[Int] =
+    new PreparedStatementActionImpl(args, pstmt => {
+      for ((param, index) <- paramIndex) {
+        setParameter(pstmt, index, args(param))
+      }
+      pstmt.executeUpdate()
+    })
+
+  def preparedStatementActionUseBatchUpdate(argsList: Iterable[Iterable[Any]])
+    : PreparedStatementAction[scala.Array[Int]] =
+    new PreparedStatementActionImpl(argsList, pstmt => {
+      for (args <- argsList) {
+        setStatementParameters(pstmt, args)
+        pstmt.addBatch()
+      }
+      pstmt.executeBatch()
+    })
+
+  def preparedStatementActionUseBatchUpdate(
+      argsList: Iterable[Map[String, Any]],
+      paramIndex: Map[String, Int]): PreparedStatementAction[scala.Array[Int]] =
+    new PreparedStatementActionImpl(argsList, pstmt => {
+      for (args <- argsList) {
         for ((param, index) <- paramIndex) {
           setParameter(pstmt, index, args(param))
         }
-        pstmt.executeUpdate()
-      })
+        pstmt.addBatch()
+      }
+      pstmt.executeBatch()
+    })
 
-  def preparedStatementActionUseBatchUpdate(argsList: Iterable[Iterable[Any]]): PreparedStatementAction[scala.Array[Int]] =
-    new PreparedStatementActionImpl(
-      argsList,
-      pstmt => {
-        for (args <- argsList) {
-          setStatementParameters(pstmt, args)
-          pstmt.addBatch()
-        }
-        pstmt.executeBatch()
-      })
-
-  def preparedStatementActionUseBatchUpdate(argsList: Iterable[Map[String, Any]], paramIndex: Map[String, Int]): PreparedStatementAction[scala.Array[Int]] =
-    new PreparedStatementActionImpl(
-      argsList,
-      pstmt => {
-        for (args <- argsList) {
-          for ((param, index) <- paramIndex) {
-            setParameter(pstmt, index, args(param))
-          }
-          pstmt.addBatch()
-        }
-        pstmt.executeBatch()
-      })
-
-  def setStatementParameters(pstmt: PreparedStatement, args: Map[String, Any], paramIndex: Map[String, Int]): PreparedStatement = {
+  def setStatementParameters(
+      pstmt: PreparedStatement,
+      args: Map[String, Any],
+      paramIndex: Map[String, Int]): PreparedStatement = {
     for ((param, index) <- paramIndex) {
       setParameter(pstmt, index, args(param))
     }
     pstmt
   }
 
-  def setStatementParameters(pstmt: PreparedStatement, args: Iterable[Any]): PreparedStatement = {
+  def setStatementParameters(pstmt: PreparedStatement,
+                             args: Iterable[Any]): PreparedStatement = {
     var i = 0
     for (arg <- args) {
       i += 1
@@ -208,18 +218,20 @@ object JdbcUtils extends StrictLogging {
       Types.SMALLINT == sqlType || Types.TINYINT == sqlType
 
   /**
-   * 从SQL结果元数据中获取列表。将首先通过 label 获取，若 label 不存在再从 name 获取
-   * @param resultSetMetaData SQL结果元数据
-   * @param columnIndex 列索引，从1开始
-   * @return 列名
-   */
-  def lookupColumnName(resultSetMetaData: ResultSetMetaData, columnIndex: Int): String = {
+    * 从SQL结果元数据中获取列表。将首先通过 label 获取，若 label 不存在再从 name 获取
+    * @param resultSetMetaData SQL结果元数据
+    * @param columnIndex 列索引，从1开始
+    * @return 列名
+    */
+  def lookupColumnName(resultSetMetaData: ResultSetMetaData,
+                       columnIndex: Int): String = {
     val name = resultSetMetaData.getColumnLabel(columnIndex)
     if (StringUtils.isEmpty(name)) resultSetMetaData.getColumnName(columnIndex)
     else name
   }
 
-  def createHikariDataSource(data: (String, String), datas: (String, String)*): HikariDataSource = {
+  def createHikariDataSource(data: (String, String),
+                             datas: (String, String)*): HikariDataSource = {
     val props = new Properties()
     props.put(data._1, data._2)
     for ((key, value) <- datas) {
@@ -236,7 +248,13 @@ object JdbcUtils extends StrictLogging {
     createHikariDataSource(props)
   }
 
-  private val REMOVED_KEYS = List("useTransaction", "ignoreWarnings", "allowPrintLog", "maxConnections", "numThreads", "registerMbeans", "queueSize")
+  private val REMOVED_KEYS = List("useTransaction",
+                                  "ignoreWarnings",
+                                  "allowPrintLog",
+                                  "maxConnections",
+                                  "numThreads",
+                                  "registerMbeans",
+                                  "queueSize")
 
   @inline def createHikariDataSource(config: Configuration): HikariDataSource =
     createHikariDataSource(config.getProperties(null))
@@ -245,8 +263,12 @@ object JdbcUtils extends StrictLogging {
     createHikariDataSource(Configuration(config))
 
   @inline def createHikariDataSource(props: Properties): HikariDataSource =
-    createHikariDataSource(new HikariConfig(REMOVED_KEYS.foldLeft(props) { (props, key) => props.remove(key); props }))
+    createHikariDataSource(new HikariConfig(REMOVED_KEYS.foldLeft(props) {
+      (props, key) =>
+        props.remove(key); props
+    }))
 
-  def createHikariDataSource(config: HikariConfig): HikariDataSource = new HikariDataSource(config)
+  def createHikariDataSource(config: HikariConfig): HikariDataSource =
+    new HikariDataSource(config)
 
 }

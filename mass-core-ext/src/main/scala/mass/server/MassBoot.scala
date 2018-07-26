@@ -45,7 +45,8 @@ object MassBoot extends StrictLogging {
 
   def configuration: Configuration = Configuration(config)
 
-  def init(config: Config): Unit = init(ActorSystem(Utils.getClusterName(config), config))
+  def init(config: Config): Unit =
+    init(ActorSystem(Utils.getClusterName(config), config))
 
   def init(s: ActorSystem): Unit = {
     _actorSystem = s
@@ -69,27 +70,36 @@ object MassBoot extends StrictLogging {
 
   def stop(): Unit = {
     actorSystem.terminate()
-    Await.ready(actorSystem.whenTerminated, 60.seconds).onComplete {
-      case scala.util.Success(terminated) =>
-        logger.info(s"MassServer退出成功：$terminated")
-        System.exit(0)
-      case scala.util.Failure(e) =>
-        logger.error(s"MassServer退出错误：${e.getMessage}", e)
-        System.exit(-1)
-    }(Implicits.global)
+    Await
+      .ready(actorSystem.whenTerminated, 60.seconds)
+      .onComplete {
+        case scala.util.Success(terminated) =>
+          logger.info(s"MassServer退出成功：$terminated")
+          System.exit(0)
+        case scala.util.Failure(e) =>
+          logger.error(s"MassServer退出错误：${e.getMessage}", e)
+          System.exit(-1)
+      }(Implicits.global)
   }
 
   def startupDump(): String = {
     val kvs = TreeMap(
       "akka.loglevel" -> config.getString("akka.loglevel"),
       "akka.stdout-loglevel" -> config.getString("akka.stdout-loglevel"),
-      "akka.cluster.seed-nodes" -> config.getStringList("akka.cluster.seed-nodes"),
+      "akka.cluster.seed-nodes" -> config.getStringList(
+        "akka.cluster.seed-nodes"),
       "akka.cluster.roles" -> config.getStringList("akka.cluster.roles"),
-      "akka.remote.netty.tcp.hostname" -> config.getString("akka.remote.netty.tcp.hostname"),
-      "akka.remote.netty.tcp.port" -> config.getInt("akka.remote.netty.tcp.port"),
-      "akka.remote.artery.canonical.hostname" -> config.getString("akka.remote.artery.canonical.hostname"),
-      "akka.remote.artery.canonical.port" -> config.getInt("akka.remote.netty.tcp.port")
-    ) ++ configuration.get[Map[String, String]]("mass").map(entry => ("mass." + entry._1, entry._2))
+      "akka.remote.netty.tcp.hostname" -> config.getString(
+        "akka.remote.netty.tcp.hostname"),
+      "akka.remote.netty.tcp.port" -> config.getInt(
+        "akka.remote.netty.tcp.port"),
+      "akka.remote.artery.canonical.hostname" -> config.getString(
+        "akka.remote.artery.canonical.hostname"),
+      "akka.remote.artery.canonical.port" -> config.getInt(
+        "akka.remote.netty.tcp.port")
+    ) ++ configuration
+      .get[Map[String, String]]("mass")
+      .map(entry => ("mass." + entry._1, entry._2))
     kvs.map(entry => s"${entry._1} = ${entry._2}").mkString("\n")
   }
 

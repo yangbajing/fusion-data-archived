@@ -9,22 +9,27 @@ import mass.core.{BaseSystem, MassSystem}
 
 object ConnectorSystem {
 
-  def apply(name: String, massSystem: MassSystem): ConnectorSystem = new ConnectorSystem(name, massSystem)
+  def apply(name: String, massSystem: MassSystem): ConnectorSystem =
+    new ConnectorSystem(name, massSystem)
 
 }
 
-class ConnectorSystem private (val name: String, val massSystem: MassSystem) extends BaseSystem with StrictLogging {
+class ConnectorSystem private (val name: String, val massSystem: MassSystem)
+    extends BaseSystem
+    with StrictLogging {
   private var _parsers = Map.empty[String, ConnectorParser]
   private var _connectors = Map.empty[String, Connector]
   init()
 
   private def init(): Unit = {
-    massSystem.configuration.get[Seq[String]]("mass.connector.parsers").foreach { className =>
-      Class.forName(className).newInstance() match {
-        case parse: ConnectorParser => registerConnectorParser(parse)
-        case unknown                => logger.error(s"未知的ConnectorParse: $unknown")
+    massSystem.configuration
+      .get[Seq[String]]("mass.connector.parsers")
+      .foreach { className =>
+        Class.forName(className).newInstance() match {
+          case parse: ConnectorParser => registerConnectorParser(parse)
+          case unknown                => logger.error(s"未知的ConnectorParse: $unknown")
+        }
       }
-    }
     massSystem.system.registerOnTermination {
       connectors.foreach { case (_, c) => c.close() }
     }
@@ -45,7 +50,8 @@ class ConnectorSystem private (val name: String, val massSystem: MassSystem) ext
 
   def parsers: Map[String, ConnectorParser] = _parsers
 
-  def registerConnectorParser(parse: ConnectorParser): Map[String, ConnectorParser] = {
+  def registerConnectorParser(
+      parse: ConnectorParser): Map[String, ConnectorParser] = {
     _parsers = _parsers.updated(parse.`type`, parse)
     logger.info(s"注册Connector解析器：$parse，当前数量：${parsers.size}")
     parsers

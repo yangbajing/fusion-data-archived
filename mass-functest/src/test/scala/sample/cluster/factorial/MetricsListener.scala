@@ -3,7 +3,11 @@ package sample.cluster.factorial
 import akka.actor.{Actor, ActorLogging}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent.CurrentClusterState
-import akka.cluster.metrics.{ClusterMetricsChanged, ClusterMetricsExtension, NodeMetrics}
+import akka.cluster.metrics.{
+  ClusterMetricsChanged,
+  ClusterMetricsExtension,
+  NodeMetrics
+}
 import akka.cluster.metrics.StandardMetrics.{Cpu, HeapMemory}
 
 class MetricsListener extends Actor with ActorLogging {
@@ -32,7 +36,12 @@ class MetricsListener extends Actor with ActorLogging {
   }
 
   def logCpu(nodeMetrics: NodeMetrics): Unit = nodeMetrics match {
-    case Cpu(address, timestamp, Some(systemLoadAverage), cpuCombined, cpuStolen, processors) =>
+    case Cpu(address,
+             timestamp,
+             Some(systemLoadAverage),
+             cpuCombined,
+             cpuStolen,
+             processors) =>
       log.info("Load: {} ({} processors)", systemLoadAverage, processors)
     case _ => // No cpu info.
   }

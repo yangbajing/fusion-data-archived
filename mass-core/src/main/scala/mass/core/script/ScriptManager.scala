@@ -14,7 +14,9 @@ object ScriptManager {
 
   val engineManager = new ScriptEngineManager()
 
-  def scriptScala: ScriptEngine = engineManager.getEngineByName(ENGINE_SCALA.toString)
+  def scriptScala: ScriptEngine =
+    engineManager.getEngineByName(ENGINE_SCALA.toString)
 
-  def scriptJavascript: ScriptEngine = engineManager.getEngineByName(ENGINE_JAVASCRIPT.toString)
+  def scriptJavascript: ScriptEngine =
+    engineManager.getEngineByName(ENGINE_JAVASCRIPT.toString)
 }

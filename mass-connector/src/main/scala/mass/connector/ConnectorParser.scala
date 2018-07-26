@@ -7,4 +7,3 @@ trait ConnectorParser {
 
   override def toString = s"SQLConnectorParser(${`type`})"
 }
-

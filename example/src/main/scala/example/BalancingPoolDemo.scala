@@ -32,7 +32,8 @@ class Worker extends Actor with ActorLogging {
 
   override def receive: Receive = {
     case FibonacciNumber(nr, delay) =>
-      context.system.scheduler.scheduleOnce(delay, self, GetResult(nr, sender()))
+      context.system.scheduler
+        .scheduleOnce(delay, self, GetResult(nr, sender()))
 
     case GetResult(nr, source) =>
       val result = fibonacci(nr)

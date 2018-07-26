@@ -8,6 +8,4 @@ object SqlSchemaType extends Enumeration {
   val DM = Value
 }
 
-object Schemas {
-
-}
+object Schemas {}

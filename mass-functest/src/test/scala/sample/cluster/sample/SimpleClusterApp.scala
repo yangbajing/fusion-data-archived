@@ -11,8 +11,7 @@ object SimpleClusterApp extends App {
   var tm = 0
   Seq("2551", "2552", "0").foreach { port =>
     // Override the configuration of the port
-    val config = ConfigFactory.parseString(
-      s"""
+    val config = ConfigFactory.parseString(s"""
         akka.remote.netty.tcp.port=$port
         akka.remote.artery.canonical.port=$port
         """).withFallback(ConfigFactory.load("simple-cluster"))
@@ -20,7 +19,8 @@ object SimpleClusterApp extends App {
     // Create an Akka system
     val system = ActorSystem("ClusterSystem", config)
     // Create an actor that handles cluster domain events
-    val simpleClusterListener = system.actorOf(Props[SimpleClusterListener], name = "clusterListener")
+    val simpleClusterListener =
+      system.actorOf(Props[SimpleClusterListener], name = "clusterListener")
 
     tm += 5
     Future {
