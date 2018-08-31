@@ -8,8 +8,7 @@ import scala.collection.immutable
 trait SQLSchema {
   def listTable(schemaName: String): immutable.Seq[TableInfo]
 
-  def listColumn(tableName: String,
-                 schemaName: String): immutable.Seq[ColumnInfo]
+  def listColumn(tableName: String, schemaName: String): immutable.Seq[ColumnInfo]
 }
 
 trait BaseInfo {
@@ -54,24 +53,21 @@ abstract class InfoHelper(_data: Map[String, AnyRef]) {
     _data.get(name).flatMap(AsDouble.unapply)
 }
 
-case class ColumnInfo(schemaName: String,
-                      tableName: String,
-                      columnName: String,
-                      ordinalPosition: Int,
-                      columnDefault: Option[String],
-                      isNullable: Boolean,
-                      dataType: String,
-                      characterMaximumLength: Option[Int],
-                      characterOctetLength: Option[Int],
-                      numericPrecision: Option[Int],
-                      numericPrecisionRadix: Option[Int],
-                      numericScale: Option[Int],
-                      datetimePrecision: Option[Int],
-                      isUpdatable: Option[Boolean])
+case class ColumnInfo(
+    schemaName: String,
+    tableName: String,
+    columnName: String,
+    ordinalPosition: Int,
+    columnDefault: Option[String],
+    isNullable: Boolean,
+    dataType: String,
+    characterMaximumLength: Option[Int],
+    characterOctetLength: Option[Int],
+    numericPrecision: Option[Int],
+    numericPrecisionRadix: Option[Int],
+    numericScale: Option[Int],
+    datetimePrecision: Option[Int],
+    isUpdatable: Option[Boolean])
     extends BaseInfo
 
-case class TableInfo(schemaName: String,
-                     tableName: String,
-                     tableType: String,
-                     isInsertable: Boolean)
-    extends BaseInfo
+case class TableInfo(schemaName: String, tableName: String, tableType: String, isInsertable: Boolean) extends BaseInfo

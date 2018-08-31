@@ -1,6 +1,7 @@
 package example.leetcode
 
 object ThreeNum {
+
   def threeSum(nums: Array[Int]): List[List[Int]] = {
     var results = List.empty[List[Int]]
 

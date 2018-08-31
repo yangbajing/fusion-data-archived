@@ -102,11 +102,10 @@ object CombiningMaterializedValues extends App {
 
     // The result of r11 can be also achieved by using the Graph API
     val r12: RunnableGraph[(Promise[Option[Int]], Cancellable, Future[Int])] =
-      RunnableGraph.fromGraph(GraphDSL.create(source, flow, sink)((_, _, _)) {
-        implicit builder ⇒ (src, f, dst) ⇒
-          import GraphDSL.Implicits._
-          src ~> f ~> dst
-          ClosedShape
+      RunnableGraph.fromGraph(GraphDSL.create(source, flow, sink)((_, _, _)) { implicit builder ⇒ (src, f, dst) ⇒
+        import GraphDSL.Implicits._
+        src ~> f ~> dst
+        ClosedShape
       })
   }
 

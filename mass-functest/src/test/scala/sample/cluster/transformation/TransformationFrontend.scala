@@ -38,6 +38,7 @@ class TransformationFrontend extends Actor {
 //#frontend
 
 object TransformationFrontend {
+
   def main(args: Array[String]): Unit = {
     // Override the configuration of the port when specified as program argument
     val port = if (args.isEmpty) "0" else args(0)
@@ -46,8 +47,7 @@ object TransformationFrontend {
         akka.remote.netty.tcp.port=$port
         akka.remote.artery.canonical.port=$port
         """)
-      .withFallback(
-        ConfigFactory.parseString("akka.cluster.roles = [frontend]"))
+      .withFallback(ConfigFactory.parseString("akka.cluster.roles = [frontend]"))
       .withFallback(ConfigFactory.load("simple-cluster"))
 
     val system = ActorSystem("ClusterSystem", config)

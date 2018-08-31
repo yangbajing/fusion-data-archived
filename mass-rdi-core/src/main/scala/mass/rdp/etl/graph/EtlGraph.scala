@@ -21,17 +21,11 @@ object EtlScriptType extends Enumeration {
   val java = Value(4)
 }
 
-case class EtlScript(`type`: EtlScriptType,
-                     src: Option[String],
-                     content: Option[String]) {
-  require(src.nonEmpty || content.nonEmpty,
-          s"src: ${src}属性 或 script内容${content}不能同时为空")
+case class EtlScript(`type`: EtlScriptType, src: Option[String], content: Option[String]) {
+  require(src.nonEmpty || content.nonEmpty, s"src: ${src}属性 或 script内容${content}不能同时为空")
 }
 
-case class EtlSource(name: String,
-                     connector: EtlConnector,
-                     script: EtlScript,
-                     out: String) {
+case class EtlSource(name: String, connector: EtlConnector, script: EtlScript, out: String) {
   require(StringUtils.isNoneBlank(name), "name 不能为空")
   require(StringUtils.isNoneBlank(out), "out 不能为空")
 }
@@ -45,10 +39,7 @@ case class EtlSink(name: String, connector: EtlConnector, script: EtlScript) {
   require(StringUtils.isNoneBlank(name), "name 不能为空")
 }
 
-case class EtlGraphSetting(name: String,
-                           source: EtlSource,
-                           flows: Vector[EtlFlow],
-                           sink: EtlSink)
+case class EtlGraphSetting(name: String, source: EtlSource, flows: Vector[EtlFlow], sink: EtlSink)
 
 trait EtlGraph {
   def name: String = graphSetting.name
@@ -61,6 +52,5 @@ trait EtlGraph {
 
   def graphSetting: EtlGraphSetting
 
-  def run(connectors: immutable.Seq[Connector],
-          rdpSystem: RdpSystem): EtlWorkflowExecution
+  def run(connectors: immutable.Seq[Connector], rdpSystem: RdpSystem): EtlWorkflowExecution
 }

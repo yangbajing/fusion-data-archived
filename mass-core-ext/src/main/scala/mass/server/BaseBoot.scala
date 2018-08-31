@@ -7,10 +7,7 @@
 package mass.server
 
 import akka.actor.{ActorRef, ActorSystem}
-import akka.cluster.singleton.{
-  ClusterSingletonProxy,
-  ClusterSingletonProxySettings
-}
+import akka.cluster.singleton.{ClusterSingletonProxy, ClusterSingletonProxySettings}
 import com.typesafe.scalalogging.StrictLogging
 import mass.core.Constants
 
@@ -23,9 +20,8 @@ trait BaseBoot extends StrictLogging {
 
   protected def startBrokerLeaderProxy(): Unit = {
     _brokerLeaderProxy = system.actorOf(
-      ClusterSingletonProxy.props(
-        s"/user/${Constants.Nodes.BROKER_LEADER}",
-        ClusterSingletonProxySettings(system).withRole(Constants.Roles.BROKER)),
+      ClusterSingletonProxy.props(s"/user/${Constants.Nodes.BROKER_LEADER}",
+                                  ClusterSingletonProxySettings(system).withRole(Constants.Roles.BROKER)),
       Constants.Nodes.BROKER_LEADER_PROXY
     )
 

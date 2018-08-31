@@ -7,33 +7,37 @@ object Commons {
 
   import sbtassembly.AssemblyKeys.{assembly, assemblyMergeStrategy}
   import sbtassembly.{MergeStrategy, PathList}
+  import Environment.{buildEnv, BuildEnv}
 
   def basicSettings =
-    Version.versionning ++ Seq(
+    Seq(
       organization := "me.yangbajing",
       organizationName := "Yangbajing's Garden",
       organizationHomepage := Some(url("https://yangbajing.me")),
       homepage := Some(url("http://www.yangbajing.me/mass-data/doc/")),
       startYear := Some(2018),
-      licenses += ("Apache-2.0", new URL(
-        "https://www.apache.org/licenses/LICENSE-2.0.txt")),
+      licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
       headerLicense := Some(HeaderLicense.ALv2("2018", "羊八井(yangbajing)（杨景）")),
       scalaVersion := Dependencies.versionScala,
-      scalacOptions ++= Seq(
-        "-encoding",
-        "UTF-8", // yes, this is 2 args
-        "-feature",
-        "-deprecation",
-        "-unchecked",
-        "-Xlint",
-        "-Yno-adapted-args", //akka-http heavily depends on adapted args and => Unit implicits break otherwise
-        "-Ywarn-dead-code"
-        // "-Xfuture" // breaks => Unit implicits
-      ),
+      scalacOptions ++= {
+        val opts = Seq(
+          "-encoding",
+          "UTF-8", // yes, this is 2 args
+          "-feature",
+          "-deprecation",
+          "-unchecked",
+          "-Xlint",
+          "-Yno-adapted-args", //akka-http heavily depends on adapted args and => Unit implicits break otherwise
+          "-Ypartial-unification",
+          "-Ywarn-dead-code"
+        )
+        buildEnv.value match {
+          case BuildEnv.Production | BuildEnv.Test => opts ++ List("-Xelide-below", "2001")
+          case _                                   => opts
+        }
+      },
       javacOptions in Compile ++= Seq("-Xlint:unchecked", "-Xlint:deprecation"),
-      javaOptions in run ++= Seq("-Xms128m",
-                                 "-Xmx1024m",
-                                 "-Djava.library.path=./target/native"),
+      javaOptions in run ++= Seq("-Xms128m", "-Xmx1024m", "-Djava.library.path=./target/native"),
       shellPrompt := { s =>
         Project.extract(s).currentProject.id + " > "
       },
@@ -78,8 +82,7 @@ object Publishing {
                     Some(
                       "hualongdata-sbt-release-local" at "https://artifactory.hualongdata.com/artifactory/sbt-release-local")
                   }),
-    credentials += Credentials(
-      Path.userHome / ".ivy2" / ".credentials_yangbajing")
+    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials_yangbajing")
   )
 
   lazy val noPublish = Seq(
@@ -125,7 +128,7 @@ object Packaging {
   // Good example https://github.com/typesafehub/activator/blob/master/project/Packaging.scala
   import com.typesafe.sbt.SbtNativePackager._
   import com.typesafe.sbt.packager.Keys._
-  import Environment.{BuildEnv, buildEnv}
+  import Environment.{buildEnv, BuildEnv}
 
   // This is dirty, but play has stolen our keys, and we must mimc them here.
   val stage = TaskKey[File]("stage")
@@ -145,8 +148,7 @@ object Packaging {
     },
     bashScriptExtraDefines ++= Seq(
       """addJava "-Dconfig.file=${app_home}/../conf/application.conf"""",
-      """addJava "-Dpidfile.path=${app_home}/../run/%s.pid"""".format(
-        name.value),
+      """addJava "-Dpidfile.path=${app_home}/../run/%s.pid"""".format(name.value),
       """addJava "-Dlogback.configurationFile=${app_home}/../conf/logback.xml""""
     ),
     bashScriptConfigLocation := Some("${app_home}/../conf/jvmopts"),

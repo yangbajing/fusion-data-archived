@@ -6,14 +6,10 @@ import helloscala.common.test.HelloscalaSpec
 import mass.core.MassSystem
 import org.scalatest.BeforeAndAfterAll
 
-class MassSystemExtensionTest
-    extends TestKit(ActorSystem("mass"))
-    with HelloscalaSpec
-    with BeforeAndAfterAll {
+class MassSystemExtensionTest extends TestKit(ActorSystem("mass")) with HelloscalaSpec with BeforeAndAfterAll {
 
-  override protected def beforeAll(): Unit = {
+  override protected def beforeAll(): Unit =
     MassSystem(system)
-  }
 
   "MassSystemExtension" should {
     "as[MassSystemExtension]" in {

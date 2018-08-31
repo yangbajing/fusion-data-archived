@@ -25,8 +25,7 @@ object SimplifiedAPI extends App {
     Sink.actorRef(system.actorOf(Props[Remotely], "remotely"), "Done")
   val localProcessing = Sink.foreach[Int](v => println(s"foreach($v)"))
   Source(List(0, 1, 1))
-    .runWith(Sink.combine(sendRemotely, localProcessing)(strategy =>
-      Broadcast[Int](strategy)))
+    .runWith(Sink.combine(sendRemotely, localProcessing)(strategy => Broadcast[Int](strategy)))
 
   StdIn.readLine()
   system.terminate()

@@ -6,8 +6,7 @@ import mass.core.event.EventData
 
 class ScriptManagerTest extends HelloscalaSpec {
 
-  case class SqlDataEvent(data: String, `type`: String = "data-sql")
-      extends EventData
+  case class SqlDataEvent(data: String, `type`: String = "data-sql") extends EventData
 
   "ScriptManagerTest" should {
 

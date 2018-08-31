@@ -1,6 +1,5 @@
-# 反映式数据处理（mass-rdi）
+# 反应式数据处理（mass-rdi）
 
-<<<<<<< HEAD
 **mass-rdi** 的数据处理部分将基于 Reactive Extension 的思想进行设计，采集 **Akka Stream** 做为实现框架，基于 **Alpakka** 进行落地实现。
 
 ## 特性
@@ -31,16 +30,6 @@ mass-rdi 可以单独使用，也可以集成到其它业务系统里面。
 **可扩展**
 
 mass-rdi 提供了完善的接口和丰富的扩展点，支持对 mass-rdi 进行二次开发，或将其嵌入到特定的应用系统中。
-=======
-mass-rdi 反应式数据集成
-
-- ETL/ELT
-- 数据迁移
-- 数据同步
-
-**MassData** 的数据处理部分将基于 Reactive Extension 的思想进行设计，采集 **Akka Stream** 做为实现框架，
-基于 **Alpakka** 进行落地实现。
->>>>>>> master
 
 @@toc { depth=1 }
 

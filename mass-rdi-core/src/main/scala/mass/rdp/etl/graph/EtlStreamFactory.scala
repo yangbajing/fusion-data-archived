@@ -16,24 +16,19 @@ trait EtlStreamFactory {
 
   def buildSource(c: Connector, s: EtlSource): Source[EventDataSql, NotUsed]
 
-  def buildSink(c: Connector,
-                s: EtlSink): Sink[EventData, Future[JdbcSinkResult]]
+  def buildSink(c: Connector, s: EtlSink): Sink[EventData, Future[JdbcSinkResult]]
 }
 
 class EtlStreamJdbcFactory extends EtlStreamFactory {
 
   override def `type`: String = "jdbc"
 
-  override def buildSource(c: Connector,
-                           s: EtlSource): Source[EventDataSql, NotUsed] = {
-    JdbcSource(s.script.content.get, Nil, 1000)(
-      c.asInstanceOf[SQLConnector].dataSource)
+  override def buildSource(c: Connector, s: EtlSource): Source[EventDataSql, NotUsed] =
+    JdbcSource(s.script.content.get, Nil, 1000)(c.asInstanceOf[SQLConnector].dataSource)
       .via(JdbcFlow.flowJdbcResultSet)
       .map(jrs => EventDataSql(jrs))
-  }
 
-  def buildSink(c: Connector,
-                s: EtlSink): Sink[EventData, Future[JdbcSinkResult]] = {
+  def buildSink(c: Connector, s: EtlSink): Sink[EventData, Future[JdbcSinkResult]] = {
     val action = (event: EventData, stmt: PreparedStatement) => {
       val args: Iterable[Any] = event match {
         case _: EventDataSimple         => event.data.asInstanceOf[Iterable[Any]]
@@ -43,8 +38,7 @@ class EtlStreamJdbcFactory extends EtlStreamFactory {
       JdbcUtils.setStatementParameters(stmt, args)
       ()
     }
-    JdbcSink(stmt => stmt.prepareStatement(s.script.content.get), action, 1000)(
-      c.asInstanceOf[SQLConnector].dataSource)
+    JdbcSink(stmt => stmt.prepareStatement(s.script.content.get), action, 1000)(c.asInstanceOf[SQLConnector].dataSource)
   }
 
 }

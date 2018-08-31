@@ -2,14 +2,7 @@ package sample.cluster.stats
 
 import java.util.concurrent.ThreadLocalRandom
 
-import akka.actor.{
-  Actor,
-  ActorSystem,
-  Address,
-  Props,
-  RelativeActorPath,
-  RootActorPath
-}
+import akka.actor.{Actor, ActorSystem, Address, Props, RelativeActorPath, RootActorPath}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, MemberStatus}
 import com.typesafe.config.ConfigFactory
@@ -17,16 +10,16 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration._
 
 object StatsSample {
-  def main(args: Array[String]): Unit = {
+
+  def main(args: Array[String]): Unit =
     if (args.isEmpty) {
       startup(Seq("2551", "2552", "0"))
       StatsSampleClient.main(Array.empty)
     } else {
       startup(args)
     }
-  }
 
-  def startup(ports: Seq[String]): Unit = {
+  def startup(ports: Seq[String]): Unit =
     ports foreach { port =>
       // Override the configuration of the port when specified as program argument
       val config = ConfigFactory
@@ -34,8 +27,7 @@ object StatsSample {
         akka.remote.netty.tcp.port=$port
         akka.remote.artery.canonical.port=$port
         """)
-        .withFallback(
-          ConfigFactory.parseString("akka.cluster.roles = [compute]"))
+        .withFallback(ConfigFactory.parseString("akka.cluster.roles = [compute]"))
         .withFallback(ConfigFactory.load("stats1"))
 
       val system = ActorSystem("ClusterSystem", config)
@@ -43,35 +35,34 @@ object StatsSample {
       system.actorOf(Props[StatsWorker], name = "statsWorker")
       system.actorOf(Props[StatsService], name = "statsService")
     }
-  }
 }
 
 object StatsSampleClient {
+
   def main(args: Array[String]): Unit = {
     // note that client is not a compute node, role not defined
     val system = ActorSystem("ClusterSystem")
-    system.actorOf(Props(classOf[StatsSampleClient], "/user/statsService"),
-                   "client")
+    system.actorOf(Props(classOf[StatsSampleClient], "/user/statsService"), "client")
   }
 }
 
 class StatsSampleClient(servicePath: String) extends Actor {
   val cluster = Cluster(context.system)
+
   val servicePathElements = servicePath match {
     case RelativeActorPath(elements) => elements
     case _ =>
-      throw new IllegalArgumentException(
-        "servicePath [%s] is not a valid relative actor path" format servicePath)
+      throw new IllegalArgumentException("servicePath [%s] is not a valid relative actor path" format servicePath)
   }
   import context.dispatcher
+
   val tickTask =
     context.system.scheduler.schedule(2.seconds, 2.seconds, self, "tick")
 
   var nodes = Set.empty[Address]
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     cluster.subscribe(self, classOf[MemberEvent], classOf[ReachabilityEvent])
-  }
   override def postStop(): Unit = {
     cluster.unsubscribe(self)
     tickTask.cancel()

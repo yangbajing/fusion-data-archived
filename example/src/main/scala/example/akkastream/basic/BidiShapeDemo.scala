@@ -63,8 +63,7 @@ object BidiShapeDemo extends App {
       override val shape: FlowShape[ByteString, ByteString] =
         FlowShape.of(in, out)
 
-      override def createLogic(
-          inheritedAttributes: Attributes): GraphStageLogic =
+      override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
         new GraphStageLogic(shape) {
 
           // this holds the received but not yet parsed bytes 保持已接收但尚未解析的字节
@@ -73,7 +72,7 @@ object BidiShapeDemo extends App {
           var needed = -1
 
           setHandler(out, new OutHandler {
-            override def onPull(): Unit = {
+            override def onPull(): Unit =
               if (isClosed(in)) {
                 println("onPull run()")
                 run()
@@ -81,7 +80,6 @@ object BidiShapeDemo extends App {
                 println("onPull pull(in)")
                 pull(in)
               }
-            }
           })
           setHandler(
             in,
@@ -93,7 +91,7 @@ object BidiShapeDemo extends App {
                 run()
               }
 
-              override def onUpstreamFinish(): Unit = {
+              override def onUpstreamFinish(): Unit =
                 // either we are done
                 if (stash.isEmpty) {
                   println("onUpstreamFinish completeStage()")
@@ -105,11 +103,10 @@ object BidiShapeDemo extends App {
                   println("onUpstreamFinish run()")
                   run()
                 }
-              }
             }
           )
 
-          private def run(): Unit = {
+          private def run(): Unit =
             if (needed == -1) {
               // are we at a boundary? then figure out next length
               if (stash.length < 4) {
@@ -132,7 +129,6 @@ object BidiShapeDemo extends App {
               needed = -1
               push(out, emit)
             }
-          }
         }
     }
 

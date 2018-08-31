@@ -2,6 +2,10 @@ import Commons._
 import Dependencies._
 import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 
+scalafmtOnCompile in ThisBuild := true
+
+//addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.7" cross CrossVersion.binary)
+
 lazy val root = Project(id = "mass-data-root", base = file("."))
   .aggregate(
     example,
@@ -56,8 +60,7 @@ lazy val massDocs = _project("mass-docs")
 
 lazy val example = _project("example")
   .settings(Publishing.publishing: _*)
-  .dependsOn(massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .settings(
     libraryDependencies ++= _akkaClusters ++ _akkaHttps //++ _kamons
   )
@@ -79,8 +82,7 @@ lazy val massFunctest = _project("mass-functest")
 
 // API Service
 lazy val massApiService = _project("mass-api-service")
-  .dependsOn(massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
@@ -92,9 +94,7 @@ lazy val massApiService = _project("mass-api-service")
 
 // 数据治理
 lazy val massGovernance = _project("mass-governance")
-  .dependsOn(massConnector,
-             massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massConnector, massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
@@ -106,8 +106,7 @@ lazy val massGovernance = _project("mass-governance")
 
 // 监查、控制、管理
 lazy val massConsole = _project("mass-console")
-  .dependsOn(massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
@@ -119,9 +118,7 @@ lazy val massConsole = _project("mass-console")
 
 // Reactive Data Integration Console
 lazy val massRdiConsole = _project("mass-rdi-console")
-  .dependsOn(massRdiCore,
-             massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massRdiCore, massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .settings(Publishing.noPublish: _*)
   .settings(
     mainClass in Compile := Some("mass.rdi.console.boot.RdiConsoleMain"),
@@ -148,9 +145,7 @@ lazy val massRdi = _project("mass-rdi")
 
 // Reactive Data Integration Cli
 lazy val massRdiCli = _project("mass-rdi-cli")
-  .dependsOn(massRdiCore,
-             massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massRdiCore, massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .settings(Publishing.noPublish: _*)
   .settings(
     //    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
@@ -170,8 +165,7 @@ lazy val massRdiCore = _project("mass-rdi-core")
 
 // mass调度任务程序.
 lazy val massScheduler = _project("mass-scheduler")
-  .dependsOn(massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
@@ -183,8 +177,7 @@ lazy val massScheduler = _project("mass-scheduler")
 
 // 统一用户，OAuth 2服务
 lazy val massAuth = _project("mass-auth")
-  .dependsOn(massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
@@ -196,8 +189,7 @@ lazy val massAuth = _project("mass-auth")
 
 // 集群代理节点
 lazy val massBroker = _project("mass-broker")
-  .dependsOn(massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
@@ -232,7 +224,7 @@ lazy val massCoreExt = _project("mass-core-ext")
       _quartz,
       _jsch,
       _sigarLoader
-    ) ++ _akkaClusters ++ _slicks //++ _kamons
+    ) ++ _akkaClusters ++ _slicks ++ _macwires ++ _akkaManagements
   )
 
 lazy val massCore = _project("mass-core")
@@ -246,13 +238,13 @@ lazy val massCore = _project("mass-core")
       _scalaXml,
       _hikariCP,
       _h2,
+      "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
       _postgresql % Test,
       _quartz % Provided
-    ) ++ _akkas ++ _akkaHttps,
+    ) ++ _catses ++ _circes ++ _akkaHttps,
     PB.targets in Compile := Seq(
       scalapb.gen(flatPackage = true) -> (sourceManaged in Compile).value
-    ),
-    libraryDependencies += "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf"
+    )
   )
 
 lazy val massCommon = _project("mass-common")
@@ -260,19 +252,15 @@ lazy val massCommon = _project("mass-common")
   .settings(
     libraryDependencies ++= Seq(
       //      _swaggerAnnotation % Provided,
-      _scalaLogging,
-      _logbackClassic,
       _config,
       "org.scala-lang" % "scala-library" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       _scalaJava8Compat,
-      _quartz % Provided,
       _scalatest % Test
-    ) ++ _jsons ++ _akkas
+    ) ++ _jsons ++ _akkas ++ _logs
   )
 
 def _project(name: String, _base: String = null) =
   Project(id = name, base = file(if (_base eq null) name else _base))
     .settings(basicSettings: _*)
-    .settings(scalafmtOnCompile := true)
 //    .settings(inConfig(Integration)(org.scalafmt.sbt.ScalafmtPlugin.scalafmtConfigSettings): _*)

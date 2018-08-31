@@ -15,7 +15,6 @@ import java.util.Properties
 import java.util.concurrent.ThreadLocalRandom
 
 import com.typesafe.config.{Config, ConfigFactory}
-import helloscala.common.exception.HSException
 
 import scala.compat.java8.FunctionConverters._
 import scala.util.Try
@@ -24,19 +23,17 @@ import scala.util.matching.Regex
 
 object Utils {
   val REGEX_DIGIT: Regex = """[\d,]+""".r
-  val RANDOM_CHARS
-    : IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
+  val RANDOM_CHARS: IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
 
   val random: SecureRandom = new SecureRandom()
 
   def swap[X, Y](x: X, y: Y): (Y, X) = (y, x)
 
   /**
-    * 获取当前进程 pid
-    */
+   * 获取当前进程 pid
+   */
   @inline def getPid: Long =
-    java.lang.Long
-      .parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
+    java.lang.Long.parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
 
   def either[R](func: => R): Either[Throwable, R] =
     try {
@@ -48,11 +45,11 @@ object Utils {
     }
 
   /**
-    * 将字符串解析为数字
-    *
-    * @param s 字符串
-    * @return
-    */
+   * 将字符串解析为数字
+   *
+   * @param s 字符串
+   * @return
+   */
   def parseInt(s: CharSequence): Option[Int] =
     REGEX_DIGIT.findFirstIn(s).map(_.replaceAll(",", "").toInt)
 
@@ -73,20 +70,18 @@ object Utils {
 
   def parseLong(s: Any, deft: => Long): Long = parseLong(s).getOrElse(deft)
 
-  def parseLong(s: Any): Option[Long] =
-    s match {
-      case l: Long    => Some(l)
-      case i: Int     => Some(i.toLong)
-      case s: String  => Try(s.toLong).toOption
-      case bi: BigInt => Some(bi.longValue())
-      case _          => None
-    }
+  def parseLong(s: Any): Option[Long] = s match {
+    case l: Long    => Some(l)
+    case i: Int     => Some(i.toLong)
+    case s: String  => Try(s.toLong).toOption
+    case bi: BigInt => Some(bi.longValue())
+    case _          => None
+  }
 
   def isNoneBlank(content: String): Boolean = !isBlank(content)
 
-  def isBlank(content: String): Boolean = {
+  def isBlank(content: String): Boolean =
     content == null || content.isEmpty || content.forall(Character.isWhitespace)
-  }
 
   def byteBufferToArray(buf: ByteBuffer): Array[Byte] = {
     val dst = new Array[Byte](buf.remaining())
@@ -108,16 +103,15 @@ object Utils {
   }
 
   /**
-    * 从目录读取所有文件的所有行，并过滤掉空行（包括空白字符行）
-    *
-    * @param dir 目录
-    * @return
-    */
+   * 从目录读取所有文件的所有行，并过滤掉空行（包括空白字符行）
+   *
+   * @param dir 目录
+   * @return
+   */
   def readAllLinesFromPath(dir: Path): java.util.stream.Stream[String] = {
     val filterNoneBlank: String => Boolean = s => StringUtils.isNoneBlank(s)
     val trim: String => String = s => s.trim
-    val trans: Path => java.util.stream.Stream[String] = path =>
-      Files.readAllLines(path).stream()
+    val trans: Path => java.util.stream.Stream[String] = path => Files.readAllLines(path).stream()
     Files
       .list(dir)
       .flatMap(trans.asJava)
@@ -131,9 +125,8 @@ object Utils {
     buf
   }
 
-  def parseSeq(str: String, splitChar: Char = ','): Vector[String] = {
+  def parseSeq(str: String, splitChar: Char = ','): Vector[String] =
     str.split(splitChar).filter(s => StringUtils.isNoneBlank(s)).toVector
-  }
 
   def mapToJMap[K, V](map: Map[K, V]): java.util.Map[K, V] = {
     val m = new java.util.HashMap[K, V]()
@@ -168,10 +161,9 @@ object Utils {
         sqlBoxed(v)
     }
 
-  def isEmail(account: String): Boolean = {
+  def isEmail(account: String): Boolean =
     // TODO
     account.contains('@')
-  }
 
   @inline
   def option(s: String): Option[String] =

@@ -13,8 +13,7 @@ import scala.collection.immutable
 
 object StringUtils {
   val BLACK_CHAR: Char = ' '
-  val PRINTER_CHARS
-    : immutable.IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
+  val PRINTER_CHARS: immutable.IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
   private val HEX_CHARS: Array[Char] = "0123456789abcdef".toCharArray
   private val HEX_CHAR_SETS = Set
     .empty[Char] ++ ('0' to '9') ++ ('a' to 'f') ++ ('A' to 'F')
@@ -47,19 +46,17 @@ object StringUtils {
     bytes
   }
 
-  def isEmpty(s: CharSequence): Boolean = {
+  def isEmpty(s: CharSequence): Boolean =
     (s eq null) || s.length() == 0
-  }
 
   @inline
   def isNoneEmpty(s: CharSequence): Boolean = !isEmpty(s)
 
   def isBlank(s: CharSequence): Boolean = {
     @tailrec
-    def isNoneBlankChar(s: CharSequence, i: Int): Boolean = {
+    def isNoneBlankChar(s: CharSequence, i: Int): Boolean =
       if (i < s.length()) s.charAt(i) != BLACK_CHAR || isNoneBlankChar(s, i + 1)
       else false
-    }
 
     isEmpty(s) || !isNoneBlankChar(s, 0)
   }
@@ -75,14 +72,13 @@ object StringUtils {
   }
 
   /**
-    * 字符串从属性形式转换为下划线形式
-    *
-    * @param name    待转字符串
-    * @param isLower 转换成下划线形式后是否使用小写，false将完全使用大写
-    * @return 转换后字符串
-    */
-  def convertPropertyToUnderscore(name: String,
-                                  isLower: Boolean = true): String =
+   * 字符串从属性形式转换为下划线形式
+   *
+   * @param name    待转字符串
+   * @param isLower 转换成下划线形式后是否使用小写，false将完全使用大写
+   * @return 转换后字符串
+   */
+  def convertPropertyToUnderscore(name: String, isLower: Boolean = true): String =
     if (isBlank(name)) {
       name
     } else {
@@ -100,45 +96,44 @@ object StringUtils {
     }
 
   /**
-    * Convert a column name with underscores to the corresponding property name using "camel case".  A name
-    * like "customer_number" would match a "customerNumber" property name.
-    *
-    * @param name the column name to be converted
-    * @return the name using "camel case"
-    */
-  def convertUnderscoreToProperty(name: String): String = {
+   * Convert a column name with underscores to the corresponding property name using "camel case".  A name
+   * like "customer_number" would match a "customerNumber" property name.
+   *
+   * @param name the column name to be converted
+   * @return the name using "camel case"
+   */
+  def convertUnderscoreToProperty(name: String): String =
     if (isBlank(name)) {
       ""
     } else {
       val arr = name.split('_')
       arr.head + arr.tail.map(item => item.head.toUpper + item.tail).mkString
     }
-    //    val result = new StringBuilder
-    //    var nextIsUpper = false
-    //    if (name != null && name.length > 0) {
-    //      if (name.length > 1 && name.substring(1, 2) == "_") {
-    //        result.append(name.substring(0, 1).toUpperCase)
-    //      } else {
-    //        result.append(name.substring(0, 1).toLowerCase)
-    //      }
-    //
-    //      var i = 1
-    //      val len = name.length
-    //      while (i < len) {
-    //        val s = name.substring(i, i + 1)
-    //        if (s == "_") {
-    //          nextIsUpper = true
-    //        } else if (nextIsUpper) {
-    //          result.append(s.toUpperCase)
-    //          nextIsUpper = false
-    //        } else {
-    //          result.append(s.toLowerCase)
-    //        }
-    //
-    //        i += 1
-    //      }
-    //    }
-    //    result.toString
-  }
+  //    val result = new StringBuilder
+  //    var nextIsUpper = false
+  //    if (name != null && name.length > 0) {
+  //      if (name.length > 1 && name.substring(1, 2) == "_") {
+  //        result.append(name.substring(0, 1).toUpperCase)
+  //      } else {
+  //        result.append(name.substring(0, 1).toLowerCase)
+  //      }
+  //
+  //      var i = 1
+  //      val len = name.length
+  //      while (i < len) {
+  //        val s = name.substring(i, i + 1)
+  //        if (s == "_") {
+  //          nextIsUpper = true
+  //        } else if (nextIsUpper) {
+  //          result.append(s.toUpperCase)
+  //          nextIsUpper = false
+  //        } else {
+  //          result.append(s.toLowerCase)
+  //        }
+  //
+  //        i += 1
+  //      }
+  //    }
+  //    result.toString
 
 }

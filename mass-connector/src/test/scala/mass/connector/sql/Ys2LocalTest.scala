@@ -35,10 +35,7 @@ class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
                                        "recdate")
 
     // 从源读取
-    val source = JdbcSource(
-      s"SELECT ${columns.mkString(", ")} FROM haishu_ys.reg_name_baninfo;",
-      Nil,
-      1500)(ysDS)
+    val source = JdbcSource(s"SELECT ${columns.mkString(", ")} FROM haishu_ys.reg_name_baninfo;", Nil, 1500)(ysDS)
 
     // 将第一个元素值改成小写
     def transferFlow(idxBanId: Int) = Flow[JdbcResultSet].map { jrs =>
@@ -46,8 +43,7 @@ class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
         jrs.values(idxBanId) match {
           case null => jrs
           case value =>
-            jrs.copy(
-              values = jrs.values.updated(1, AsString.unapply(value).orNull))
+            jrs.copy(values = jrs.values.updated(1, AsString.unapply(value).orNull))
         }
       } else
         jrs
@@ -57,8 +53,7 @@ class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
       conn =>
         conn.prepareStatement(
           """INSERT INTO reg_name_baninfo (id, ban_id, banletter, banlettpiny, bantype, banexp, banform, banto, recper, recdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""),
-      (jrs, stmt) =>
-        columns.indices.foreach(i => stmt.setObject(i + 1, jrs.values(i))),
+      (jrs, stmt) => columns.indices.foreach(i => stmt.setObject(i + 1, jrs.values(i))),
       1000
     )(localDS)
 
@@ -73,13 +68,11 @@ class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
     val end = System.nanoTime()
 
     val costTime = java.time.Duration.ofNanos(end - begin)
-    println(
-      s"从 155 导 reg_name_baninfo 表的 ${result.count} 条数据到本地共花费时间：$costTime")
+    println(s"从 155 导 reg_name_baninfo 表的 ${result.count} 条数据到本地共花费时间：$costTime")
   }
 
-  override protected def beforeAll(): Unit = {
+  override protected def beforeAll(): Unit =
     TimeUnit.SECONDS.sleep(3) // JVM预热
-  }
 
   override protected def afterAll(): Unit = {
     localDS.close()
@@ -91,8 +84,7 @@ class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
     val props = new Properties()
     props.setProperty("poolName", "local")
     props.setProperty("maximumPoolSize", "4")
-    props.setProperty("dataSourceClassName",
-                      "org.postgresql.ds.PGSimpleDataSource")
+    props.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource")
     props.setProperty("dataSource.serverName", "localhost")
     props.setProperty("dataSource.databaseName", "yangbajing")
     props.setProperty("dataSource.user", "yangbajing")

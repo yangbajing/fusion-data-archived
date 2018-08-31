@@ -7,8 +7,8 @@
 package helloscala.common
 
 /**
-  * Created by yangbajing(yangbajing@gmail.com) on 2017-02-21.
-  */
+ * Created by yangbajing(yangbajing@gmail.com) on 2017-02-21.
+ */
 object Colors {
 
   import scala.Console._

@@ -47,10 +47,7 @@ object EchoClient extends App {
       }
 
   val repl = Flow[ByteString]
-    .via(
-      Framing.delimiter(ByteString("\n"),
-                        maximumFrameLength = 256,
-                        allowTruncation = true))
+    .via(Framing.delimiter(ByteString("\n"), maximumFrameLength = 256, allowTruncation = true))
     .map(_.utf8String)
     .map(text ⇒ println("Server: " + text))
     .map(_ ⇒ StdIn.readLine("> "))

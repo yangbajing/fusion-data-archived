@@ -14,9 +14,10 @@ import helloscala.common.jackson.{ObjectIdDeserializer, ObjectIdSerializer}
 import helloscala.common.types.ObjectId
 
 class HelloscalaSerializers extends Serializers.Base {
-  override def findSerializer(config: SerializationConfig,
-                              `type`: JavaType,
-                              beanDesc: BeanDescription): JsonSerializer[_] = {
+  override def findSerializer(
+      config: SerializationConfig,
+      `type`: JavaType,
+      beanDesc: BeanDescription): JsonSerializer[_] = {
     val rawClass = `type`.getRawClass
     if (classOf[ObjectId].isAssignableFrom(rawClass)) new ObjectIdSerializer
     else super.findSerializer(config, `type`, beanDesc)
@@ -24,6 +25,7 @@ class HelloscalaSerializers extends Serializers.Base {
 }
 
 class HelloscalaDeserializers extends Deserializers.Base {
+
   @throws[JsonMappingException]
   override def findBeanDeserializer(
       `type`: JavaType,

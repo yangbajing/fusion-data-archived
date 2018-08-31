@@ -6,6 +6,7 @@ import org.scalatest.BeforeAndAfterAll
 import scala.xml.XML
 
 class SQLConnectorTest extends HelloscalaSpec with BeforeAndAfterAll {
+
   val postgresConfig =
     """        <connector id="postgres" type="jdbc">
       |            <props>
@@ -20,6 +21,7 @@ class SQLConnectorTest extends HelloscalaSpec with BeforeAndAfterAll {
       |            </props>
       |        </connector>
       |""".stripMargin
+
   val mysqlConfig =
     """        <connector id="mysql" type="jdbc">
       |            <props>

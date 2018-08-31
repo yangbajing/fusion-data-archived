@@ -14,9 +14,7 @@ object ConnectorSystem {
 
 }
 
-class ConnectorSystem private (val name: String, val massSystem: MassSystem)
-    extends BaseSystem
-    with StrictLogging {
+class ConnectorSystem private (val name: String, val massSystem: MassSystem) extends BaseSystem with StrictLogging {
   private var _parsers = Map.empty[String, ConnectorParser]
   private var _connectors = Map.empty[String, Connector]
   init()
@@ -50,8 +48,7 @@ class ConnectorSystem private (val name: String, val massSystem: MassSystem)
 
   def parsers: Map[String, ConnectorParser] = _parsers
 
-  def registerConnectorParser(
-      parse: ConnectorParser): Map[String, ConnectorParser] = {
+  def registerConnectorParser(parse: ConnectorParser): Map[String, ConnectorParser] = {
     _parsers = _parsers.updated(parse.`type`, parse)
     logger.info(s"注册Connector解析器：$parse，当前数量：${parsers.size}")
     parsers

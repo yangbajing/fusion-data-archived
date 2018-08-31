@@ -8,11 +8,7 @@ package mass.connector.sql
 
 import java.sql.{Connection, PreparedStatement}
 
-import akka.stream.stage.{
-  GraphStageLogic,
-  GraphStageWithMaterializedValue,
-  InHandler
-}
+import akka.stream.stage.{GraphStageLogic, GraphStageWithMaterializedValue, InHandler}
 import akka.stream.{Attributes, Inlet, SinkShape}
 import javax.sql.DataSource
 import mass.core.jdbc.{ConnectionPreparedStatementCreator, JdbcUtils}
@@ -25,14 +21,13 @@ class JdbcSinkStage[T](
     creator: ConnectionPreparedStatementCreator,
     actionBinder: (T, PreparedStatement) => Unit,
     batchSize: Int = 100
-) extends GraphStageWithMaterializedValue[SinkShape[T],
-                                            Future[JdbcSinkResult]] {
+) extends GraphStageWithMaterializedValue[SinkShape[T], Future[JdbcSinkResult]] {
   val in: Inlet[T] = Inlet("JdbcSink.in")
 
   override def shape: SinkShape[T] = SinkShape(in)
 
-  override def createLogicAndMaterializedValue(inheritedAttributes: Attributes)
-    : (GraphStageLogic, Future[JdbcSinkResult]) = {
+  override def createLogicAndMaterializedValue(
+      inheritedAttributes: Attributes): (GraphStageLogic, Future[JdbcSinkResult]) = {
     val promise = Promise[JdbcSinkResult]()
 
     val logic = new GraphStageLogic(shape) with InHandler {
@@ -42,7 +37,7 @@ class JdbcSinkStage[T](
 
       setHandler(in, this)
 
-      override def onPush(): Unit = {
+      override def onPush(): Unit =
         maybeConn match {
           case Some((_, _, stmt)) =>
             val v = grab(in)
@@ -58,7 +53,6 @@ class JdbcSinkStage[T](
           case None =>
             () // do nothing
         }
-      }
 
       override def onUpstreamFinish(): Unit = {
         writeToDB()
@@ -66,9 +60,8 @@ class JdbcSinkStage[T](
         completeStage()
       }
 
-      override def onUpstreamFailure(e: Throwable): Unit = {
+      override def onUpstreamFailure(e: Throwable): Unit =
         setupFailure(e)
-      }
 
       override def preStart(): Unit =
         try {
@@ -83,7 +76,7 @@ class JdbcSinkStage[T](
             setupFailure(e)
         }
 
-      override def postStop(): Unit = {
+      override def postStop(): Unit =
         for {
           (conn, autoCommit, stmt) <- maybeConn
         } {
@@ -91,7 +84,6 @@ class JdbcSinkStage[T](
           conn.setAutoCommit(autoCommit)
           JdbcUtils.closeConnection(conn)
         }
-      }
 
       private def writeToDB(): Unit =
         for {
@@ -100,8 +92,7 @@ class JdbcSinkStage[T](
           try {
             val batchs = stmt.executeBatch().toVector
             conn.commit()
-            results = results.copy(count = results.count + batchs.size,
-                                   results = results.results :+ batchs)
+            results = results.copy(count = results.count + batchs.size, results = results.results :+ batchs)
           } catch {
             case NonFatal(e) =>
               conn.rollback()

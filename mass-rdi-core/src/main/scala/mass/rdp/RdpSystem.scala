@@ -15,9 +15,7 @@ trait RdpRefFactory extends BaseSystem {
   def connectorSystem: ConnectorSystem
 }
 
-private[rdp] class RdpSetup(val massSystem: MassSystem,
-                            val connectorSystem: ConnectorSystem)
-    extends StrictLogging {
+private[rdp] class RdpSetup(val massSystem: MassSystem, val connectorSystem: ConnectorSystem) extends StrictLogging {
 
   val extensions: Vector[RdpModule] =
     massSystem.configuration
@@ -47,15 +45,14 @@ private[rdp] class RdpSetup(val massSystem: MassSystem,
     list.map(v => v.`type` -> v).toMap
   }
 
-  def initialGraphParserFactories(): Map[String, EtlGraphParserFactory] = {
+  def initialGraphParserFactories(): Map[String, EtlGraphParserFactory] =
     extensions.flatMap(_.graphParserFactories).map(v => v.`type` -> v).toMap
-  }
 
 }
 
 /**
-  * RDP 系统，保存RDP运行所全局需要的各配置、资源
-  */
+ * RDP 系统，保存RDP运行所全局需要的各配置、资源
+ */
 abstract class RdpSystem extends RdpRefFactory with StrictLogging {
   implicit def materializer: ActorMaterializer
 
@@ -84,11 +81,8 @@ object RdpSystem {
   private var _instance: RdpSystem = _
   def instance: RdpSystem = _instance
 
-  def apply(name: String,
-            massSystem: MassSystem,
-            connectorSystem: ConnectorSystem): RdpSystem = {
+  def apply(name: String, massSystem: MassSystem, connectorSystem: ConnectorSystem): RdpSystem =
     apply(name, new RdpSetup(massSystem, connectorSystem))
-  }
 
   def apply(name: String, setup: RdpSetup): RdpSystem = {
     _instance = new RdpSystemImpl(name,
@@ -113,7 +107,7 @@ private[rdp] class RdpSystemImpl(
 
   override def configuration: Configuration = massSystem.configuration
 
-  override implicit def materializer: ActorMaterializer =
+  implicit override def materializer: ActorMaterializer =
     ActorMaterializer()(massSystem.system)
 
 }

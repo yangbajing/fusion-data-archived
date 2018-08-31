@@ -48,7 +48,7 @@
     <li><a href="../connector/connector.html" class="page">扩展连接器</a></li>
   </ul></li>
   <li><a href="../scheduler/index.html" class="active page">调度（mass-scheduler）</a></li>
-  <li><a href="../rdi/index.html" class="page">反映式数据处理（mass-rdi）</a>
+  <li><a href="../rdi/index.html" class="page">反应式数据处理（mass-rdi）</a>
   <ul>
     <li><a href="../rdi/core.html" class="page">核心概念</a></li>
     <li><a href="../rdi/workflow.html" class="page">工作流</a></li>
@@ -112,7 +112,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
     <li><a href="../connector/connector.html" class="page">扩展连接器</a></li>
   </ul></li>
   <li><a href="../scheduler/index.html" class="active page">调度（mass-scheduler）</a></li>
-  <li><a href="../rdi/index.html" class="page">反映式数据处理（mass-rdi）</a>
+  <li><a href="../rdi/index.html" class="page">反应式数据处理（mass-rdi）</a>
   <ul>
     <li><a href="../rdi/core.html" class="page">核心概念</a></li>
     <li><a href="../rdi/workflow.html" class="page">工作流</a></li>
@@ -187,6 +187,22 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
   <li>REST接口上传zip包，应用可将任务打成zip包后提交到平台待执行。</li>
   <li>实现 <code>SchedulerJob</code> 接口，将代码打成jar包后放入 mass-scheduler/lib 目录，再通过管理界面启用（扩展mass-scheduler功能）。</li>
 </ol>
+<h3><a href="#zip包" name="zip包" class="anchor"><span class="anchor-link"></span></a>Zip包</h3>
+<p>Zip包里面需要包含配置文件和可执行程序，配置文件使用 <a href="https://github.com/lightbend/config">HOCON</a> 格式。每个配置文件代表一个Job。</p>
+<pre class="prettyprint"><code class="language-conf">{
+  job-name = &quot;Job名字&quot;
+  job-program = &quot;java&quot; # Job程序类型，当前支持Java，sh（bash），python
+  job-java-main = &quot;example.Main&quot; # 可执行Java主类名字，[需要将程序打成Jar包。job-program为java时有效
+  job-python-main = &quot;main.py&quot; # 可执行Python脚本文件名，job-program为python时有效
+  job-python-version = &quot;python2.7&quot; # Python程序。可选，默认使用python2.7。job-program为python时有效
+  job-sh-file = &quot;&quot; # 可执行脚本文件名，job-program为sh时有效
+  job-type = &quot;cron&quot; # Job类型，当前支持：simple和cron两种
+  job-start-time = &quot;yyyy-MM-dd HH:mm:ss&quot; # Job开始执行时间（可选）
+  job-end-time = &quot;yyyy-MM-dd HH:mm:ss&quot; # Job结束时间（可选）
+  job-repeat = 4 # Job重复次数，job-type为simple时有效
+  job-duration = 120.seconds # 两次Job之间的时间间隔，job-type为simple时有效
+  job-cron-express = &quot;1 0 0 * * ?&quot; # 基于CRON的日历调度配置，job-type为cron时有效
+}</code></pre><a href="https://github.com/yangbajing/mass-data/tree/master/mass-scheduler/src/universal/examples/sample-job/sample.conf">Full source at GitHub</a>
 <h2><a href="#远程调度" name="远程调度" class="anchor"><span class="anchor-link"></span></a>远程调度</h2>
 <p>MassData通过SSH支持任务调度支持远程启动程序，要使用此功能需要配置SSL免密码登录。</p>
 <h2><a href="#配置" name="配置" class="anchor"><span class="anchor-link"></span></a>配置</h2>
@@ -238,13 +254,13 @@ create table public.job_log (
   completion_status int,
   completion_value  text
 );
-</code></pre><a href="https://github.com/yangbajing/mass-data/tree/master/mass-docs/src/main/paradox/_code/pg-ddl.sql#L4-L51">Full source at GitHub</a>
+</code></pre><a href="https://github.com/yangbajing/mass-data/tree/master/mass-docs/src/main/paradox/_code/pg-ddl.sql#L6-L53">Full source at GitHub</a>
 <div class="source-github">
 The source code for this page can be found <a href="https://github.com/yangbajing/mass-data/tree/master/mass-docs/src/main/paradox/scheduler/index.md">here</a>.
 </div>
 
 <div class="nav-next">
-<p><strong>Next:</strong> <a href="../rdi/index.html">反映式数据处理（mass-rdi）</a></p>
+<p><strong>Next:</strong> <a href="../rdi/index.html">反应式数据处理（mass-rdi）</a></p>
 </div>
 </div>
 <div class="large-3 show-for-large column" data-sticky-container>

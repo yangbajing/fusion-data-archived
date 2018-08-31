@@ -15,32 +15,32 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 /**
-  * Postgres:
-  * create table t_book (
-  *   id          bigint primary key,
-  *   isbn        varchar(255),
-  *   title       varchar(255),
-  *   description text,
-  *   publish_at  timestamptz,
-  *   created_at  timestamptz
-  * );
-  *
-  *
-  * MySQL:
-  * jdbcUrl添加参数：useSSL=false&characterEncoding=utf8
-  * my.cnf 在 [mysqld] 段添加：
-  * character_set_server=utf8mb4
-  * default-time-zone='+8:00'
-  *
-  * create table t_book (
-  *   id          bigint primary key,
-  *   isbn        varchar(255),
-  *   title       varchar(255),
-  *   description text,
-  *   publish_at  datetime,
-  *   created_at  datetime
-  * );
-  */
+ * Postgres:
+ * create table t_book (
+ *   id          bigint primary key,
+ *   isbn        varchar(255),
+ *   title       varchar(255),
+ *   description text,
+ *   publish_at  timestamptz,
+ *   created_at  timestamptz
+ * );
+ *
+ *
+ * MySQL:
+ * jdbcUrl添加参数：useSSL=false&characterEncoding=utf8
+ * my.cnf 在 [mysqld] 段添加：
+ * character_set_server=utf8mb4
+ * default-time-zone='+8:00'
+ *
+ * create table t_book (
+ *   id          bigint primary key,
+ *   isbn        varchar(255),
+ *   title       varchar(255),
+ *   description text,
+ *   publish_at  datetime,
+ *   created_at  datetime
+ * );
+ */
 class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
 
   "Database" should {
@@ -63,8 +63,7 @@ class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
             "insert into t_book(id, isbn, title, description, publish_at, created_at) values (?, ?, ?, ?, ?, ?);"),
         (rs, pstmt) => {
           val meta = rs.getMetaData
-          (1 to meta.getColumnCount).foreach(i =>
-            JdbcUtils.setParameter(pstmt, i, rs.getObject(i)))
+          (1 to meta.getColumnCount).foreach(i => JdbcUtils.setParameter(pstmt, i, rs.getObject(i)))
         },
         1000
       )(TestSchema.mysql)
@@ -82,8 +81,7 @@ class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
         conn =>
           conn.prepareStatement(
             "insert into t_book(id, isbn, title, description, publish_at, created_at) values (?, ?, ?, ?, ?, ?);"),
-        (jrs, pstmt) =>
-          JdbcUtils.setStatementParameters(pstmt, jrs.values.updated(0, 100L)),
+        (jrs, pstmt) => JdbcUtils.setStatementParameters(pstmt, jrs.values.updated(0, 100L)),
         1000
       )(TestSchema.postgres)
       val f = source.via(JdbcFlow.flowJdbcResultSet).runWith(sink)
@@ -121,12 +119,7 @@ class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
           println(values)
           JdbcUtils.setStatementParameters(
             pstmt,
-            List(id.toLong,
-                 isbn,
-                 title,
-                 description,
-                 java.sql.Date.valueOf(publishAt),
-                 Timestamp.valueOf(createdAt)))
+            List(id.toLong, isbn, title, description, java.sql.Date.valueOf(publishAt), Timestamp.valueOf(createdAt)))
         },
         1000
       )(TestSchema.mysql)

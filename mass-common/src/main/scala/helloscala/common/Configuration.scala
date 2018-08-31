@@ -23,29 +23,28 @@ import scala.concurrent.duration._
 import scala.util.control.NonFatal
 
 /**
-  * Typesafe Config 辅助类
-  *
-  * @param underlying 原始Config, @see https://github.com/typesafehub/config.
-  */
+ * Typesafe Config 辅助类
+ *
+ * @param underlying 原始Config, @see https://github.com/typesafehub/config.
+ */
 case class Configuration(underlying: Config) {
 
   // TODO 基于 etcd 或 consul 进行重设
   //  underlying.withFallback()
 
   /**
-    * 合并两个HlConfiguration
-    */
-  def ++(other: Configuration): Configuration = {
+   * 合并两个HlConfiguration
+   */
+  def ++(other: Configuration): Configuration =
     Configuration(other.underlying.withFallback(underlying))
-  }
 
   /**
-    * Reads a value from the underlying implementation.
-    * If the value is not set this will return None, otherwise returns Some.
-    *
-    * Does not check neither for incorrect type nor null value, but catches and wraps the error.
-    */
-  private def readValue[T](path: String, v: => T): Option[T] = {
+   * Reads a value from the underlying implementation.
+   * If the value is not set this will return None, otherwise returns Some.
+   *
+   * Does not check neither for incorrect type nor null value, but catches and wraps the error.
+   */
+  private def readValue[T](path: String, v: => T): Option[T] =
     try {
       if (underlying.hasPathOrNull(path)) Some(v) else None
     } catch {
@@ -53,11 +52,9 @@ case class Configuration(underlying: Config) {
         throw new IllegalArgumentException(path + e.getMessage, e)
     }
 
-  }
-
   /**
-    * Check if the given path exists.
-    */
+   * Check if the given path exists.
+   */
   def has(path: String): Boolean = underlying.hasPath(path)
 
   def getConfiguration(path: String): Configuration = get[Configuration](path)
@@ -85,21 +82,19 @@ case class Configuration(underlying: Config) {
     get[java.util.Map[String, String]](path)
 
   /**
-    * Get the config at the given path.
-    */
-  def get[A](path: String)(implicit loader: ConfigLoader[A]): A = {
+   * Get the config at the given path.
+   */
+  def get[A](path: String)(implicit loader: ConfigLoader[A]): A =
     loader.load(underlying, path)
-  }
 
   def getOrElse[A](path: String, deft: => A)(
       implicit loader: ConfigLoader[A]
   ): A = get[Option[A]](path).getOrElse(deft)
 
   /**
-    * Get the config at the given path and validate against a set of valid values.
-    */
-  def getAndValidate[A](path: String, values: Set[A])(
-      implicit loader: ConfigLoader[A]): A = {
+   * Get the config at the given path and validate against a set of valid values.
+   */
+  def getAndValidate[A](path: String, values: Set[A])(implicit loader: ConfigLoader[A]): A = {
     val value = get(path)
     if (!values(value)) {
       throw reportError(
@@ -111,99 +106,96 @@ case class Configuration(underlying: Config) {
   }
 
   /**
-    * Get a value that may either not exist or be null. Note that this is not generally considered idiomatic Config
-    * usage. Instead you should define all config keys in a reference.conf file.
-    */
+   * Get a value that may either not exist or be null. Note that this is not generally considered idiomatic Config
+   * usage. Instead you should define all config keys in a reference.conf file.
+   */
   def getOptional[A](
       path: String
-  )(implicit loader: ConfigLoader[A]): Option[A] = {
+  )(implicit loader: ConfigLoader[A]): Option[A] =
     readValue(path, get[A](path))
-  }
 
   /**
-    * Retrieves a configuration value as `Milliseconds`.
-    *
-    * For example:
-    * {{{
-    * val configuration = HlConfiguration.load()
-    * val timeout = configuration.getMillis("engine.timeout")
-    * }}}
-    *
-    * The configuration must be provided as:
-    *
-    * {{{
-    * engine.timeout = 1 second
-    * }}}
-    */
+   * Retrieves a configuration value as `Milliseconds`.
+   *
+   * For example:
+   * {{{
+   * val configuration = HlConfiguration.load()
+   * val timeout = configuration.getMillis("engine.timeout")
+   * }}}
+   *
+   * The configuration must be provided as:
+   *
+   * {{{
+   * engine.timeout = 1 second
+   * }}}
+   */
   def getMillis(path: String): Long = get[Duration](path).toMillis
 
   /**
-    * Retrieves a configuration value as `Milliseconds`.
-    *
-    * For example:
-    * {{{
-    * val configuration = HlConfiguration.load()
-    * val timeout = configuration.getNanos("engine.timeout")
-    * }}}
-    *
-    * The configuration must be provided as:
-    *
-    * {{{
-    * engine.timeout = 1 second
-    * }}}
-    */
+   * Retrieves a configuration value as `Milliseconds`.
+   *
+   * For example:
+   * {{{
+   * val configuration = HlConfiguration.load()
+   * val timeout = configuration.getNanos("engine.timeout")
+   * }}}
+   *
+   * The configuration must be provided as:
+   *
+   * {{{
+   * engine.timeout = 1 second
+   * }}}
+   */
   def getNanos(path: String): Long = get[Duration](path).toNanos
 
   /**
-    * Returns available keys.
-    *
-    * For example:
-    * {{{
-    * val configuration = HlConfiguration.load()
-    * val keys = configuration.keys
-    * }}}
-    *
-    * @return the set of keys available in this configuration
-    */
+   * Returns available keys.
+   *
+   * For example:
+   * {{{
+   * val configuration = HlConfiguration.load()
+   * val keys = configuration.keys
+   * }}}
+   *
+   * @return the set of keys available in this configuration
+   */
   def keys: Set[String] = underlying.entrySet.asScala.map(_.getKey).toSet
 
   /**
-    * Returns sub-keys.
-    *
-    * For example:
-    * {{{
-    * val configuration = HlConfiguration.load()
-    * val subKeys = configuration.subKeys
-    * }}}
-    *
-    * @return the set of direct sub-keys available in this configuration
-    */
+   * Returns sub-keys.
+   *
+   * For example:
+   * {{{
+   * val configuration = HlConfiguration.load()
+   * val subKeys = configuration.subKeys
+   * }}}
+   *
+   * @return the set of direct sub-keys available in this configuration
+   */
   def subKeys: Set[String] = underlying.root().keySet().asScala.toSet
 
   /**
-    * Returns every path as a set of key to value pairs, by recursively iterating through the
-    * config objects.
-    */
+   * Returns every path as a set of key to value pairs, by recursively iterating through the
+   * config objects.
+   */
   def entrySet: Set[(String, ConfigValue)] =
     underlying.entrySet().asScala.map(e => e.getKey -> e.getValue).toSet
 
   /**
-    * Creates a configuration error for a specific configuration key.
-    *
-    * For example:
-    * {{{
-    * val configuration = HlConfiguration.load()
-    * throw configuration.reportError("engine.connectionUrl", "Cannot connect!")
-    * }}}
-    *
-    * @param path    the configuration key, related to this error
-    * @param message the error message
-    * @param e       the related exception
-    * @return a configuration exception
-    */
-  def reportError(path: String,
-                  message: String,
-                  e: Option[Throwable] = None): HSException = {
+   * Creates a configuration error for a specific configuration key.
+   *
+   * For example:
+   * {{{
+   * val configuration = HlConfiguration.load()
+   * throw configuration.reportError("engine.connectionUrl", "Cannot connect!")
+   * }}}
+   *
+   * @param path    the configuration key, related to this error
+   * @param message the error message
+   * @param e       the related exception
+   * @return a configuration exception
+   */
+  def reportError(path: String, message: String, e: Option[Throwable] = None): HSException = {
     val origin = Option(
       if (underlying.hasPath(path)) underlying.getValue(path).origin
       else underlying.root.origin
@@ -212,27 +204,25 @@ case class Configuration(underlying: Config) {
   }
 
   /**
-    * Creates a configuration error for this configuration.
-    *
-    * For example:
-    * {{{
-    * val configuration = HlConfiguration.load()
-    * throw configuration.globalError("Missing configuration key: [yop.url]")
-    * }}}
-    *
-    * @param message the error message
-    * @param e       the related exception
-    * @return a configuration exception
-    */
-  def globalError(message: String, e: Option[Throwable] = None): HSException = {
+   * Creates a configuration error for this configuration.
+   *
+   * For example:
+   * {{{
+   * val configuration = HlConfiguration.load()
+   * throw configuration.globalError("Missing configuration key: [yop.url]")
+   * }}}
+   *
+   * @param message the error message
+   * @param e       the related exception
+   * @return a configuration exception
+   */
+  def globalError(message: String, e: Option[Throwable] = None): HSException =
     Configuration.configError(message, Option(underlying.root.origin), e)
-  }
 }
 
 object Configuration {
-  def configError(message: String,
-                  origin: Option[ConfigOrigin],
-                  me: Option[Throwable]): HSException = {
+
+  def configError(message: String, origin: Option[ConfigOrigin], me: Option[Throwable]): HSException = {
     val msg = origin.map(o => s"[$o] $message").getOrElse(message)
     me.map(e => new HSException(ErrCodes.UNKNOWN, msg, e))
       .getOrElse(new HSException(ErrCodes.UNKNOWN, msg))
@@ -249,16 +239,15 @@ object Configuration {
 }
 
 /**
-  * A config loader
-  */
+ * A config loader
+ */
 trait ConfigLoader[A] {
   self =>
   def load(config: Config, path: String = ""): A
 
   def map[B](f: A => B): ConfigLoader[B] = new ConfigLoader[B] {
-    override def load(config: Config, path: String): B = {
+    override def load(config: Config, path: String): B =
       f(self.load(config, path))
-    }
   }
 }
 
@@ -266,9 +255,8 @@ object ConfigLoader {
 
   def apply[A](f: Config => String => A): ConfigLoader[A] =
     new ConfigLoader[A] {
-      override def load(config: Config, path: String): A = {
+      override def load(config: Config, path: String): A =
         f(config)(path)
-      }
     }
 
   implicit val stringLoader: ConfigLoader[String] = ConfigLoader(_.getString)
@@ -293,10 +281,9 @@ object ConfigLoader {
   implicit val seqBooleanLoader: ConfigLoader[Seq[Boolean]] =
     ConfigLoader(_.getBooleanList).map(_.asScala.map(_.booleanValue))
 
-  implicit val durationLoader: ConfigLoader[Duration] = ConfigLoader {
-    config => path =>
-      if (!config.getIsNull(path)) config.getDuration(path).toNanos.nanos
-      else Duration.Inf
+  implicit val durationLoader: ConfigLoader[Duration] = ConfigLoader { config => path =>
+    if (!config.getIsNull(path)) config.getDuration(path).toNanos.nanos
+    else Duration.Inf
   }
 
   // Note: this does not support null values but it added for convenience
@@ -342,27 +329,24 @@ object ConfigLoader {
     seqConfigLoader.map(_.map(Configuration(_)))
 
   /**
-    * Loads a value, interpreting a null value as None and any other value as Some(value).
-    */
+   * Loads a value, interpreting a null value as None and any other value as Some(value).
+   */
   implicit def optionLoader[A](
       implicit valueLoader: ConfigLoader[A]
   ): ConfigLoader[Option[A]] =
     new ConfigLoader[Option[A]] {
-      override def load(config: Config, path: String): Option[A] = {
+      override def load(config: Config, path: String): Option[A] =
         if (!config.hasPath(path) || config.getIsNull(path)) None
         else {
           val value = valueLoader.load(config, path)
           Some(value)
         }
-      }
     }
 
   implicit val propertiesLoader: ConfigLoader[Properties] =
     new ConfigLoader[Properties] {
 
-      def make(props: Properties,
-               parentKeys: String,
-               obj: ConfigObject): Unit = {
+      def make(props: Properties, parentKeys: String, obj: ConfigObject): Unit =
         obj
           .keySet()
           .forEach(new Consumer[String] {
@@ -379,7 +363,6 @@ object ConfigLoader {
               }
             }
           })
-      }
 
       override def load(config: Config, path: String): Properties = {
         val obj =
@@ -394,9 +377,7 @@ object ConfigLoader {
   implicit val scalaMapLoader: ConfigLoader[Map[String, String]] =
     new ConfigLoader[Map[String, String]] {
 
-      def make(props: mutable.Map[String, String],
-               parentKeys: String,
-               obj: ConfigObject): Unit = {
+      def make(props: mutable.Map[String, String], parentKeys: String, obj: ConfigObject): Unit =
         obj
           .keySet()
           .forEach(new Consumer[String] {
@@ -413,7 +394,6 @@ object ConfigLoader {
               }
             }
           })
-      }
 
       override def load(config: Config, path: String): Map[String, String] = {
         val obj =

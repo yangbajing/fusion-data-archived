@@ -19,23 +19,23 @@ import scala.concurrent.Future
 object MessageDigestAlgorithms {
 
   /**
-    * The MD5 message digest algorithm defined in RFC 1321.
-    */
+   * The MD5 message digest algorithm defined in RFC 1321.
+   */
   val MD5 = "MD5"
 
   /**
-    * The SHA-1 hash algorithm defined in the FIPS PUB 180-2.
-    */
+   * The SHA-1 hash algorithm defined in the FIPS PUB 180-2.
+   */
   val SHA_1 = "SHA-1"
 
   /**
-    * The SHA-256 hash algorithm defined in the FIPS PUB 180-2.
-    */
+   * The SHA-256 hash algorithm defined in the FIPS PUB 180-2.
+   */
   val SHA_256 = "SHA-256"
 
   /**
-    * The SHA-512 hash algorithm defined in the FIPS PUB 180-2.
-    */
+   * The SHA-512 hash algorithm defined in the FIPS PUB 180-2.
+   */
   val SHA_512 = "SHA-512"
 }
 
@@ -44,9 +44,8 @@ object DigestUtils {
 
   val DEFAULT_FILE_BYTE_BUFFER_SIZE: Int = 1024 * 1024
 
-  def digestMD5(): MessageDigest = {
+  def digestMD5(): MessageDigest =
     MessageDigest.getInstance(MessageDigestAlgorithms.MD5)
-  }
 
   def digestSha1(): MessageDigest =
     MessageDigest.getInstance(MessageDigestAlgorithms.SHA_1)

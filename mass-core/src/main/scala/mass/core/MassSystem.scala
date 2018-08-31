@@ -14,7 +14,7 @@ trait BaseSystem {
   def configuration: Configuration
 }
 
-private[mass] abstract class MassSystem(
+abstract private[mass] class MassSystem(
     val name: String,
     val system: ActorSystem,
     private var _configuration: Configuration
@@ -25,12 +25,11 @@ private[mass] abstract class MassSystem(
   def as[T: ClassTag]: T = this.asInstanceOf[T]
 
   /**
-    * @return 返回临时目录
-    */
+   * @return 返回临时目录
+   */
   def tempDir: Path = {
-    val tempDirectory = Paths.get(
-      configuration.getOrElse[String]("mass.core.temp-dir",
-                                      System.getProperty("java.io.tmpdir")))
+    val tempDirectory =
+      Paths.get(configuration.getOrElse[String]("mass.core.temp-dir", System.getProperty("java.io.tmpdir")))
     if (!Files.isDirectory(tempDirectory)) {
       Files.createDirectories(tempDirectory)
     }
@@ -57,14 +56,10 @@ object MassSystem {
   def apply(name: String, system: ActorSystem): MassSystem =
     apply(name, system, Configuration(system.settings.config))
 
-  def apply(name: String,
-            system: ActorSystem,
-            configuration: Configuration): MassSystem = {
+  def apply(name: String, system: ActorSystem, configuration: Configuration): MassSystem = {
     val c = Class.forName(configuration.getString("mass.mass-system-class"))
     _instance = c
-      .getDeclaredConstructor(classOf[String],
-                              classOf[ActorSystem],
-                              classOf[Configuration])
+      .getDeclaredConstructor(classOf[String], classOf[ActorSystem], classOf[Configuration])
       .newInstance(name, system, configuration)
       .asInstanceOf[MassSystem]
     _instance

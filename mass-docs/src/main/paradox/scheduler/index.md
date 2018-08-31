@@ -41,6 +41,12 @@ mass-scheduler提供两种任务提交方式：
 1. REST接口上传zip包，应用可将任务打成zip包后提交到平台待执行。
 0. 实现 `SchedulerJob` 接口，将代码打成jar包后放入 mass-scheduler/lib 目录，再通过管理界面启用（扩展mass-scheduler功能）。
 
+### Zip包
+
+Zip包里面需要包含配置文件和可执行程序，配置文件使用 [HOCON](https://github.com/lightbend/config) 格式。每个配置文件代表一个Job。
+
+@@snip [sample.conf](../../../../../mass-scheduler/src/universal/examples/sample-job/sample.conf)
+
 ## 远程调度
 
 MassData通过SSH支持任务调度支持远程启动程序，要使用此功能需要配置SSL免密码登录。

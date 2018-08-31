@@ -8,21 +8,19 @@ import scala.collection.immutable
 import scala.util.control.NonFatal
 
 /**
-  * PostgreSQL 表 Information
-  * @param jdbcTemplate Jdbc Template
-  */
+ * PostgreSQL 表 Information
+ * @param jdbcTemplate Jdbc Template
+ */
 class PostgresSchema private (jdbcTemplate: JdbcOperations) extends SQLSchema {
 
   import mass.connector.sql.schema.PostgresSchema._
 
   override def listTable(schemaName: String): immutable.Seq[TableInfo] =
-    jdbcTemplate.listForObject(
-      s"select * from information_schema.tables where table_schema = ?",
-      List(schemaName),
-      rs => tableInfo(jdbcTemplate, JdbcUtils.resultSetToMap(rs)))
+    jdbcTemplate.listForObject(s"select * from information_schema.tables where table_schema = ?",
+                               List(schemaName),
+                               rs => tableInfo(jdbcTemplate, JdbcUtils.resultSetToMap(rs)))
 
-  override def listColumn(tableName: String,
-                          schemaName: String): immutable.Seq[ColumnInfo] =
+  override def listColumn(tableName: String, schemaName: String): immutable.Seq[ColumnInfo] =
     jdbcTemplate.listForObject(
       "select * from information_schema.columns where table_schema = ? and table_name = ?",
       List(schemaName, tableName),
@@ -32,17 +30,15 @@ class PostgresSchema private (jdbcTemplate: JdbcOperations) extends SQLSchema {
 }
 
 object PostgresSchema {
-  def listColumn(jdbcTemplate: JdbcOperations,
-                 tableName: String,
-                 schemaName: String): immutable.Seq[ColumnInfo] =
+
+  def listColumn(jdbcTemplate: JdbcOperations, tableName: String, schemaName: String): immutable.Seq[ColumnInfo] =
     jdbcTemplate.listForObject(
       "select * from information_schema.columns where table_schema = '?' and table_name = '?'",
       List(schemaName, tableName),
       rs => columnInfo(JdbcUtils.resultSetToMap(rs))
     )
 
-  def tableInfo(jdbcTemplate: JdbcOperations,
-                _data: Map[String, AnyRef]): TableInfo =
+  def tableInfo(jdbcTemplate: JdbcOperations, _data: Map[String, AnyRef]): TableInfo =
     TableInfo(
       _data("table_schema").toString,
       _data("table_name").toString,

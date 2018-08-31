@@ -7,10 +7,7 @@
 package helloscala.common.jackson;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -58,7 +55,8 @@ class ZonedDateTimeDeserializer extends JSR310DateTimeDeserializerBase<ZonedDate
             try {
                 return TimeUtils.toZonedDateTime(string);
             } catch (DateTimeException e) {
-                _rethrowDateTimeException(parser, context, e, string);
+//                _rethrowDateTimeException(parser, context, e, string);
+                throw new JsonParseException(parser, string, e);
             }
         }
         if (parser.isExpectedStartArrayToken()) {

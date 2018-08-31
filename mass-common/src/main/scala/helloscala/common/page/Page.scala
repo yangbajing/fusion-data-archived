@@ -26,20 +26,20 @@ import scala.beans.BeanProperty
 import scala.util.{Failure, Success, Try}
 
 /**
-  * Created by yangbajing(yangbajing@gmail.com) on 2017-04-28.
-  */
+ * Created by yangbajing(yangbajing@gmail.com) on 2017-04-28.
+ */
 trait PageSort {}
 
 object Page {
 
   /**
-    * 默认页码
-    */
+   * 默认页码
+   */
   val DEFAULT_PAGE = 1
 
   /**
-    * 默认返回记录条数
-    */
+   * 默认返回记录条数
+   */
   val DEFAULT_SIZE = 10
 }
 
@@ -59,9 +59,7 @@ trait Pager[T] {
   def params: Map[String, Any]
 }
 
-case class PageInput(@BeanProperty page: Int,
-                     @BeanProperty size: Int,
-                     @BeanProperty params: Map[String, Any] = Map())
+case class PageInput(@BeanProperty page: Int, @BeanProperty size: Int, @BeanProperty params: Map[String, Any] = Map())
     extends Page
     with StrictLogging {
 
@@ -190,18 +188,16 @@ trait PageResult[T] extends Page {
 
 object PageResult {
 
-  def apply[T](page: Int,
-               size: Int,
-               content: Seq[T],
-               totalElements: Int): PageResult[T] =
+  def apply[T](page: Int, size: Int, content: Seq[T], totalElements: Int): PageResult[T] =
     DefaultPageResult(page, size, content, totalElements)
 
 }
 
-case class DefaultPageResult[T](@BeanProperty page: Int,
-                                @BeanProperty size: Int,
-                                @BeanProperty content: Seq[T],
-                                @BeanProperty totalElements: Long)
+case class DefaultPageResult[T](
+    @BeanProperty page: Int,
+    @BeanProperty size: Int,
+    @BeanProperty content: Seq[T],
+    @BeanProperty totalElements: Long)
     extends PageResult[T] {
 
   override def toString =

@@ -13,11 +13,11 @@ object PidFile {
 class PidFile(val pid: Long) {
 
   /**
-    * Creates a new PidFile and writes the current process ID into the provided path
-    *
-    * @param path         the path to the pid file. The file is newly created or truncated if it already exists
-    * @param deleteOnExit if <code>true</code> the pid file is deleted with best effort on system exit
-    */
+   * Creates a new PidFile and writes the current process ID into the provided path
+   *
+   * @param path         the path to the pid file. The file is newly created or truncated if it already exists
+   * @param deleteOnExit if <code>true</code> the pid file is deleted with best effort on system exit
+   */
   @throws[IOException]("if an IOException occurs")
   def create(path: Path, deleteOnExit: Boolean): PidFile =
     create(path, deleteOnExit, Utils.getPid)
@@ -62,9 +62,9 @@ class PidFile(val pid: Long) {
     new PidFile(pid)
   }
 
-  private def addShutdownHook(path: Path): Unit = {
+  private def addShutdownHook(path: Path): Unit =
     Runtime.getRuntime.addShutdownHook(new Thread() {
-      override def run(): Unit = {
+      override def run(): Unit =
         try {
           Files.deleteIfExists(path)
         } catch {
@@ -74,8 +74,6 @@ class PidFile(val pid: Long) {
               e
             )
         }
-      }
     })
-  }
 
 }

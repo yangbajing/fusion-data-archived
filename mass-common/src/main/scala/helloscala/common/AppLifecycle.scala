@@ -7,6 +7,7 @@
 package helloscala.common
 
 trait AppLifecycle {
+
   def addStopHook(hook: () => Unit): Unit =
     addStopHook(new Runnable {
       override def run(): Unit = hook()

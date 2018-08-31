@@ -9,12 +9,7 @@ import org.scalatest.time.{Millis, Seconds, Span}
 
 import scala.concurrent.Future
 
-trait HelloscalaSpec
-    extends WordSpecLike
-    with MustMatchers
-    with OptionValues
-    with EitherValues
-    with ScalaFutures {
+trait HelloscalaSpec extends WordSpecLike with MustMatchers with OptionValues with EitherValues with ScalaFutures {
   this: Suite =>
 
   val defaultObjectMapper: ObjectMapper = Jackson.defaultObjectMapper
@@ -38,8 +33,7 @@ trait HelloscalaSpec
     defaultObjectMapper.writeValueAsString(results)
   }
 
-  def jsonString(obj: AnyRef): String = {
+  def jsonString(obj: AnyRef): String =
     defaultObjectMapper.writeValueAsString(obj)
-  }
 
 }

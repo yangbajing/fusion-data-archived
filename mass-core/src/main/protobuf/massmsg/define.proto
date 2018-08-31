@@ -2,76 +2,13 @@ syntax = "proto3";
 
 package massmsg;
 
-//参考HTTP的分段及定义，来确定服务端的常见错误
-enum ErrorCode {
-    ErrorCode_Unkown                        =   0;
-    ErrorCode_OK                            =   1;    //没有错误
-    ErrorCode_FailureOther                  =   2;    //数据输入不合法或其他
-    ErrorCode_FailureErrAccount             =   3;    //登录帐号不匹配（accountid与authcode不匹配）
-    ErrorCode_FailureForbid                 =   4;    //登录帐号被禁止
-    ErrorCode_FailureMatain                 =   5;
-    ErrorCode_MismatchRule                  =  10; //不符合业务规则，对于有些不好归类的错误也使用该定义
-    ErrorCode_NotMatchedResult              =  11; //没有符合条件的结果
-    //客户端请求错误或系统错误。
-    ErrorCode_RequestBad                    = 100; //输入请求的参数错误
-    ErrorCode_RequestEntityTooLarge         = 103; //服务器拒绝处理当前请求，因为该请求提交的实体数据大小超过了服务器愿意或者能够处理的范围。此种情况下，服务器可以关闭连接以免客户端继续发送此请求。
-    ErrorCode_MethodNotFounded              = 104; //请求方法不存在。
-    ErrorCode_RequestTimeout                = 105; //请求超时。客户端没有在服务器预备等待的时间内完成一个请求的发送。
-    ErrorCode_KeyNotFounded                 = 107; //指定键值不存在
-    ErrorCode_NetConnClosed                 = 110; //网络连接已经关闭
-    ErrorCode_NetConnMax                    = 111; //超过最大连接数
-    ErrorCode_Internal                      = 150; //系统内部错误
-    ErrorCode_NotImplemented                = 151; //功能未实现。
-    ErrorCode_ServiceUnavailable            = 160; //由于临时的服务器维护或者过载，服务器当前无法处理请求。这个状况是临时的，并且将在一段时间以后恢复
-    ErrorCode_TransferVersionNotSupported   = 161; //服务器网络协议不支持，或者拒绝支持在请求中使用的版本。
-    ErrorCode_ServiceClosed                 = 162; //被调用的服务关闭
-    ErrorCode_DBOperation                   = 163; //数据库操作异常
-    ErrorCode_CodecOperation                = 164; //序列化错误
-    ErrorCode_ServiceNotFounded             = 165; //服务没有找到
-    ErrorCode_NetConnTimeOut                = 168; //网络访问超时
-    ErrorCode_ThirdPlatform                 = 170; //第三方平台访问错误
-    ErrorCode_UnmatchDataType               = 171; //回复类型不匹配
-    //验证服相关
-    ErrorCode_PlayerSpidBound               = 190; //玩家已经绑定到了SPID的ID
-    // 游戏服相关，通用
-    ErrorCode_PlayerNotExist                = 200; //玩家不存在,表示服务端无法匹配用户信息
-    ErrorCode_PlayerUnavailable             = 202; //玩家无效，主要用于存在的玩家不在联盟或者殖民地中
-    ErrorCode_PlayerHandShaking             = 203; //握手数据异常
-    ErrorCode_LackofResources               = 210; //资源不足
-    ErrorCode_LackofGemstone                = 211; //宝石不足
-    ErrorCode_MaxNum                        = 215; //达到条件许可的最大值
-    ErrorCode_OutBoundary                   = 216; //地图越界
+import "google/protobuf/timestamp.proto";
 
-    ErrorCode_Attacking                     = 221; //当前玩家正在被攻击
-    ErrorCode_Investigation                 = 222; //当前玩家正在被侦查
+enum CommonStatus {
+    DISABLE = 0;
+    ENABLE = 1;
+}
 
-    // 联盟服相关
-    ErrorCode_ClanLongText                  = 301; //名字或描述超长
-    ErrorCode_ClanNotExist                  = 302; //联盟不存在
-    ErrorCode_ClanMemberUnavailable         = 303; //联盟成员不存在
-    ErrorCode_ClanMemberExist               = 304; //用户已经存在
-    ErrorCode_ClanMemberIsFull              = 305; //联盟容量已经满员
-    ErrorCode_ClanInvalidRequest            = 306; //请求数据无效，通常是格式不正确或属性不足
-    ErrorCode_ClanMedalLack                 = 307; //玩家杯数不足以加入联盟设定
-    ErrorCode_ClanPositionDeficient         = 309; //等级不够
-    ErrorCode_ClanJoinDecline               = 310; //联盟拒绝加入
-    ErrorCode_ClanApplyInvaliable           = 311; //联盟申请失效
-
-    // 世界服相关
-    ErrorCode_ColonyUnavailable     = 400; //殖民地不存在
-    ErrorCode_StrongholdUnavailable = 401; //基地不存在
-    ErrorCode_StrongholdMove        = 402; //基地正在移动中，无法安排新的指令
-    ErrorCode_StrongholdWait        = 403; //基地还没有到可以操作的时候
-    ErrorCode_Armys                 = 404; //存在部队
-    ErrorCode_ArmyUnavailable       = 410; //部队不存在
-    ErrorCode_ResourceUnavailable   = 411; //资源不存在
-    ErrorCode_MapFull               = 415; //地图已满，无法填充基地等信息
-
-    //支付服相关
-    ErrorCode_DuplicateReceipt  = 450; //重复表单验证申请或反复确认
-    ErrorCode_InvalidReceipt    = 452; //无效表单
-    ErrorCode_ChannelForbid     = 453; //支付通道被禁用
-
-    // 战斗服务相关
-    ErrorCode_RoomNotExist      = 501; //房间不存在
+message MyMessage {
+    google.protobuf.Timestamp createdAt = 1;
 }

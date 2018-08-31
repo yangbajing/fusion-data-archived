@@ -10,8 +10,7 @@ trait EtlResult
 
 case class SqlEtlResult(data: JdbcSinkResult) extends EtlResult
 
-class EtlWorkflowExecution(promise: Promise[EtlResult], funcClose: () => Unit)
-    extends WorkflowExecution[EtlResult] {
+class EtlWorkflowExecution(promise: Promise[EtlResult], funcClose: () => Unit) extends WorkflowExecution[EtlResult] {
 
   override def future: Future[EtlResult] = promise.future
 

@@ -3,36 +3,22 @@ package example.akkastream.basic
 import akka.actor.ActorSystem
 import akka.stream.FanInShape.{Init, Name}
 import akka.stream._
-import akka.stream.scaladsl.{
-  Balance,
-  Flow,
-  GraphDSL,
-  Merge,
-  MergePreferred,
-  RunnableGraph,
-  Sink,
-  Source
-}
+import akka.stream.scaladsl.{Balance, Flow, GraphDSL, Merge, MergePreferred, RunnableGraph, Sink, Source}
 
 import scala.collection.immutable
 import scala.io.StdIn
 
-case class PriorityWorkerPoolShape[In, Out](jobsIn: Inlet[In],
-                                            priorityJobsIn: Inlet[In],
-                                            resultsOut: Outlet[Out])
+case class PriorityWorkerPoolShape[In, Out](jobsIn: Inlet[In], priorityJobsIn: Inlet[In], resultsOut: Outlet[Out])
     extends Shape {
   override def inlets: immutable.Seq[Inlet[_]] = jobsIn :: priorityJobsIn :: Nil
 
   override def outlets: immutable.Seq[Outlet[_]] = resultsOut :: Nil
 
   override def deepCopy(): Shape =
-    PriorityWorkerPoolShape(jobsIn.carbonCopy(),
-                            priorityJobsIn.carbonCopy(),
-                            resultsOut.carbonCopy())
+    PriorityWorkerPoolShape(jobsIn.carbonCopy(), priorityJobsIn.carbonCopy(), resultsOut.carbonCopy())
 }
 
-case class PriorityWorkerPoolShape2[In, Out](
-    _init: Init[Out] = Name("PriorityWorkerPoolShape2"))
+case class PriorityWorkerPoolShape2[In, Out](_init: Init[Out] = Name("PriorityWorkerPoolShape2"))
     extends FanInShape[Out](_init) {
   override protected def construct(init: Init[Out]): FanInShape[Out] =
     PriorityWorkerPoolShape2(init)
@@ -43,6 +29,7 @@ case class PriorityWorkerPoolShape2[In, Out](
 }
 
 object PriorityWorkerPool {
+
   def apply[In, Out](worker: Flow[In, Out, Any], workerCount: Int) =
     GraphDSL.create() { implicit b =>
       import GraphDSL.Implicits._
@@ -57,9 +44,7 @@ object PriorityWorkerPool {
       // 在合并优先和普通作业后发送到平衡器
       priorityMerge ~> balance
 
-      PriorityWorkerPoolShape(priorityMerge.in(0),
-                              priorityMerge.preferred,
-                              resultsMerge.out)
+      PriorityWorkerPoolShape(priorityMerge.in(0), priorityMerge.preferred, resultsMerge.out)
     }
 }
 

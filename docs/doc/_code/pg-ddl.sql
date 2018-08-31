@@ -1,6 +1,8 @@
+-- create user massdata nosuperuser encrypted password 'Massdata.2018';
+-- create database massdata with owner=massdata template=template1;
 set timezone to 'Asia/Chongqing';
 
--- #ddl-job start
+-- #ddl-job
 
 drop table if exists public.job_detail;
 create table public.job_detail (
@@ -49,7 +51,7 @@ create table public.job_log (
   completion_value  text
 );
 
--- #ddl-job end
+-- #ddl-job
 
 -- #ddl-workflow
 

@@ -26,22 +26,15 @@ class JdbcTemplateTest extends HelloscalaSpec with BeforeAndAfterAll {
 
   "migrate" should {
     "mysql2pg" in {
-      val mysqlSource = JdbcSource("SELECT isbn, title, created_at FROM t_book",
-                                   Nil,
-                                   100)(pgDataSource)
+      val mysqlSource = JdbcSource("SELECT isbn, title, created_at FROM t_book", Nil, 100)(pgDataSource)
 
       val flow: Flow[ResultSet, Book, NotUsed] = Flow[ResultSet].map { rs =>
-        Book(rs.getString("isbn"),
-             rs.getString("title"),
-             rs.getTimestamp("created_at").toInstant)
+        Book(rs.getString("isbn"), rs.getString("title"), rs.getTimestamp("created_at").toInstant)
       }
 
       val sink: Sink[Book, Future[JdbcSinkResult]] = JdbcSink[Book](
-        conn =>
-          conn.prepareStatement(
-            "INSERT INTO t_book(isbn, title, created_at) VALUES(?, ?, ?)"),
-        (book, stmt) =>
-          JdbcUtils.setStatementParameters(stmt, book.productIterator.toList),
+        conn => conn.prepareStatement("INSERT INTO t_book(isbn, title, created_at) VALUES(?, ?, ?)"),
+        (book, stmt) => JdbcUtils.setStatementParameters(stmt, book.productIterator.toList),
         100
       )(mysqlDataSource)
 
@@ -56,11 +49,8 @@ class JdbcTemplateTest extends HelloscalaSpec with BeforeAndAfterAll {
       type V = (Int, String, Instant)
       val items = List[V]((16, "16", Instant.now()), (17, "17", Instant.now()))
       val sink = JdbcSink[V](
-        conn =>
-          conn.prepareStatement(
-            "INSERT INTO public.t_role(id, name, created_at) VALUES(?, ?, ?)"),
-        (value, pstmt) =>
-          JdbcUtils.setStatementParameters(pstmt, value.productIterator.toList),
+        conn => conn.prepareStatement("INSERT INTO public.t_role(id, name, created_at) VALUES(?, ?, ?)"),
+        (value, pstmt) => JdbcUtils.setStatementParameters(pstmt, value.productIterator.toList),
         100
       )(pgDataSource)
       val results = Source(items).runWith(sink).futureValue
@@ -69,16 +59,11 @@ class JdbcTemplateTest extends HelloscalaSpec with BeforeAndAfterAll {
     }
 
     "source" in {
-      val source = JdbcSource("SELECT id, name, created_at FROM public.t_role",
-                              Nil,
-                              100)(pgDataSource)
+      val source = JdbcSource("SELECT id, name, created_at FROM public.t_role", Nil, 100)(pgDataSource)
       val future = source.zipWithIndex
         .map {
           case (rs, idx) =>
-            (idx + 1,
-             rs.getInt("id"),
-             rs.getString("name"),
-             rs.getTimestamp("created_at"))
+            (idx + 1, rs.getInt("id"), rs.getString("name"), rs.getTimestamp("created_at"))
         }
         .runWith(Sink.seq)
       val results = future.futureValue
@@ -97,8 +82,7 @@ class JdbcTemplateTest extends HelloscalaSpec with BeforeAndAfterAll {
     val props = new Properties()
     props.setProperty("poolName", "mass-pg-1")
     props.setProperty("maximumPoolSize", "4")
-    props.setProperty("dataSourceClassName",
-                      "org.postgresql.ds.PGSimpleDataSource")
+    props.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource")
     props.setProperty("dataSource.serverName", "localhost")
     props.setProperty("dataSource.databaseName", "yangbajing")
     props.setProperty("dataSource.user", "yangbajing")

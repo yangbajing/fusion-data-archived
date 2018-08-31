@@ -19,14 +19,14 @@ object SessionUtil {
   }
 
   /**
-    * Utility method for generating a good server secret.
-    */
+   * Utility method for generating a good server secret.
+   */
   def randomServerSecret(): String = randomString(128)
 
   // Do not change this unless you understand the security issues behind timing attacks.
   // This method intentionally runs in constant time if the two strings have the same length.
   // If it didn't, it would be vulnerable to a timing attack.
-  def constantTimeEquals(a: String, b: String): Boolean = {
+  def constantTimeEquals(a: String, b: String): Boolean =
     if (a.length != b.length) {
       false
     } else {
@@ -36,13 +36,10 @@ object SessionUtil {
       }
       equal == 0
     }
-  }
 
-  def toHexString(array: Array[Byte]): String = {
+  def toHexString(array: Array[Byte]): String =
     DatatypeConverter.printHexBinary(array)
-  }
 
-  def hexStringToByte(hexString: String): Array[Byte] = {
+  def hexStringToByte(hexString: String): Array[Byte] =
     DatatypeConverter.parseHexBinary(hexString)
-  }
 }

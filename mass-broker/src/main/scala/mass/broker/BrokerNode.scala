@@ -21,16 +21,11 @@ class BrokerNode extends MetricActor {
 
   val cluster = Cluster(context.system)
 
-  override def preStart(): Unit = {
-    cluster.subscribe(self,
-                      InitialStateAsEvents,
-                      classOf[MemberEvent],
-                      classOf[UnreachableMember])
-  }
+  override def preStart(): Unit =
+    cluster.subscribe(self, InitialStateAsEvents, classOf[MemberEvent], classOf[UnreachableMember])
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     cluster.unsubscribe(self)
-  }
 
   override def metricReceive: Receive = {
     case MemberUp(member) =>

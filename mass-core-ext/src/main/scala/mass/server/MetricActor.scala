@@ -11,13 +11,11 @@ import com.typesafe.scalalogging.LazyLogging
 
 trait MetricActor extends Actor with LazyLogging {
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     logger.info(s"actor已启动: $self")
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     logger.info(s"actor已停止：$self")
-  }
 
   //  override def preRestart(reason: Throwable, message: Option[Any]): Unit = super.preRestart(reason, message)
   //

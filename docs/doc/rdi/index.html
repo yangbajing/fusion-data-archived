@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>反映式数据处理（mass-rdi） · MassData（海量数据平台）</title>
+<title>反应式数据处理（mass-rdi） · MassData（海量数据平台）</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content='mass-docs'/>
@@ -48,7 +48,7 @@
     <li><a href="../connector/connector.html" class="page">扩展连接器</a></li>
   </ul></li>
   <li><a href="../scheduler/index.html" class="page">调度（mass-scheduler）</a></li>
-  <li><a href="../rdi/index.html" class="active page">反映式数据处理（mass-rdi）</a>
+  <li><a href="../rdi/index.html" class="active page">反应式数据处理（mass-rdi）</a>
   <ul>
     <li><a href="../rdi/core.html" class="page">核心概念</a></li>
     <li><a href="../rdi/workflow.html" class="page">工作流</a></li>
@@ -112,7 +112,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
     <li><a href="../connector/connector.html" class="page">扩展连接器</a></li>
   </ul></li>
   <li><a href="../scheduler/index.html" class="page">调度（mass-scheduler）</a></li>
-  <li><a href="../rdi/index.html" class="active page">反映式数据处理（mass-rdi）</a>
+  <li><a href="../rdi/index.html" class="active page">反应式数据处理（mass-rdi）</a>
   <ul>
     <li><a href="../rdi/core.html" class="page">核心概念</a></li>
     <li><a href="../rdi/workflow.html" class="page">工作流</a></li>
@@ -144,7 +144,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="nav-breadcrumbs">
 <ul>
   <li><a href="../index.html">MassData（海量数据平台）</a></li>
-  <li>反映式数据处理（mass-rdi）</li>
+  <li>反应式数据处理（mass-rdi）</li>
 </ul>
 </div>
 </div>
@@ -152,8 +152,8 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 
 <div class="page-content row">
 <div class="small-12 large-9 column" id="docs">
-<h1><a href="#反映式数据处理-mass-rdi-" name="反映式数据处理-mass-rdi-" class="anchor"><span class="anchor-link"></span></a>反映式数据处理（mass-rdi）</h1>
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD <strong>mass-rdi</strong> 的数据处理部分将基于 Reactive Extension 的思想进行设计，采集 <strong>Akka Stream</strong> 做为实现框架，基于 <strong>Alpakka</strong> 进行落地实现。</p>
+<h1><a href="#反应式数据处理-mass-rdi-" name="反应式数据处理-mass-rdi-" class="anchor"><span class="anchor-link"></span></a>反应式数据处理（mass-rdi）</h1>
+<p><strong>mass-rdi</strong> 的数据处理部分将基于 Reactive Extension 的思想进行设计，采集 <strong>Akka Stream</strong> 做为实现框架，基于 <strong>Alpakka</strong> 进行落地实现。</p>
 <h2><a href="#特性" name="特性" class="anchor"><span class="anchor-link"></span></a>特性</h2>
 <p><strong>有效提供工作效率</strong></p>
 <p>mass-rdp可数据工程师**提高**对复杂数据的处理能力，**提高**对各种数据来源、数据格式的数据的入库效率，**提高**对业务快速变化的响应。</p>
@@ -170,29 +170,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 </ul>
 <p>mass-rdi 可以单独使用，也可以集成到其它业务系统里面。</p>
 <p><strong>可扩展</strong></p>
-<h1><a href="#mass-rdi-提供了完善的接口和丰富的扩展点-支持对-mass-rdi-进行二次开发-或将其嵌入到特定的应用系统中-" name="mass-rdi-提供了完善的接口和丰富的扩展点-支持对-mass-rdi-进行二次开发-或将其嵌入到特定的应用系统中-" class="anchor"><span class="anchor-link"></span></a>mass-rdi 提供了完善的接口和丰富的扩展点，支持对 mass-rdi 进行二次开发，或将其嵌入到特定的应用系统中。</h1>
-<p>mass-rdi 反应式数据集成</p>
-<ul>
-  <li>ETL/ELT</li>
-  <li>数据迁移</li>
-  <li>数据同步</li>
-</ul>
-<p><strong>MassData</strong> 的数据处理部分将基于 Reactive Extension 的思想进行设计，采集 <strong>Akka Stream</strong> 做为实现框架， 基于 <strong>Alpakka</strong> 进行落地实现。</p>
-<blockquote>
-  <blockquote>
-    <blockquote>
-      <blockquote>
-        <blockquote>
-          <blockquote>
-            <blockquote>
-              <p>master</p>
-            </blockquote>
-          </blockquote>
-        </blockquote>
-      </blockquote>
-    </blockquote>
-  </blockquote>
-</blockquote>
+<p>mass-rdi 提供了完善的接口和丰富的扩展点，支持对 mass-rdi 进行二次开发，或将其嵌入到特定的应用系统中。</p>
 <div class="toc ">
 <ul>
   <li><a href="../rdi/core.html" class="page">核心概念</a></li>
@@ -214,10 +192,9 @@ The source code for this page can be found <a href="https://github.com/yangbajin
 <div class="nav-title">On this page:</div>
 <div class="nav-toc">
 <ul>
-  <li><a href="../rdi/index.html#反映式数据处理-mass-rdi-" class="header">反映式数据处理（mass-rdi）</a>
+  <li><a href="../rdi/index.html#反应式数据处理-mass-rdi-" class="header">反应式数据处理（mass-rdi）</a>
   <ul>
     <li><a href="../rdi/index.html#特性" class="header">特性</a></li>
-    <li><a href="../rdi/index.html#mass-rdi-提供了完善的接口和丰富的扩展点-支持对-mass-rdi-进行二次开发-或将其嵌入到特定的应用系统中-" class="header">mass-rdi 提供了完善的接口和丰富的扩展点，支持对 mass-rdi 进行二次开发，或将其嵌入到特定的应用系统中。</a></li>
   </ul></li>
 </ul>
 </div>

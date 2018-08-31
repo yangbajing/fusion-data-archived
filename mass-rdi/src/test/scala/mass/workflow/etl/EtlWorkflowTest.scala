@@ -12,19 +12,14 @@ import org.scalatest.BeforeAndAfterAll
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class EtlWorkflowTest
-    extends TestKit(ActorSystem("etl-test"))
-    with HelloscalaSpec
-    with BeforeAndAfterAll {
+class EtlWorkflowTest extends TestKit(ActorSystem("etl-test")) with HelloscalaSpec with BeforeAndAfterAll {
   var rdpSystem: RdpSystem = _
   var etlWorkflow: EtlWorkflow = _
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     val massSystem = MassSystem("mass", system)
-    rdpSystem = RdpSystem("rdp-test",
-                          massSystem,
-                          ConnectorSystem("connector", massSystem))
+    rdpSystem = RdpSystem("rdp-test", massSystem, ConnectorSystem("connector", massSystem))
     etlWorkflow = EtlWorkflow.fromXML(TestStub.graphXmlConfig, rdpSystem).get
   }
 

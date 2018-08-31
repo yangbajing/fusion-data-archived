@@ -42,11 +42,11 @@ object SecurityUtils {
   //    new HSBizMsgCrypt(key, encodingAesKey, clientId)
 
   /**
-    * 生成通用 Salt 及 Salt Password
-    *
-    * @param password 待生成密码
-    * @return
-    */
+   * 生成通用 Salt 及 Salt Password
+   *
+   * @param password 待生成密码
+   * @return
+   */
   def byteGeneratePassword(password: String): ByteSaltPassword = {
     val salt = Utils.randomBytes(SaltPassword.SALT_LENGTH)
     val saltPwd = DigestUtils.sha256(salt ++ password.getBytes)
@@ -60,23 +60,19 @@ object SecurityUtils {
   }
 
   /**
-    * 校验密码
-    *
-    * @param salt     salt
-    * @param saltPwd  salt password
-    * @param password request password
-    * @return
-    */
-  def matchSaltPassword(salt: Array[Byte],
-                        saltPwd: Array[Byte],
-                        password: Array[Byte]): Boolean = {
+   * 校验密码
+   *
+   * @param salt     salt
+   * @param saltPwd  salt password
+   * @param password request password
+   * @return
+   */
+  def matchSaltPassword(salt: Array[Byte], saltPwd: Array[Byte], password: Array[Byte]): Boolean = {
     val bytes = DigestUtils.sha256(salt ++ password)
     util.Arrays.equals(saltPwd, bytes)
   }
 
-  def matchSaltPassword(salt: String,
-                        saltPwd: String,
-                        password: String): Boolean = {
+  def matchSaltPassword(salt: String, saltPwd: String, password: String): Boolean = {
     val securityPassword = DigestUtils.sha256Hex(salt + password)
     securityPassword == saltPwd
   }

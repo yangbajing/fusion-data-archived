@@ -1,6 +1,7 @@
 package sample
 
 object Test {
+
   def filter(source: Seq[Int]): Unit = {
     val result = Array.ofDim[Int](source.size)
     var i = 0

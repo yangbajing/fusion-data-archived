@@ -7,9 +7,9 @@
 package mass.core.component.spi
 
 /**
-  * 转换组件
-  * @tparam T
-  */
+ * 转换组件
+ * @tparam T
+ */
 trait FunctionComponent[T] extends BaseComponent {
   def preStart(): Unit
 

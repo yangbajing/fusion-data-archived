@@ -9,6 +9,7 @@ import com.typesafe.scalalogging.LazyLogging
 import helloscala.common.Configuration
 import helloscala.common.util.TimeUtils
 import mass.core.job._
+import mass.scheduler.job.JobClassJob
 import mass.server.MassSystemExtension
 
 import scala.concurrent.ExecutionContext
@@ -21,9 +22,7 @@ object SchedulerSystem {
   def apply(massSystem: MassSystemExtension): SchedulerSystem =
     apply(massSystem.name, massSystem, true)
 
-  def apply(name: String,
-            massSystem: MassSystemExtension,
-            waitForJobsToComplete: Boolean): SchedulerSystem = {
+  def apply(name: String, massSystem: MassSystemExtension, waitForJobsToComplete: Boolean): SchedulerSystem = {
     _instance = new SchedulerSystem(name, massSystem, waitForJobsToComplete)
     _instance
   }
@@ -40,15 +39,12 @@ class SchedulerSystem private (
   import org.quartz._
   import org.quartz.impl.StdSchedulerFactory
 
-  private val props =
-    configuration.get[Properties]("mass.core.scheduler.properties")
-  private val scheduler: Scheduler = new StdSchedulerFactory(props).getScheduler
+  private val scheduler: org.quartz.Scheduler =
+    new StdSchedulerFactory(configuration.get[Properties]("mass.core.scheduler.properties")).getScheduler
   val conf = new SchedulerConfig(configuration)
   init()
 
   private def init(): Unit = {
-    props.forEach((key, value) => logger.info(s"[props] $key = $value"))
-
     if (!Files.isDirectory(conf.jobSavedPath)) {
       Files.createDirectories(conf.jobSavedPath)
     }
@@ -60,45 +56,35 @@ class SchedulerSystem private (
   }
 
   // TODO 定义 SchedulerSystem 自有的线程执行器
-  override implicit def dispatcher: ExecutionContext =
+  implicit override def dispatcher: ExecutionContext =
     massSystem.system.dispatcher
 
   override def system: ActorSystem = massSystem.system
 
   override def configuration: Configuration = massSystem.configuration
 
-  def schedulerJob[T <: SchedulerJob](
-      conf: JobConf,
-      jobClass: Class[T],
-      data: Map[String, String]): OffsetDateTime =
+  def schedulerJob[T <: SchedulerJob](conf: JobConf, jobClass: Class[T], data: Map[String, String]): OffsetDateTime =
     schedulerJob(conf, jobClass.getName, data)
 
-  def schedulerJob[T <: SchedulerJob](
-      conf: JobConf,
-      className: String,
-      data: Map[String, String]): OffsetDateTime = {
+  def schedulerJob[T <: SchedulerJob](conf: JobConf, className: String, data: Map[String, String]): OffsetDateTime = {
     val jobDetail = buildJobDetail(conf, className, data)
     val trigger = buildTrigger(conf)
     schedulerJob(jobDetail, trigger)
   }
 
-  private def schedulerJob(detail: JobDetail,
-                           trigger: Trigger): OffsetDateTime = {
+  private def schedulerJob(detail: JobDetail, trigger: Trigger): OffsetDateTime =
     scheduler
       .scheduleJob(detail, trigger)
       .toInstant
       .atOffset(TimeUtils.ZONE_CHINA_OFFSET)
-  }
 
   private def buildTrigger(conf: JobConf): Trigger = {
     var builder: TriggerBuilder[Trigger] = TriggerBuilder
       .newTrigger()
       .withIdentity(TriggerKey.triggerKey(conf.triggerKey))
 
-    conf.startTime.foreach(st =>
-      builder = builder.startAt(java.util.Date.from(st.toInstant)))
-    conf.endTime.foreach(et =>
-      builder = builder.endAt(java.util.Date.from(et.toInstant)))
+    conf.startTime.foreach(st => builder = builder.startAt(java.util.Date.from(st.toInstant)))
+    conf.endTime.foreach(et => builder = builder.endAt(java.util.Date.from(et.toInstant)))
 
     val schedule = conf match {
       case JobDurationConf(_, _, duration, repeat, _, _) =>
@@ -113,9 +99,7 @@ class SchedulerSystem private (
     builder.withSchedule(schedule).build()
   }
 
-  private def buildJobDetail(conf: JobConf,
-                             className: String,
-                             data: Map[String, String]): JobDetail = {
+  private def buildJobDetail(conf: JobConf, className: String, data: Map[String, String]): JobDetail = {
     val dataMap = new JobDataMap()
     dataMap.put(SchedulerUtils.JOB_CLASS, className)
     for ((key, value) <- data) {

@@ -14,10 +14,7 @@ import mass.scheduler.SchedulerSystem
 import mass.server.MassSystemExtension
 import org.scalatest.BeforeAndAfterAll
 
-class EtlSchedulerWorkflowTest
-    extends TestKit(ActorSystem("etl-test"))
-    with HelloscalaSpec
-    with BeforeAndAfterAll {
+class EtlSchedulerWorkflowTest extends TestKit(ActorSystem("etl-test")) with HelloscalaSpec with BeforeAndAfterAll {
   var rdpSystem: RdpSystem = _
   var schedulerSystem: SchedulerSystem = _
   //  var etlWorkflow: EtlWorkflow = _
@@ -25,17 +22,14 @@ class EtlSchedulerWorkflowTest
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     val massSystem = MassSystem("mass", system).as[MassSystemExtension]
-    rdpSystem = RdpSystem("rdp-test",
-                          massSystem,
-                          ConnectorSystem("connector", massSystem))
+    rdpSystem = RdpSystem("rdp-test", massSystem, ConnectorSystem("connector", massSystem))
     schedulerSystem = SchedulerSystem(massSystem)
     //    etlWorkflow = EtlWorkflow.fromXML(TestStub.graphXmlConfig, rdpSystem).get
   }
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     //    etlWorkflow.close()
     super.afterAll()
-  }
 
   "EtlSchedulerWorkflowTest" should {
 
@@ -44,10 +38,7 @@ class EtlSchedulerWorkflowTest
         .builder("test", "test")
         .withCronExpress("10 * * * * ?")
         .result
-      schedulerSystem.schedulerJob(
-        conf,
-        classOf[EtlJob],
-        Map(EtlJob.WORKFLOW_STRING -> TestStub.graphConfig))
+      schedulerSystem.schedulerJob(conf, classOf[EtlJob], Map(EtlJob.WORKFLOW_STRING -> TestStub.graphConfig))
 
       TimeUnit.MINUTES.sleep(5)
     }

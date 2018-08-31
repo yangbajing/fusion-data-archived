@@ -21,9 +21,7 @@ object JdbcSource {
       new JdbcSourceStage(
         dataSource,
         conn => {
-          val stmt = conn.prepareStatement(sql,
-                                           ResultSet.TYPE_FORWARD_ONLY,
-                                           ResultSet.CONCUR_READ_ONLY)
+          val stmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
           JdbcUtils.setStatementParameters(stmt, args)
         },
         fetchRowSize

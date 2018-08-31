@@ -40,9 +40,7 @@ class EtlGraphXmlParserFactory extends EtlGraphParserFactory {
 
   def build(elem: NodeSeq): EtlGraphParser = new EtlGraphXmlParser(elem)
 
-  class EtlGraphXmlParser(elem: NodeSeq)
-      extends EtlGraphParser
-      with StrictLogging {
+  class EtlGraphXmlParser(elem: NodeSeq) extends EtlGraphParser with StrictLogging {
 
     import mass.core.XmlUtils.XmlRich
 
@@ -83,9 +81,7 @@ class EtlGraphXmlParserFactory extends EtlGraphParserFactory {
 
     @inline private def parseScript(node: NodeSeq): EtlScript = {
       logger.trace(s"parse script:\n$node")
-      EtlScript(EtlScriptType.withName(node.attr("type")),
-                node.getAttr("src"),
-                node.getText)
+      EtlScript(EtlScriptType.withName(node.attr("type")), node.getAttr("src"), node.getText)
     }
 
     @inline private def parseConnector(node: NodeSeq): EtlConnector =

@@ -13,9 +13,7 @@ object MaterializeValue {
   implicit val mat = ActorMaterializer()
   import system.dispatcher
 
-  case class MyClass(private val p: Promise[Option[Int]],
-                     conn: Tcp.OutgoingConnection)
-      extends AutoCloseable {
+  case class MyClass(private val p: Promise[Option[Int]], conn: Tcp.OutgoingConnection) extends AutoCloseable {
     override def close(): Unit = p.trySuccess(None)
   }
 
@@ -41,10 +39,10 @@ object MaterializeValue {
 
   val nestedFlow: Flow[Int, ByteString, Future[Tcp.OutgoingConnection]] =
     flow2.viaMat(flow3)(Keep.right)
+
   val nestedFlow2: Flow[Int, ByteString, NotUsed] =
     flow2.viaMat(flow3)(Keep.left) // flow2.via(flow3)
-  val nestedFlow3
-    : Flow[Int, ByteString, (NotUsed, Future[Tcp.OutgoingConnection])] =
+  val nestedFlow3: Flow[Int, ByteString, (NotUsed, Future[Tcp.OutgoingConnection])] =
     flow2.viaMat(flow3)(Keep.both)
 
   // Materializes to Future[String]   (Keep.right)
@@ -54,9 +52,7 @@ object MaterializeValue {
   val nestedSink: Sink[Int, (Future[Tcp.OutgoingConnection], Future[String])] =
     nestedFlow.toMat(sink)(Keep.both)
 
-  def f(p: Promise[Option[Int]],
-        rest: (Future[Tcp.OutgoingConnection], Future[String]))
-    : Future[MyClass] = {
+  def f(p: Promise[Option[Int]], rest: (Future[Tcp.OutgoingConnection], Future[String])): Future[MyClass] = {
     val connFuture = rest._1
     connFuture.map(outConn => MyClass(p, outConn))
   }
@@ -67,6 +63,7 @@ object MaterializeValue {
 
   val r: RunnableGraph[Promise[Option[Int]]] =
     nestedSource.toMat(nestedSink)(Keep.left)
+
   val r2: RunnableGraph[(Future[Tcp.OutgoingConnection], Future[String])] =
     nestedSource.toMat(nestedSink)(Keep.right)
 }

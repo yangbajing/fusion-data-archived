@@ -6,10 +6,9 @@ import mass.connector.{Connector, ConnectorSetting, ConnectorType}
 import mass.core.jdbc.{JdbcTemplate, JdbcUtils}
 
 /**
-  *
-  */
-final case class SQLConnector(name: String, setting: ConnectorSetting)
-    extends Connector {
+ *
+ */
+final case class SQLConnector(name: String, setting: ConnectorSetting) extends Connector {
 
   override def `type`: ConnectorType = ConnectorType.JDBC
 

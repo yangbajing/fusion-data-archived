@@ -23,12 +23,9 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 /**
-  * Created by yangbajing(yangbajing@gmail.com) on 2017-03-08.
-  */
-trait HSAkkaHttpServer
-    extends BaseExceptionPF
-    with BaseRejectionBuilder
-    with StrictLogging {
+ * Created by yangbajing(yangbajing@gmail.com) on 2017-03-08.
+ */
+trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with StrictLogging {
   def actorSystem: ActorSystem
 
   def actorMaterializer: ActorMaterializer
@@ -78,15 +75,11 @@ trait HSAkkaHttpServer
     response.copy(headers = headers)
   }
 
-  def afterHttpBindingSuccess(binding: ServerBinding): Unit = {
-    logger.info(
-      s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
-  }
+  def afterHttpBindingSuccess(binding: ServerBinding): Unit =
+    logger.info(s"Server online at http://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
 
-  def afterHttpsBindingSuccess(binding: ServerBinding): Unit = {
-    logger.info(
-      s"Server online at https://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
-  }
+  def afterHttpsBindingSuccess(binding: ServerBinding): Unit =
+    logger.info(s"Server online at https://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
 
   def afterHttpBindingFailure(cause: Throwable): Unit = {
     logger.error(s"Error starting the server ${cause.getMessage}", cause)
@@ -115,11 +108,8 @@ trait HSAkkaHttpServer
       tmf.init(ks)
 
       val sslContext: SSLContext = SSLContext.getInstance("TLS")
-      sslContext.init(keyManagerFactory.getKeyManagers,
-                      tmf.getTrustManagers,
-                      new SecureRandom)
-      hcc =
-        ConnectionContext.https(sslContext, Some(AkkaSSLConfig(actorSystem)))
+      sslContext.init(keyManagerFactory.getKeyManagers, tmf.getTrustManagers, new SecureRandom)
+      hcc = ConnectionContext.https(sslContext, Some(AkkaSSLConfig(actorSystem)))
     } catch {
       case NonFatal(e) =>
         e.printStackTrace()
@@ -128,14 +118,13 @@ trait HSAkkaHttpServer
     hcc
   }
 
-  def startServerAwait(): Unit = {
+  def startServerAwait(): Unit =
     Await.result(startServer()._1, 60.seconds)
-  }
 
   /**
-    * 启动基于Akka HTTP的服务
-    * @return
-    */
+   * 启动基于Akka HTTP的服务
+   * @return
+   */
   def startServer(): (Future[ServerBinding], Option[Future[ServerBinding]]) //=
   //    startServer(
   //      configuration.getString("server.host"),
@@ -143,10 +132,12 @@ trait HSAkkaHttpServer
   //      configuration.get[Option[Int]]("server.https-port"))
 
   /**
-    * 根据设置的host:绑定主机名和port:绑定网络端口 启动Akka HTTP服务
-    */
-  def startServer(host: String, port: Int, httpsPort: Option[Int])
-    : (Future[ServerBinding], Option[Future[ServerBinding]]) = {
+   * 根据设置的host:绑定主机名和port:绑定网络端口 启动Akka HTTP服务
+   */
+  def startServer(
+      host: String,
+      port: Int,
+      httpsPort: Option[Int]): (Future[ServerBinding], Option[Future[ServerBinding]]) = {
     implicit val system: ActorSystem = actorSystem
     implicit val mat: ActorMaterializer = actorMaterializer
     implicit val executionContext: ExecutionContextExecutor =
@@ -164,10 +155,7 @@ trait HSAkkaHttpServer
       }
     val handler = flow.map(handleMapResponse)
 
-    bindingFuture = Http().bindAndHandle(handler,
-                                         interface = host,
-                                         port = port,
-                                         settings = ServerSettings(actorSystem))
+    bindingFuture = Http().bindAndHandle(handler, interface = host, port = port, settings = ServerSettings(actorSystem))
 
     bindingFuture.onComplete {
       case Success(binding) ⇒

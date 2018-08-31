@@ -17,8 +17,7 @@ class Database {
 
   //  def bulkInsertAsync(insert: Seq[InsertMessage])(implicit ec: ExecutionContext): Future[Seq[String]] = bulkInsertAsync(insert.map(_.message))
 
-  def bulkInsertAsync(insert: Seq[String])(
-      implicit ec: ExecutionContext): Future[Seq[String]] = Future {
+  def bulkInsertAsync(insert: Seq[String])(implicit ec: ExecutionContext): Future[Seq[String]] = Future {
     TimeUnit.MILLISECONDS.sleep(50)
     insert
   }
@@ -53,11 +52,10 @@ class DatabaseActor extends Actor {
   var flush = true
   var outstanding = 0
 
-  override def preStart() = {
+  override def preStart() =
     context.system.scheduler.scheduleOnce(1.second) {
       self ! Insert
     }
-  }
 
   def receive: Receive = {
     case InsertMessage(message) =>
@@ -80,7 +78,7 @@ class DatabaseActor extends Actor {
       }
   }
 
-  private def insert() = {
+  private def insert() =
     if (count > 0 && outstanding < 10) {
       outstanding += 1
       val (insert, remaining) = messages.splitAt(1000)
@@ -90,7 +88,6 @@ class DatabaseActor extends Actor {
         case _ => self ! Decrement
       }
     }
-  }
 }
 
 import akka.http.scaladsl.server.Directives._
@@ -100,6 +97,7 @@ object DatabaseDemo extends App {
   implicit val mat: ActorMaterializer = ActorMaterializer()
 
   val database = system.actorOf(Props[DatabaseActor], "database")
+
   val measurementsWebSocketService: Flow[Message, Message, NotUsed] =
     Flow[Message]
       .collect {

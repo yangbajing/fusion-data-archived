@@ -9,9 +9,9 @@ import helloscala.common.data.ApiResult
 import helloscala.common.exception.HSException
 
 /**
-  * 基本异常处理函数
-  * Created by yangbajing(yangbajing@gmail.com) on 2017-03-01.
-  */
+ * 基本异常处理函数
+ * Created by yangbajing(yangbajing@gmail.com) on 2017-03-01.
+ */
 trait BaseExceptionPF extends StrictLogging {
 
   def exceptionHandlerPF: ExceptionHandler.PF = {
@@ -21,9 +21,7 @@ trait BaseExceptionPF extends StrictLogging {
           case e: HSException =>
             val t = e.getCause
             //            if (t != null) logger.warn(s"URI[$uri] ${e.toString}", t) else logger.warn(s"URI[$uri] ${e.toString}")
-            logger.warn(
-              s"Exception[${e.getClass.getSimpleName}] URI[$uri] ${e.getMessage}",
-              t)
+            logger.warn(s"Exception[${e.getClass.getSimpleName}] URI[$uri] ${e.getMessage}", t)
             (StatusCodes
                .getForKey(e.getHttpStatus)
                .getOrElse(StatusCodes.Conflict),
@@ -31,20 +29,15 @@ trait BaseExceptionPF extends StrictLogging {
 
           case e: IllegalArgumentException =>
             logger.debug(s"Illegal Argument: ${e.getMessage}", e)
-            (StatusCodes.BadRequest,
-             ApiResult.error(StatusCodes.BadRequest.intValue,
-                             e.getLocalizedMessage))
+            (StatusCodes.BadRequest, ApiResult.error(StatusCodes.BadRequest.intValue, e.getLocalizedMessage))
 
           case e: AskTimeoutException =>
             logger.debug(s"Actor Timeout: ${e.getMessage}", e)
-            (StatusCodes.GatewayTimeout,
-             ApiResult.error(StatusCodes.GatewayTimeout.intValue, "请求超时"))
+            (StatusCodes.GatewayTimeout, ApiResult.error(StatusCodes.GatewayTimeout.intValue, "请求超时"))
 
           case _ =>
             logger.error(s"请求无法正常处理，URI[$uri]", ex)
-            (StatusCodes.InternalServerError,
-             ApiResult.error(StatusCodes.InternalServerError.intValue,
-                             ex.getMessage))
+            (StatusCodes.InternalServerError, ApiResult.error(StatusCodes.InternalServerError.intValue, ex.getMessage))
         }
         import JacksonSupport._
         complete(response)

@@ -1,6 +1,6 @@
 /**
-  * http://blog.colinbreck.com/patterns-for-streaming-measurement-data-with-akka-streams/
-  */
+ * http://blog.colinbreck.com/patterns-for-streaming-measurement-data-with-akka-streams/
+ */
 package example.motivating
 
 import java.security.SecureRandom

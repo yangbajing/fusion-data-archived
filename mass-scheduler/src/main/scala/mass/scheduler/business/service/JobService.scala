@@ -10,25 +10,22 @@ import helloscala.common.Configuration
 import helloscala.common.exception.HSBadRequestException
 import helloscala.common.util.{DigestUtils, FileUtils, Utils}
 import mass.core.job.JobConf
-import mass.scheduler.SchedulerSystem
+import mass.scheduler.SchedulerConfig
+import mass.scheduler.model.JobUploadJobReq
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class JobService(schedulerSystem: SchedulerSystem) extends StrictLogging {
-
-  import schedulerSystem.dispatcher
+object JobService extends StrictLogging {
 
   val JOB_CONF = "job.conf"
 
-  def uploadJob(file: File,
-                fileName: String,
-                charset: Charset): Future[JobZip] = Future {
-    val jobZip = parseJobZip(file, charset) match {
+  def uploadJob(conf: SchedulerConfig, req: JobUploadJobReq)(implicit ec: ExecutionContext): Future[JobZip] = Future {
+    val jobZip = parseJobZip(req.file, req.charset) match {
       case Right(v) => v
       case Left(e)  => throw e
     }
 
-    val dest = schedulerSystem.conf.jobSavedPath
+    val dest = conf.jobSavedPath
       .resolve(jobZip.sha.take(2))
       .resolve(jobZip.sha)
     logger.debug(s"dest: $dest")
@@ -40,13 +37,11 @@ class JobService(schedulerSystem: SchedulerSystem) extends StrictLogging {
       if (!Files.isDirectory(savePath.getParent)) {
         Files.createDirectories(savePath.getParent)
       }
-      FileUtils.write(jobZip.zip.getInputStream(entry),
-                      Files.newOutputStream(savePath),
-                      buf)
+      FileUtils.write(jobZip.zip.getInputStream(entry), Files.newOutputStream(savePath), buf)
       savePath
     }
 
-    Files.copy(file.toPath, dest.resolve(fileName))
+    Files.copy(req.file.toPath, dest.resolve(req.fileName))
     JobZip(jobZip.sha, JobConf.parseConfiguration(jobZip.conf), savedEntries)
   }
 
@@ -63,8 +58,7 @@ class JobService(schedulerSystem: SchedulerSystem) extends StrictLogging {
         .span(entry => entry.getName == JOB_CONF && !entry.isDirectory)
       confEntries.toList.headOption match {
         case Some(confEntry) =>
-          val conf = parseJobConf(
-            FileUtils.getString(zip.getInputStream(confEntry), charset))
+          val conf = parseJobConf(FileUtils.getString(zip.getInputStream(confEntry), charset))
           JobZipTO(zip, fileSha, conf, entries.toVector)
         case None =>
           throw HSBadRequestException("压缩包缺少 job.conf 配置文件")
@@ -73,15 +67,12 @@ class JobService(schedulerSystem: SchedulerSystem) extends StrictLogging {
 
   def parseJobConf(content: String): Configuration = {
     val conf = Configuration.parseString(content)
-    require(conf.has("type"),
-            "type 配置未设置，可选值：java, scala, javascript, shell, python")
+    require(conf.has("type"), "type 配置未设置，可选值：java, scala, javascript, shell, python")
     conf
   }
+
 }
 
-private[mass] case class JobZipTO(zip: ZipFile,
-                                  sha: String,
-                                  conf: Configuration,
-                                  entries: Vector[ZipEntry])
+private[mass] case class JobZipTO(zip: ZipFile, sha: String, conf: Configuration, entries: Vector[ZipEntry])
 
 case class JobZip(sha: String, conf: JobConf, entries: Vector[Path])

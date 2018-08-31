@@ -22,13 +22,11 @@ class Worker extends Actor with ActorLogging {
   import Worker._
   import context.dispatcher
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     log.info(s"$self started")
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     log.info(s"$self stopped")
-  }
 
   override def receive: Receive = {
     case FibonacciNumber(nr, delay) =>

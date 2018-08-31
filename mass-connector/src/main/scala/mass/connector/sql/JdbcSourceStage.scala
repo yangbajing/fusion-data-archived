@@ -27,12 +27,13 @@ class JdbcSourceStage(
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) with OutHandler {
+
       var maybeConn =
         Option.empty[(Connection, Boolean, PreparedStatement, ResultSet)]
 
       setHandler(out, this)
 
-      override def onPull(): Unit = {
+      override def onPull(): Unit =
         maybeConn match {
           case Some((_, _, _, rs)) if rs.next() =>
             push(out, rs)
@@ -41,7 +42,6 @@ class JdbcSourceStage(
           case None =>
             () // doing nothing, waiting for in preStart() to be completed
         }
-      }
 
       override def preStart(): Unit =
         try {

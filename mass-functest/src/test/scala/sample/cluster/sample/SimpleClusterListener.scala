@@ -13,16 +13,11 @@ import scala.concurrent.Future
 class SimpleClusterListener extends Actor with StrictLogging {
   val cluster = Cluster(context.system)
 
-  override def preStart(): Unit = {
-    cluster.subscribe(self,
-                      InitialStateAsEvents,
-                      classOf[MemberEvent],
-                      classOf[UnreachableMember])
-  }
+  override def preStart(): Unit =
+    cluster.subscribe(self, InitialStateAsEvents, classOf[MemberEvent], classOf[UnreachableMember])
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     cluster.unsubscribe(self)
-  }
 
   override def receive: Receive = {
     case MemberUp(member) =>

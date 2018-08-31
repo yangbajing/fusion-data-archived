@@ -15,12 +15,9 @@ import scala.collection.immutable
 import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success}
 
-case class EtlGraphImpl(graphSetting: EtlGraphSetting)
-    extends EtlGraph
-    with StrictLogging {
+case class EtlGraphImpl(graphSetting: EtlGraphSetting) extends EtlGraph with StrictLogging {
 
-  override def run(connectors: immutable.Seq[Connector],
-                   rdpSystem: RdpSystem): EtlWorkflowExecution = {
+  override def run(connectors: immutable.Seq[Connector], rdpSystem: RdpSystem): EtlWorkflowExecution = {
     implicit val ec = rdpSystem.materializer.system.dispatcher
     implicit val mat = rdpSystem.materializer
 
@@ -56,16 +53,13 @@ case class EtlGraphImpl(graphSetting: EtlGraphSetting)
     new EtlWorkflowExecution(promise, () => ())
   }
 
-  private def dataSource(connector: Connector,
-                         rdpSystem: RdpSystem): Source[EventData, NotUsed] =
+  private def dataSource(connector: Connector, rdpSystem: RdpSystem): Source[EventData, NotUsed] =
     rdpSystem.streamFactories.get(connector.`type`.toString) match {
       case Some(b) => b.buildSource(connector, graphSource)
       case _       => throw new EtlGraphException(s"未知Connector: $connector")
     }
 
-  private def dataSink(
-      connector: Connector,
-      rdpSystem: RdpSystem): Sink[EventData, Future[JdbcSinkResult]] =
+  private def dataSink(connector: Connector, rdpSystem: RdpSystem): Sink[EventData, Future[JdbcSinkResult]] =
     rdpSystem.streamFactories.get(connector.`type`.toString) match {
       case Some(b) => b.buildSink(connector, graphSink)
       case _       => throw new EtlGraphException(s"未知Connector: $connector")

@@ -11,23 +11,23 @@ import scala.concurrent.duration.FiniteDuration
 trait JobConf {
 
   /**
-    * 任务 key
-    */
+   * 任务 key
+   */
   val jobKey: String
 
   /**
-    * 触发器 key
-    */
+   * 触发器 key
+   */
   val triggerKey: String
 
   /**
-    * 任务开始时间，未设置则马上开始
-    */
+   * 任务开始时间，未设置则马上开始
+   */
   val startTime: Option[OffsetDateTime]
 
   /**
-    * 任务结束时间，未设置则一直有效
-    */
+   * 任务结束时间，未设置则一直有效
+   */
   val endTime: Option[OffsetDateTime]
 }
 
@@ -36,8 +36,7 @@ object JobConf {
   def builder(jobKey: String, triggerKey: String): Builder =
     new Builder(jobKey, triggerKey)
 
-  def parseConfiguration(configuration: Configuration,
-                         path: String = null): JobConf = {
+  def parseConfiguration(configuration: Configuration, path: String = null): JobConf = {
     val conf =
       if (StringUtils.isBlank(path)) configuration
       else configuration.getConfiguration(path)
@@ -91,43 +90,34 @@ object JobConf {
       this
     }
 
-    def result: JobConf = {
+    def result: JobConf =
       if (StringUtils.isNoneBlank(cronExpress))
-        JobCronConf(jobKey,
-                    triggerKey,
-                    cronExpress,
-                    Option(startTime),
-                    Option(endTime))
+        JobCronConf(jobKey, triggerKey, cronExpress, Option(startTime), Option(endTime))
       else if (duration != null && repeat >= 0)
-        JobDurationConf(jobKey,
-                        triggerKey,
-                        duration,
-                        repeat,
-                        Option(startTime),
-                        Option(endTime))
+        JobDurationConf(jobKey, triggerKey, duration, repeat, Option(startTime), Option(endTime))
       else throw new IllegalArgumentException("构建错误")
-    }
   }
 
 }
 
-case class JobDurationConf(jobKey: String,
-                           triggerKey: String,
-                           duration: FiniteDuration,
-                           repeat: Int = 0,
-                           startTime: Option[OffsetDateTime] = None,
-                           endTime: Option[OffsetDateTime] = None)
+case class JobDurationConf(
+    jobKey: String,
+    triggerKey: String,
+    duration: FiniteDuration,
+    repeat: Int = 0,
+    startTime: Option[OffsetDateTime] = None,
+    endTime: Option[OffsetDateTime] = None)
     extends JobConf
 
-case class JobCronConf(jobKey: String,
-                       triggerKey: String,
-                       cronExpress: String,
-                       startTime: Option[OffsetDateTime] = None,
-                       endTime: Option[OffsetDateTime] = None)
+case class JobCronConf(
+    jobKey: String,
+    triggerKey: String,
+    cronExpress: String,
+    startTime: Option[OffsetDateTime] = None,
+    endTime: Option[OffsetDateTime] = None)
     extends JobConf
 
-case class SchedulerContext(data: Map[String, String],
-                            scheduler: SchedulerSystemRef)
+case class SchedulerContext(data: Map[String, String], scheduler: SchedulerSystemRef)
 
 trait JobResult
 

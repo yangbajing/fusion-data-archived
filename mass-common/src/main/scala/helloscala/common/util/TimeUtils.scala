@@ -19,12 +19,15 @@ object TimeUtils extends StrictLogging {
 
   val DATE_TIME_EPOCH: LocalDateTime = LocalDateTime.of(1970, 1, 1, 0, 0, 0)
   val ZONE_CHINA_OFFSET: ZoneOffset = ZoneOffset.ofHours(8)
+
   val formatterDateTime: DateTimeFormatter =
     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
   val formatterMonth: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM")
   val formatterDate: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+
   val formatterDateHours: DateTimeFormatter =
     DateTimeFormatter.ofPattern("yyyy-MM-dd HH")
+
   val formatterDateMinutes: DateTimeFormatter =
     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
   val formatterMinutes: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -38,11 +41,11 @@ object TimeUtils extends StrictLogging {
   def nowTimestamp(): SQLTimestamp = SQLTimestamp.from(Instant.now())
 
   /**
-    * 函数执行时间
-    * @param func 待执行函数
-    * @tparam R func函数返回类型
-    * @return (func函数返回值，函数执行时间纳秒数)
-    */
+   * 函数执行时间
+   * @param func 待执行函数
+   * @tparam R func函数返回类型
+   * @return (func函数返回值，函数执行时间纳秒数)
+   */
   def executeTime[R](func: => R): (R, Long) = {
     val begin = System.nanoTime()
     val result = func
@@ -51,11 +54,11 @@ object TimeUtils extends StrictLogging {
   }
 
   /**
-    * 函数执行时间
-    * @param func 待执行函数
-    * @tparam R func函数返回类型
-    * @return (func函数返回值，函数执行时间毫秒数)
-    */
+   * 函数执行时间
+   * @param func 待执行函数
+   * @tparam R func函数返回类型
+   * @return (func函数返回值，函数执行时间毫秒数)
+   */
   def executeMillis[R](func: => R): (R, Long) = {
     val begin = System.currentTimeMillis()
     val result = func
@@ -72,11 +75,11 @@ object TimeUtils extends StrictLogging {
   }
 
   /**
-    * 解析字符串为 LocalDate
-    *
-    * @param date 字符串形式日期
-    * @return 成功返回 LocalDate
-    */
+   * 解析字符串为 LocalDate
+   *
+   * @param date 字符串形式日期
+   * @return 成功返回 LocalDate
+   */
   def toLocalDate(date: String): LocalDate =
     Try(LocalDate.parse(date, formatterDate)) getOrElse {
       val (year, month, day) = date.split("""[-/:]""") match {
@@ -101,11 +104,11 @@ object TimeUtils extends StrictLogging {
     }
 
   /**
-    * 解析字符串为 LocalTime
-    *
-    * @param time 字符串形式时间
-    * @return 成功返回 LocalTime
-    */
+   * 解析字符串为 LocalTime
+   *
+   * @param time 字符串形式时间
+   * @return 成功返回 LocalTime
+   */
   def toLocalTime(time: String): LocalTime =
     Try(LocalTime.parse(time, formatterTime)) getOrElse {
       val (hour, minute, second, nano) =
@@ -131,12 +134,12 @@ object TimeUtils extends StrictLogging {
     }
 
   /**
-    * 解析字符串为 LocalDateTime
-    *
-    * @param date 字符串形式日期
-    * @param time 字符串形式时间
-    * @return 成功返回 LocalDateTime
-    */
+   * 解析字符串为 LocalDateTime
+   *
+   * @param date 字符串形式日期
+   * @param time 字符串形式时间
+   * @return 成功返回 LocalDateTime
+   */
   def toLocalDateTime(date: String, time: String): LocalDateTime = {
     val d =
       if (StringUtils.isNoneBlank(date)) toLocalDate(date) else LocalDate.now()
@@ -146,11 +149,11 @@ object TimeUtils extends StrictLogging {
   }
 
   /**
-    * 解析字符串为 LocalDateTime
-    *
-    * @param ldt 字符串形式日期时间
-    * @return 成功返回 LocalDateTime
-    */
+   * 解析字符串为 LocalDateTime
+   *
+   * @param ldt 字符串形式日期时间
+   * @return 成功返回 LocalDateTime
+   */
   def toLocalDateTime(ldt: String): LocalDateTime =
     Try(LocalDateTime.parse(ldt, formatterDateTime)) getOrElse {
       ldt.split("""[ Tt]+""") match {
@@ -166,9 +169,8 @@ object TimeUtils extends StrictLogging {
       }
     }
 
-  private def containsDateKeys(dOrT: String) = {
+  private def containsDateKeys(dOrT: String) =
     DateKeys.exists(v => dOrT.contains(v))
-  }
 
   def toLocalDateTime(instant: Instant): LocalDateTime =
     LocalDateTime.ofInstant(instant, ZONE_CHINA_OFFSET)
@@ -176,22 +178,19 @@ object TimeUtils extends StrictLogging {
   def toLocalDateTime(epochMilli: Long): LocalDateTime =
     toLocalDateTime(Instant.ofEpochMilli(epochMilli))
 
-  def toLocalDateTime(date: Date): LocalDateTime = {
+  def toLocalDateTime(date: Date): LocalDateTime =
     if (date eq null) null
     else toLocalDateTime(date.toInstant)
-  }
 
-  def zoneOf(str: String): ZoneId = {
+  def zoneOf(str: String): ZoneId =
     if (str.indexOf('-') >= 0 || str.indexOf('+') >= 0) ZoneOffset.of(str)
     else if (str == "Z") ZoneOffset.UTC
     else ZoneId.of(str)
-  }
 
-  def zoneOffsetOf(str: String): ZoneOffset = {
+  def zoneOffsetOf(str: String): ZoneOffset =
     if (str.indexOf('-') >= 0 || str.indexOf('+') >= 0) ZoneOffset.of(str)
     else if (str == "Z") ZoneOffset.UTC
     else ZoneOffset.of(str)
-  }
 
   def toZonedDateTime(zdt: String): ZonedDateTime =
     try {
@@ -224,15 +223,11 @@ object TimeUtils extends StrictLogging {
         throw e
     }
 
-  def toZonedDateTime(date: String, time: String): ZonedDateTime = {
+  def toZonedDateTime(date: String, time: String): ZonedDateTime =
     toZonedDateTime(date, time, ZONE_CHINA_OFFSET)
-  }
 
-  def toZonedDateTime(date: String,
-                      time: String,
-                      zoneId: ZoneId): ZonedDateTime = {
+  def toZonedDateTime(date: String, time: String, zoneId: ZoneId): ZonedDateTime =
     toLocalDateTime(date, time).atZone(zoneId)
-  }
 
   def toOffsetDateTime(zdt: String): OffsetDateTime =
     try {
@@ -267,15 +262,11 @@ object TimeUtils extends StrictLogging {
         throw e
     }
 
-  def toOffsetDateTime(date: String, time: String): OffsetDateTime = {
+  def toOffsetDateTime(date: String, time: String): OffsetDateTime =
     toOffsetDateTime(date, time, ZONE_CHINA_OFFSET)
-  }
 
-  def toOffsetDateTime(date: String,
-                       time: String,
-                       zoneOffset: ZoneOffset): OffsetDateTime = {
+  def toOffsetDateTime(date: String, time: String, zoneOffset: ZoneOffset): OffsetDateTime =
     toLocalDateTime(date, time).atOffset(zoneOffset)
-  }
 
   def toDate(ldt: LocalDateTime): Date =
     Date.from(ldt.toInstant(ZONE_CHINA_OFFSET))
@@ -302,28 +293,26 @@ object TimeUtils extends StrictLogging {
     new SQLTime(toEpochMilli(time.atDate(LocalDate.now())))
 
   /**
-    * @return 一天的开始：
-    */
+   * @return 一天的开始：
+   */
   def nowBegin(): LocalDateTime = LocalDate.now().atTime(0, 0, 0, 0)
 
   /**
-    * @return 一天的结尾：
-    */
+   * @return 一天的结尾：
+   */
   def nowEnd(): LocalDateTime =
     LocalTime.of(23, 59, 59, 999999999).atDate(LocalDate.now())
 
-  def toDayInt(localDateTime: LocalDateTime): Int = {
+  def toDayInt(localDateTime: LocalDateTime): Int =
     toDayInt(localDateTime.toLocalDate)
-  }
 
   /**
-    * 将 LocalDate(2017-11-21) 转换成 20171121 (Int类型)
-    * @param localDate
-    * @return
-    */
-  def toDayInt(localDate: LocalDate): Int = {
+   * 将 LocalDate(2017-11-21) 转换成 20171121 (Int类型)
+   * @param localDate
+   * @return
+   */
+  def toDayInt(localDate: LocalDate): Int =
     localDate.getYear * 10000 + localDate.getMonthValue * 100 + localDate.getDayOfMonth
-  }
 
   private[this] val funcId = new java.util.concurrent.atomic.AtomicInteger()
 

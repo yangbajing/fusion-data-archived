@@ -9,9 +9,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.Try
 
-class FactorialFrontend(upToN: Int, repeat: Boolean)
-    extends Actor
-    with ActorLogging {
+class FactorialFrontend(upToN: Int, repeat: Boolean) extends Actor with ActorLogging {
 
   val backend =
     context.actorOf(FromConfig.props(), name = "factorialBackendRouter")
@@ -35,13 +33,13 @@ class FactorialFrontend(upToN: Int, repeat: Boolean)
       sendJobs()
   }
 
-  def sendJobs(): Unit = {
+  def sendJobs(): Unit =
     //    log.info("Starting batch of factorials up to [{}]", upToN)
     1 to upToN foreach { backend ! _ }
-  }
 }
 
 object FactorialFrontend {
+
   def main(args: Array[String]): Unit = {
     val upToN = 200
 
@@ -50,12 +48,10 @@ object FactorialFrontend {
       .withFallback(ConfigFactory.load("factorial"))
 
     val system = ActorSystem("ClusterSystem", config)
-    system.log.info(
-      "Factorials will start when 2 backend members in the cluster.")
+    system.log.info("Factorials will start when 2 backend members in the cluster.")
 
     Cluster(system) registerOnMemberUp {
-      system.actorOf(Props(classOf[FactorialFrontend], upToN, false),
-                     name = "factorialFrontend")
+      system.actorOf(Props(classOf[FactorialFrontend], upToN, false), name = "factorialFrontend")
     }
 
     Cluster(system).registerOnMemberRemoved {
@@ -69,10 +65,9 @@ object FactorialFrontend {
       // We must spawn a separate thread to not block current thread,
       // since that would have blocked the shutdown of the ActorSystem.
       new Thread {
-        override def run(): Unit = {
+        override def run(): Unit =
           if (Try(Await.ready(system.whenTerminated, 10.seconds)).isFailure)
             System.exit(-1)
-        }
       }.start()
     }
   }

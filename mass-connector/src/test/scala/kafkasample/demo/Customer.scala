@@ -14,7 +14,7 @@ class CustomerSerializer extends Serializer[Customer] {
 
   override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
 
-  override def serialize(topic: String, data: Customer): Array[Byte] = {
+  override def serialize(topic: String, data: Customer): Array[Byte] =
     if (data eq null) {
       null
     } else {
@@ -32,7 +32,6 @@ class CustomerSerializer extends Serializer[Customer] {
 
       buf.array()
     }
-  }
 
   override def close(): Unit = ???
 }

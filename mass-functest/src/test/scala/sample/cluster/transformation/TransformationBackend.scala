@@ -31,13 +31,13 @@ class TransformationBackend extends Actor {
 
   def register(member: Member): Unit =
     if (member.hasRole("frontend"))
-      context.actorSelection(
-        RootActorPath(member.address) / "user" / "frontend") !
+      context.actorSelection(RootActorPath(member.address) / "user" / "frontend") !
         BackendRegistration
 }
 //#backend
 
 object TransformationBackend {
+
   def main(args: Array[String]): Unit = {
     // Override the configuration of the port when specified as program argument
     val port = if (args.isEmpty) "0" else args(0)

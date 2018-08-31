@@ -20,8 +20,10 @@ import scala.concurrent.ExecutionContext.Implicits
 import scala.concurrent.duration._
 
 object MassBoot extends StrictLogging {
+
   object StartupType extends Enumeration {
     type StartupType = Value
+
     val // Identifies extensions
     EXTENSIONS, // Identifies actors as startup type
     ACTORS, // Identifies service as startup type
@@ -60,13 +62,11 @@ object MassBoot extends StrictLogging {
     logger.trace(startupDump())
   }
 
-  def registerOnTermination[T](func: => T): Unit = {
+  def registerOnTermination[T](func: => T): Unit =
     actorSystem.registerOnTermination(func)
-  }
 
-  def registerOnTermination(func: Runnable): Unit = {
+  def registerOnTermination(func: Runnable): Unit =
     actorSystem.registerOnTermination(func)
-  }
 
   def stop(): Unit = {
     actorSystem.terminate()
@@ -86,17 +86,12 @@ object MassBoot extends StrictLogging {
     val kvs = TreeMap(
       "akka.loglevel" -> config.getString("akka.loglevel"),
       "akka.stdout-loglevel" -> config.getString("akka.stdout-loglevel"),
-      "akka.cluster.seed-nodes" -> config.getStringList(
-        "akka.cluster.seed-nodes"),
+      "akka.cluster.seed-nodes" -> config.getStringList("akka.cluster.seed-nodes"),
       "akka.cluster.roles" -> config.getStringList("akka.cluster.roles"),
-      "akka.remote.netty.tcp.hostname" -> config.getString(
-        "akka.remote.netty.tcp.hostname"),
-      "akka.remote.netty.tcp.port" -> config.getInt(
-        "akka.remote.netty.tcp.port"),
-      "akka.remote.artery.canonical.hostname" -> config.getString(
-        "akka.remote.artery.canonical.hostname"),
-      "akka.remote.artery.canonical.port" -> config.getInt(
-        "akka.remote.netty.tcp.port")
+      "akka.remote.netty.tcp.hostname" -> config.getString("akka.remote.netty.tcp.hostname"),
+      "akka.remote.netty.tcp.port" -> config.getInt("akka.remote.netty.tcp.port"),
+      "akka.remote.artery.canonical.hostname" -> config.getString("akka.remote.artery.canonical.hostname"),
+      "akka.remote.artery.canonical.port" -> config.getInt("akka.remote.netty.tcp.port")
     ) ++ configuration
       .get[Map[String, String]]("mass")
       .map(entry => ("mass." + entry._1, entry._2))
