@@ -1,0 +1,149 @@
+syntax = "proto3";
+package mass.model.job;
+
+import "google/protobuf/wrappers.proto";
+import "scalapb/scalapb.proto";
+import "mass/model/define.proto";
+
+enum Program {
+    UNKOWN = 0;
+    SCALA = 1;
+    JAVA = 2;
+    PYTHON = 3;
+    SH = 4;
+    SQL = 5;
+    NODE_JS = 6;
+}
+
+enum TriggerType {
+    TRIGGER_UNKNOWN = 0;
+    CRON = 1;
+    SIMPLE = 2;
+    EVENT = 3;
+}
+
+option (scalapb.options) = {
+  import: "mass.core.protobuf.MassProtoImplicits._"
+};
+
+/// #JobItem
+message JobItem {
+
+    // Job key，需要全局唯一。
+//    string key = 1;
+
+    //  Job程序类型：java、sh、python、sql
+    Program program = 2;
+
+    repeated string programOptions = 3;
+
+    string programMain = 4;
+
+    // 程序执行参数
+    repeated string programArgs = 5;
+
+    // 程序版本。java: 7、8，python：2.7、3.6，sql：psql、mysql、sqlplus
+    string programVersion = 6;
+
+    // Job程序需要的资源
+    map<string, string> resources = 7;
+
+    // 配置数据（参数）
+    map<string, string> data = 8;
+
+    // 描述
+    string description = 9;
+
+    // 执行成功后依赖触发的作业列表，可用于作业依赖控制。
+    repeated string dependentJobKeys = 10;
+}
+/// #JobItem
+
+/// #JobTrigger
+message JobTrigger {
+    // required Trigger key，需要全局唯一。
+//    string key = 1;
+
+    // required 触发器类型：simple、cron、event
+    TriggerType triggerType = 2;
+
+    // 触发事件（通过IPC服务获取的全局事件完整名）
+    string triggerEvent = 3;
+
+    // 设置任务开始时间
+    int64 startTime = 4 [(scalapb.field).type = "scala.Option[java.time.OffsetDateTime]"];
+
+    // 设置任务结束时间
+    int64 endTime = 5 [(scalapb.field).type = "scala.Option[java.time.OffsetDateTime]"];
+
+    // 任务重复次数，triggerType == simple时有效
+    int32 repeat = 6;
+
+    // 两次任务之间的间隔时间，triggerType == simple时有效
+    int64 duration = 7 [(scalapb.field).type = "scala.concurrent.duration.FiniteDuration"];
+
+    // 类似CRON的基于日历时间的调度，triggerType == cron时有效
+    string cronExpress = 8;
+
+    // 描述
+    string description = 9;
+
+    // 失败重试次数
+    int32 failedRetries = 10;
+
+    // 超时控制
+    int64 timeout = 11 [(scalapb.field).type = "scala.concurrent.duration.FiniteDuration"];
+
+    // 告警通知邮件
+    repeated string alarmEmails = 12;
+}
+/// #JobTrigger
+
+enum RunStatus {
+    JOB_NORMAL = 0; // 普通
+    JOB_ENABLE = 1; // 已启用
+    JOB_RUNNING = 100; // 运行中
+    JOB_OK = 200; // 运行成功完成
+    JOB_FAILURE = 500; // 运行失败结束
+}
+
+message JobSchedule {
+    // jobKey + triggerKey
+    string key = 1;
+
+    JobItem item = 2;
+
+    JobTrigger trigger = 3;
+
+    string description = 4;
+
+    RunStatus runStatus = 5;
+
+    CommonStatus status = 6;
+
+    string creator = 7;
+
+    int64 createdAt = 8 [(scalapb.field).type = "java.time.OffsetDateTime"];
+
+    // 被调度次数
+    int64 scheduleCount = 9;
+
+    // 最后调度开始时间
+    google.protobuf.Int64Value lastScheduleStart = 10 [(scalapb.field).type = "java.time.OffsetDateTime"];
+
+    // 最后调度完成时间
+    google.protobuf.Int64Value lastScheduledAt = 11 [(scalapb.field).type = "java.time.OffsetDateTime"];
+
+}
+
+/// #JobLog
+message JobLog {
+    string id = 1;
+    string jobKey = 2;
+    int64 startTime = 3 [(scalapb.field).type = "java.time.OffsetDateTime"];
+    google.protobuf.Int64Value completionTime = 4 [(scalapb.field).type = "java.time.OffsetDateTime"];
+    RunStatus completionStatus = 5;
+    google.protobuf.StringValue completionValue = 6;
+    int64 createdAt = 7 [(scalapb.field).type = "java.time.OffsetDateTime"];
+}
+/// #JobLog

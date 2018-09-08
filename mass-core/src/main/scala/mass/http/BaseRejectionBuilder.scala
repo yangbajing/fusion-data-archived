@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RejectionHandler.Builder
 import akka.http.scaladsl.server._
 import com.typesafe.scalalogging.StrictLogging
-import helloscala.common.data.ApiResult
+import helloscala.data.ApiResult
 
 /**
  * Created by yangbajing(yangbajing@gmail.com) on 2017-03-01.

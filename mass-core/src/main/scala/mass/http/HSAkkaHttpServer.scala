@@ -36,14 +36,14 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
 
   def routes: AbstractRoute
 
-  def close(): Unit
+  def close(): Unit = {}
 
   protected var bindingFuture: Future[ServerBinding] = _
   protected var httpsBindingFuture: Option[Future[ServerBinding]] = _
   protected var serverHost: String = _
   protected var serverPort: Int = _
 
-  def shutdown(): Unit = {
+  final def shutdown(): Unit = {
     import scala.concurrent.ExecutionContext.Implicits.global
     val f = bindingFuture.flatMap { binding =>
       logger.info(s"Unbind: $binding")
@@ -59,12 +59,13 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
       case e: Exception =>
         logger.error("停止http服务错误", e)
     }
-    try {
-      if (fSsl.isDefined)
-        Await.result(fSsl.get, 60.seconds)
-    } catch {
-      case e: Exception =>
-        logger.error("停止https服务错误", e)
+    fSsl.foreach { ff =>
+      try {
+        Await.result(ff, 60.seconds)
+      } catch {
+        case e: Exception =>
+          logger.error("停止https服务错误", e)
+      }
     }
     close()
   }
@@ -82,6 +83,12 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
     logger.info(s"Server online at https://${binding.localAddress.getHostName}:${binding.localAddress.getPort}/")
 
   def afterHttpBindingFailure(cause: Throwable): Unit = {
+    logger.error(s"Error starting the server ${cause.getMessage}", cause)
+    close()
+    System.exit(-1)
+  }
+
+  def afterHttpsBindingFailure(cause: Throwable): Unit = {
     logger.error(s"Error starting the server ${cause.getMessage}", cause)
     close()
     System.exit(-1)
@@ -123,13 +130,21 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
 
   /**
    * 启动基于Akka HTTP的服务
-   * @return
+   * @return (http绑定，https绑定)
    */
-  def startServer(): (Future[ServerBinding], Option[Future[ServerBinding]]) //=
-  //    startServer(
-  //      configuration.getString("server.host"),
-  //      configuration.getInt("server.port"),
-  //      configuration.get[Option[Int]]("server.https-port"))
+  def startServer(): (Future[ServerBinding], Option[Future[ServerBinding]])
+
+  /**
+   * 启动基于Akka HTTP的服务
+   * @param prefix 配置前缀，需要包含尾部的点符号。如：mass.job应用设置为 mass.job.
+   * @return (http绑定，https绑定)
+   */
+  def startServer(prefix: String): (Future[ServerBinding], Option[Future[ServerBinding]]) =
+    startServer(
+      configuration.getString(s"${prefix}server.host"),
+      configuration.getInt(s"${prefix}server.port"),
+      configuration.get[Option[Int]](s"${prefix}server.https-port")
+    )
 
   /**
    * 根据设置的host:绑定主机名和port:绑定网络端口 启动Akka HTTP服务
@@ -158,12 +173,12 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
     bindingFuture = Http().bindAndHandle(handler, interface = host, port = port, settings = ServerSettings(actorSystem))
 
     bindingFuture.onComplete {
-      case Success(binding) ⇒
+      case Success(binding) =>
         //setting the server binding for possible future uses in the client
         //        serverBinding.set(binding)
         //        binding.unbind()
         afterHttpBindingSuccess(binding)
-      case Failure(cause) ⇒
+      case Failure(cause) =>
         afterHttpBindingFailure(cause)
     }
 
@@ -174,20 +189,20 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
                                    connectionContext = generateHttps(),
                                    settings = ServerSettings(actorSystem))
       f.onComplete {
-        case Success(binding) ⇒
+        case Success(binding) =>
           //setting the server binding for possible future uses in the client
           //        serverBinding.set(binding)
           //        binding.unbind()
           afterHttpsBindingSuccess(binding)
-        case Failure(cause) ⇒
-          afterHttpBindingFailure(cause)
+        case Failure(cause) =>
+          afterHttpsBindingFailure(cause)
       }
       f
     }
 
-    Runtime.getRuntime.addShutdownHook(new Thread() {
-      override def run(): Unit = shutdown()
-    })
+    sys.addShutdownHook {
+      shutdown()
+    }
 
     bindingFuture -> httpsBindingFuture
   }

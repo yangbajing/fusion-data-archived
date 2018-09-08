@@ -2,40 +2,40 @@ package mass.connector
 
 import java.nio.file.Path
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.Configuration
-import mass.core.{BaseSystem, MassSystem}
+import mass.core.Constants
+import mass.extension.MassCore
 
-object ConnectorSystem {
-
-  def apply(name: String, massSystem: MassSystem): ConnectorSystem =
-    new ConnectorSystem(name, massSystem)
-
+object ConnectorSystem extends ExtensionId[ConnectorSystem] with ExtensionIdProvider {
+  override def createExtension(system: ExtendedActorSystem): ConnectorSystem = new ConnectorSystem(system)
+  override def lookup(): ExtensionId[_ <: Extension] = ConnectorSystem
 }
 
-class ConnectorSystem private (val name: String, val massSystem: MassSystem) extends BaseSystem with StrictLogging {
+final class ConnectorSystem private (val system: ActorSystem) extends Extension with StrictLogging {
   private var _parsers = Map.empty[String, ConnectorParser]
   private var _connectors = Map.empty[String, Connector]
+  val settings = MassCore(system)
   init()
 
   private def init(): Unit = {
-    massSystem.configuration
-      .get[Seq[String]]("mass.connector.parsers")
+    settings.configuration
+      .get[Seq[String]](s"${Constants.BASE_CONF}.connector.parsers")
       .foreach { className =>
         Class.forName(className).newInstance() match {
           case parse: ConnectorParser => registerConnectorParser(parse)
           case unknown                => logger.error(s"未知的ConnectorParse: $unknown")
         }
       }
-    massSystem.system.registerOnTermination {
+    system.registerOnTermination {
       connectors.foreach { case (_, c) => c.close() }
     }
   }
 
-  override def system: ActorSystem = massSystem.system
+  def name: String = system.name
 
-  override def configuration: Configuration = massSystem.configuration
+  def configuration: Configuration = settings.configuration
 
   def getConnector(name: String): Option[Connector] = _connectors.get(name)
 
@@ -61,5 +61,4 @@ class ConnectorSystem private (val name: String, val massSystem: MassSystem) ext
     val maybeParser = parsers.get(node.attr("type"))
     maybeParser.map(cp => cp.parseFromXML(node))
   }
-
 }

@@ -1,25 +1,44 @@
 /*
- * Copyright (c) Yangbajing 2018
+ * Copyright 2018 羊八井(yangbajing)（杨景）
  *
- * This is the custom License of Yangbajing
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package helloscala.common.util
 
+import java.io._
 import java.security.SecureRandom
 
 import scala.annotation.tailrec
 import scala.collection.immutable
 
 object StringUtils {
+
   val BLACK_CHAR: Char = ' '
   val PRINTER_CHARS: immutable.IndexedSeq[Char] = ('0' to '9') ++ ('a' to 'z') ++ ('A' to 'Z')
   private val HEX_CHARS: Array[Char] = "0123456789abcdef".toCharArray
-  private val HEX_CHAR_SETS = Set
-    .empty[Char] ++ ('0' to '9') ++ ('a' to 'f') ++ ('A' to 'F')
+  private val HEX_CHAR_SETS = Set[Char]() ++ ('0' to '9') ++ ('a' to 'f') ++ ('A' to 'F')
 
-  def option(text: String): Option[String] =
-    if (isBlank(text)) None else Some(text)
+  def extractFirstName(msg: Any): Option[String] = msg match {
+    case c: AnyRef =>
+      val s = convertPropertyToUnderscore(c.getClass.getSimpleName)
+      Some(s.take(s.indexOf('_')))
+    case _ => None
+  }
+
+  def option(text: String): Option[String] = if (isBlank(text)) None else Some(text)
+
+  def option(text: Option[String]): Option[String] = text.flatMap(option)
 
   @inline def isHex(c: Char): Boolean = HEX_CHAR_SETS.contains(c)
 
@@ -109,31 +128,14 @@ object StringUtils {
       val arr = name.split('_')
       arr.head + arr.tail.map(item => item.head.toUpper + item.tail).mkString
     }
-  //    val result = new StringBuilder
-  //    var nextIsUpper = false
-  //    if (name != null && name.length > 0) {
-  //      if (name.length > 1 && name.substring(1, 2) == "_") {
-  //        result.append(name.substring(0, 1).toUpperCase)
-  //      } else {
-  //        result.append(name.substring(0, 1).toLowerCase)
-  //      }
-  //
-  //      var i = 1
-  //      val len = name.length
-  //      while (i < len) {
-  //        val s = name.substring(i, i + 1)
-  //        if (s == "_") {
-  //          nextIsUpper = true
-  //        } else if (nextIsUpper) {
-  //          result.append(s.toUpperCase)
-  //          nextIsUpper = false
-  //        } else {
-  //          result.append(s.toLowerCase)
-  //        }
-  //
-  //        i += 1
-  //      }
-  //    }
-  //    result.toString
 
+  def toString(e: Throwable): String = {
+    val pw = new PrintWriter(new StringWriter())
+    try {
+      e.printStackTrace(pw)
+      pw.toString
+    } finally {
+      Utils.closeQuiet(pw)
+    }
+  }
 }

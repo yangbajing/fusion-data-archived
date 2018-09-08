@@ -1,0 +1,137 @@
+syntax = "proto3";
+package mass.message.job;
+
+import "google/protobuf/wrappers.proto";
+import "scalapb/scalapb.proto";
+import "mass/model/define.proto";
+import "mass/model/job/job.proto";
+
+option (scalapb.options) = {
+  import: "mass.core.protobuf.MassProtoImplicits._"
+};
+
+// 创建作业
+message JobCreateReq {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+
+    google.protobuf.StringValue key = 1;
+
+    // not null
+    mass.model.job.JobItem item = 2;
+
+    // not null
+    mass.model.job.JobTrigger trigger = 3;
+
+    string description = 4;
+}
+
+/// #JobCreateResp
+// 创建Job结果
+message JobCreateResp {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+
+    mass.model.job.JobSchedule schedule = 1;
+}
+/// #JobCreateResp
+
+// 更新作业
+message JobUpdateReq {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+
+    string key = 1;
+    mass.model.job.JobItem item = 2;
+    mass.model.job.JobTrigger trigger = 3;
+    google.protobuf.StringValue description = 4;
+    mass.model.CommonStatus status = 5;
+}
+
+// 根据key查找作业
+message JobFindReq {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+    string key = 1;
+}
+
+// 根据key查找作业结果
+message JobFindResp {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+    mass.model.job.JobSchedule schedule = 1;
+}
+
+// 调度（执行）作业结果
+message SchedulerJobResult {
+    option (scalapb.message).extends = "mass.core.model.scheduler.SchedulerJobResultTrait";
+
+    int64 start = 1;
+    int64 end = 2;
+    int32 exitValue = 3;
+    string outPath = 4;
+    string errPath = 5;
+}
+
+// 作业分页
+message JobPageReq {
+    option (scalapb.message).extends = "helloscala.common.page.Page";
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+
+    int32 page = 1;
+    int32 size = 2;
+    string key = 3;
+}
+
+message JobUploadJobResp {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+
+    repeated JobCreateResp results = 1;
+}
+
+message JobUploadFilesResp {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+
+    repeated mass.model.IdValue resources = 1;
+}
+
+message JobListReq {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+
+    google.protobuf.StringValue key = 1;
+}
+
+message JobListResp {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+
+    repeated mass.model.job.JobSchedule items = 1;
+}
+
+message JobPageResp {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+    option (scalapb.message).extends = "helloscala.common.page.PageResult[mass.model.job.JobSchedule]";
+
+    repeated mass.model.job.JobSchedule content = 1;
+    int64 totalElements = 2;
+    int32 page = 3;
+    int32 size = 4;
+//    repeated mass.model.KeyValues jobKey2Triggerkeys = 3;
+}
+
+// 手动执行作业
+message JobExecuteEvent {
+    option (scalapb.message).extends = "mass.message.job.JobEvent";
+
+    string key = 1;
+}
+
+message JobGetAllOptionReq {
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+}
+message JobGetAllOptionResp {
+    message ProgramVersionItem {
+        int32 programId = 1;
+        repeated mass.model.TitleValue versions = 2;
+    }
+
+    option (scalapb.message).extends = "mass.message.job.JobMessage";
+    repeated mass.model.TitleIdValue program = 1; // 作业程序类型
+    repeated mass.model.TitleIdValue triggerType = 2; // 作业触发器类型
+    repeated ProgramVersionItem programVersion = 3;
+    repeated mass.model.TitleIdValue jobStatus = 4;
+}

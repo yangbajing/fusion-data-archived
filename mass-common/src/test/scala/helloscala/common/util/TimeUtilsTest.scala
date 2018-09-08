@@ -1,12 +1,26 @@
 package helloscala.common.util
 
-import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
+import java.time.{LocalDateTime, OffsetDateTime, ZoneOffset, ZonedDateTime}
 
 import helloscala.common.test.HelloscalaSpec
 
 class TimeUtilsTest extends HelloscalaSpec {
 
   "TimeUtilsTest" must {
+    "0 toOffsetDateTime" in {
+      val odt = TimeUtils.toOffsetDateTime(0L)
+      println(odt)
+      println(odt.toInstant.toEpochMilli)
+
+      val odt2 = TimeUtils.toOffsetDateTime(OffsetDateTime.now().toString)
+      println(odt2)
+
+      val d3 = OffsetDateTime.now().format(TimeUtils.formatterDateTime)
+      println(d3)
+      val odt3 = TimeUtils.toOffsetDateTime(d3)
+      println(odt3)
+    }
+
     "toLocalDate" in {
       val strLdt = "2017-01-23  22:32:11"
       TimeUtils.toLocalDateTime(strLdt) mustBe LocalDateTime.of(2017, 1, 23, 22, 32, 11)

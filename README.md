@@ -1,6 +1,6 @@
 # MassData
 
-*反映式*海量数据平台（mass-rdi, Reactive MassData asset management Platform）
+*反映式*数据治理平台（mass-rdi, Reactive MassData asset management Platform）
 
 - Java 8+
 - Scala 2.12+
@@ -26,12 +26,13 @@ google-chrome mass-docs/target/paradox/site/main/index.html
 
 - [mass-docs](mass-docs)：使用 [Lightbend Paradox](https://developer.lightbend.com/docs/paradox/latest/) 编写的文档。在线访问地址：[http://www.yangbajing.me/mass-data/doc/](http://www.yangbajing.me/mass-data/doc/)
 - [mass-functest](mass-functest)：功能测试项目，支持 multi-jvm 测试（单机上启动多个JVM实例模拟集群）
-- [mass-console](mass-console)：管理控制台、监控、业务流程编排
-- [mass-broker](mass-broker)：mass 执行Broker节点
+- [mass-console](mass-console)：mass 管理控制台、监控、业务流程编排
+- [mass-governance](mass-governance)：mass 数据治理
+- [mass-rdi](mass-rdi)：mass 数据集成，ETL
 - [mass-connector](mass-connector): 基于Akka Stream的数据连接器
-- [mass-core-ext](mass-core-ext)：mass 核心库扩展
-- [mass-ipc](mass-pic)：mass 通信协议、规范 ？需要
-- [mass-core](mass-core)：mass 核心库
+- [mass-job](mass-job)：mass 作业调度
+- [mass-core-ext](mass-core-ext)：mass 通用业务、存储、集群
+- [mass-core](mass-core)：mass 核心库、消息定义
 - [mass-common](mass-common)：一些工具类、库
 
 orchestration 编排
@@ -49,7 +50,7 @@ sudo docker-compose up --build -d
 **Postgres**
 
 ```
-sudo docker run -it --rm --net scripts_default --link scripts_mass-postgres_1:postgres postgres:10.4 psql -h postgres -U massdata -d massdata
+sudo docker run -it --rm --net scripts_default --link scripts_mass-postgres_1:postgres postgres:11.1 psql -h postgres -U massdata -d massdata
 ```
 或
 ```

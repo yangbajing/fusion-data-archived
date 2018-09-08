@@ -15,12 +15,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class JacksonHelper {
     public static final Map<String, String> empty = new HashMap<>();
 
     public static <T> Marshaller<T, RequestEntity> marshaller() {
-        return marshaller(Jackson.defaultObjectMapper);
+        return marshaller(Jackson.defaultObjectMapper());
     }
 
     public static <T> Marshaller<T, RequestEntity> marshaller(ObjectMapper mapper) {
@@ -32,11 +31,11 @@ public class JacksonHelper {
     }
 
     public static <T> Unmarshaller<ByteString, T> byteStringUnmarshaller(Class<T> expectedType) {
-        return byteStringUnmarshaller(Jackson.defaultObjectMapper, expectedType);
+        return byteStringUnmarshaller(Jackson.defaultObjectMapper(), expectedType);
     }
 
     public static <T> Unmarshaller<HttpEntity, T> unmarshaller(Class<T> expectedType) {
-        return unmarshaller(Jackson.defaultObjectMapper, expectedType);
+        return unmarshaller(Jackson.defaultObjectMapper(), expectedType);
     }
 
     public static <T> Unmarshaller<HttpEntity, T> unmarshaller(ObjectMapper mapper, Class<T> expectedType) {
@@ -50,9 +49,9 @@ public class JacksonHelper {
 
     private static String toJSON(ObjectMapper mapper, Object object) {
         try {
-            if (object instanceof Done)
+            if (object instanceof Done) {
                 return mapper.writeValueAsString(empty);
-
+            }
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Cannot marshal to JSON: " + object, e);

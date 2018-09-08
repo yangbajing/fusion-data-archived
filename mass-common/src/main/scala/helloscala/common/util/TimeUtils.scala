@@ -1,7 +1,17 @@
 /*
- * Copyright (c) Yangbajing 2018
+ * Copyright 2018 羊八井(yangbajing)（杨景）
  *
- * This is the custom License of Yangbajing
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package helloscala.common.util
@@ -20,8 +30,8 @@ object TimeUtils extends StrictLogging {
   val DATE_TIME_EPOCH: LocalDateTime = LocalDateTime.of(1970, 1, 1, 0, 0, 0)
   val ZONE_CHINA_OFFSET: ZoneOffset = ZoneOffset.ofHours(8)
 
-  val formatterDateTime: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+  val formatterDateTime: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+  val formatterDateTimeMillisCompact: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")
   val formatterMonth: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM")
   val formatterDate: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
@@ -32,6 +42,9 @@ object TimeUtils extends StrictLogging {
     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
   val formatterMinutes: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
   val formatterTime: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+
+  val formatterYear: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy")
+  val formatterOnlyMonth: DateTimeFormatter = DateTimeFormatter.ofPattern("MM")
 
   val DateKeys = List("年", "月", "-", "/", "日")
 
@@ -228,6 +241,9 @@ object TimeUtils extends StrictLogging {
 
   def toZonedDateTime(date: String, time: String, zoneId: ZoneId): ZonedDateTime =
     toLocalDateTime(date, time).atZone(zoneId)
+
+  def toOffsetDateTime(epochMillis: Long): OffsetDateTime =
+    Instant.ofEpochMilli(epochMillis).atOffset(ZONE_CHINA_OFFSET)
 
   def toOffsetDateTime(zdt: String): OffsetDateTime =
     try {

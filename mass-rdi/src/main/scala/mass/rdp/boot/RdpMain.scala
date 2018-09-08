@@ -1,3 +1,10 @@
 package mass.rdp.boot
 
-object RdpMain extends App {}
+import com.typesafe.config.ConfigFactory
+import mass.Global
+import mass.rdp.RdpSystem
+
+object RdpMain extends App {
+  val system = Global.registerActorSystem(ConfigFactory.load())
+  RdpSystem(system)
+}

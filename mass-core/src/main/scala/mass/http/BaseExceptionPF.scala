@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives.{complete, extractUri}
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.pattern.AskTimeoutException
 import com.typesafe.scalalogging.StrictLogging
-import helloscala.common.data.ApiResult
+import helloscala.data.ApiResult
 import helloscala.common.exception.HSException
 
 /**

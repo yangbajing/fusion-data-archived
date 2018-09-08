@@ -1,6 +1,6 @@
-# MassData（海量数据平台）
+# MassData（反映式数据治理）
 
-*数据处理、治理、管理*
+*数据治理*
 
 ## 特性
 
@@ -9,6 +9,7 @@
 - 分布式任务调度
 - ETL/ELT
 - 工作流
+- 数据治理，元数据管理
 
 @@toc { depth=2 }
 
@@ -17,7 +18,7 @@
 * [intro/index](intro/index.md)
 * [design/index](design/index.md)
 * [connector](connector/index.md)
-* [scheduler](scheduler/index.md)
+* [job](job/index.md)
 * [rdi/index](rdi/index.md)
 * [console/index](console/index.md)
 * [broker/index](broker/index.md)

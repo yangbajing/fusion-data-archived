@@ -18,9 +18,8 @@ object Commons {
       startYear := Some(2018),
       licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
       headerLicense := Some(HeaderLicense.ALv2("2018", "羊八井(yangbajing)（杨景）")),
-      scalaVersion := Dependencies.versionScala,
       scalacOptions ++= {
-        val opts = Seq(
+        var list = Seq(
           "-encoding",
           "UTF-8", // yes, this is 2 args
           "-feature",
@@ -29,12 +28,17 @@ object Commons {
           "-Xlint",
           "-Yno-adapted-args", //akka-http heavily depends on adapted args and => Unit implicits break otherwise
           "-Ypartial-unification",
+          "-opt:l:inline",
+          "-opt-inline-from",
           "-Ywarn-dead-code"
         )
-        buildEnv.value match {
-          case BuildEnv.Production | BuildEnv.Test => opts ++ List("-Xelide-below", "2001")
-          case _                                   => opts
+        if (scalaVersion.value.startsWith("2.12")) {
+          list ++= Seq("-opt:l:inline", "-opt-inline-from")
         }
+        if (buildEnv.value != BuildEnv.Developement) {
+          list ++= Seq("-Xelide-below", "2001")
+        }
+        list
       },
       javacOptions in Compile ++= Seq("-Xlint:unchecked", "-Xlint:deprecation"),
       javaOptions in run ++= Seq("-Xms128m", "-Xmx1024m", "-Djava.library.path=./target/native"),
@@ -43,19 +47,17 @@ object Commons {
       },
       test in assembly := {},
       assemblyMergeStrategy in assembly := {
-        case PathList("javax", "servlet", xs @ _*) => MergeStrategy.first
-        case PathList("io", "netty", xs @ _*)      => MergeStrategy.first
-        case PathList("jnr", xs @ _*)              => MergeStrategy.first
-        case PathList("com", "datastax", xs @ _*)  => MergeStrategy.first
-        case PathList("com", "kenai", xs @ _*)     => MergeStrategy.first
-        case PathList("org", "objectweb", xs @ _*) => MergeStrategy.first
-        case PathList(ps @ _*) if ps.last endsWith ".html" =>
-          MergeStrategy.first
-        case "application.conf"                      => MergeStrategy.concat
-        case "META-INF/io.netty.versions.properties" => MergeStrategy.first
-        case PathList("org", "slf4j", xs @ _*)       => MergeStrategy.first
-        case "META-INF/native/libnetty-transport-native-epoll.so" =>
-          MergeStrategy.first
+        case PathList("javax", "servlet", xs @ _*)                => MergeStrategy.first
+        case PathList("io", "netty", xs @ _*)                     => MergeStrategy.first
+        case PathList("jnr", xs @ _*)                             => MergeStrategy.first
+        case PathList("com", "datastax", xs @ _*)                 => MergeStrategy.first
+        case PathList("com", "kenai", xs @ _*)                    => MergeStrategy.first
+        case PathList("org", "objectweb", xs @ _*)                => MergeStrategy.first
+        case PathList(ps @ _*) if ps.last endsWith ".html"        => MergeStrategy.first
+        case "application.conf"                                   => MergeStrategy.concat
+        case "META-INF/io.netty.versions.properties"              => MergeStrategy.first
+        case PathList("org", "slf4j", xs @ _*)                    => MergeStrategy.first
+        case "META-INF/native/libnetty-transport-native-epoll.so" => MergeStrategy.first
         case x =>
           val oldStrategy = (assemblyMergeStrategy in assembly).value
           oldStrategy(x)
@@ -101,19 +103,6 @@ object Environment {
   val buildEnv = settingKey[BuildEnv.Value]("The current build environment")
 
   val settings = Seq(
-    buildEnv := {
-      sys.props
-        .get("build.env")
-        .orElse(sys.env.get("BUILD_ENV"))
-        .flatMap {
-          case "prod"  => Some(BuildEnv.Production)
-          case "stage" => Some(BuildEnv.Stage)
-          case "test"  => Some(BuildEnv.Test)
-          case "dev"   => Some(BuildEnv.Developement)
-          case _       => None
-        }
-        .getOrElse(BuildEnv.Developement)
-    },
     onLoadMessage := {
       // old message as well
       val defaultMessage = onLoadMessage.value

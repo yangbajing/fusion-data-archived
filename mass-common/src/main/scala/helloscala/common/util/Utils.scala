@@ -1,7 +1,17 @@
 /*
- * Copyright (c) Yangbajing 2018
+ * Copyright 2018 羊八井(yangbajing)（杨景）
  *
- * This is the custom License of Yangbajing
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package helloscala.common.util
@@ -13,8 +23,6 @@ import java.security.SecureRandom
 import java.time.{LocalDate, LocalDateTime}
 import java.util.Properties
 import java.util.concurrent.ThreadLocalRandom
-
-import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.compat.java8.FunctionConverters._
 import scala.util.Try
@@ -35,13 +43,13 @@ object Utils {
   @inline def getPid: Long =
     java.lang.Long.parseLong(ManagementFactory.getRuntimeMXBean.getName.split("@")(0))
 
-  def either[R](func: => R): Either[Throwable, R] =
+  def either[T <: Throwable, R](func: => R): Either[T, R] =
     try {
       val result = func
       Right(result)
     } catch {
       case NonFatal(e) =>
-        Left(e)
+        Left(e.asInstanceOf[T])
     }
 
   /**
@@ -181,10 +189,27 @@ object Utils {
       .toMap
   }
 
-  def getClusterName(config: Config): String =
-    option(System.getProperty("mass.cluster.name"))
-      .orElse(Try(config.getString("mass.cluster.name")).toOption)
-      .getOrElse("mass")
+  def closeQuiet(io: AutoCloseable): Unit = {
+    if (io ne null) try {
+      io.close()
+    } catch {
+      case _: Throwable => // do nothing
+    }
+  }
 
-  def getClusterName(): String = getClusterName(ConfigFactory.load())
+  def some[T](v: T): Option[T] = Option(v)
+
+  def test(): Unit = {
+    val 1 = 1
+    val 1 = 2
+    val 3 = 3
+    val 8239 = 43
+
+    val s: Option[String] = null
+    s match {
+      case Some(v) => println("Some(v)")
+      case _       => println("None")
+    }
+  }
+
 }

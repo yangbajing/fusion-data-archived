@@ -14,6 +14,9 @@ object Constants {
   val STATUS_DISABLE = 0
   val STATUS_ENABLE = 1
 
+  val OUT_LOG_SUFFIX = "out.log"
+  val ERR_LOG_SUFFIX = "err.log"
+
   object Roles {
     val BROKER = "broker"
     val CONSOLE = "console"

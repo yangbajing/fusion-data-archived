@@ -413,3 +413,7 @@ _book/
 native/
 /scripts/software/dameng/DM7Install.bin
 /logfile
+/share/
+/logs/
+mass-job/web/
+

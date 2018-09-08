@@ -1,4 +1,5 @@
 package akka.mass
+
 import java.util.concurrent.TimeoutException
 
 import akka.actor.{ActorSystem, ActorSystemImpl}

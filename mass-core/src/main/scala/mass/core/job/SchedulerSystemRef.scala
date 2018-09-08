@@ -1,11 +1,8 @@
 package mass.core.job
 
-import mass.core.BaseSystem
-
 import scala.concurrent.ExecutionContext
 
-abstract class SchedulerSystemRef extends BaseSystem {
+abstract class SchedulerSystemRef {
   val waitForJobsToComplete: Boolean
-
-  implicit def dispatcher: ExecutionContext
+  implicit def executionContext: ExecutionContext
 }

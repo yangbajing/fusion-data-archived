@@ -6,9 +6,11 @@
 
 package mass.connector.boot
 
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+import com.typesafe.config.ConfigFactory
+import mass.Global
+import mass.connector.ConnectorSystem
 
 object ConnectorMain extends App {
-  println(LocalDateTime.now().truncatedTo(ChronoUnit.HOURS))
+  val system = Global.registerActorSystem(ConfigFactory.load())
+  ConnectorSystem(system)
 }

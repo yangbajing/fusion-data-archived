@@ -1,0 +1,25 @@
+syntax = "proto3";
+package mass.session;
+
+import "scalapb/scalapb.proto";
+
+message AuthSession {
+    option (scalapb.message).extends = "mass.session.BaseSession";
+
+    string openId = 1;
+    string appId = 2;
+    string userId = 3;
+    string sessionCode = 4;
+    string domain = 5;
+    int64 maxAge = 6;
+    bool httpOnly = 7;
+    int64 expiresIn = 8;
+}
+
+// OAuth 2 用户登录会话访问凭证
+message SessionToken {
+    string access_token = 1 [(scalapb.field).scala_name = "access_token"];
+    int64 expires_in = 2 [(scalapb.field).scala_name = "expires_in"];
+    string passport_id = 3 [(scalapb.field).scala_name = "passport_id"];
+    string refresh_token = 4 [(scalapb.field).scala_name = "refresh_token"];
+}

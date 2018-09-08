@@ -31,6 +31,10 @@ class ScriptManagerTest extends HelloscalaSpec {
       println(s"result = $result")
     }
 
+    "set same" in {
+      println(Set(1, 2, 3, 4) sameElements Set(2, 3, 1, 4))
+      println(Set(1, 2, 3, 4) == Set(2, 3, 1, 4))
+    }
   }
 
 }

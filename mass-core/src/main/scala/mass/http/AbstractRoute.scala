@@ -14,15 +14,17 @@ import akka.http.scaladsl.server.util.Tuple
 import akka.http.scaladsl.unmarshalling.{FromRequestUnmarshaller, FromStringUnmarshaller, Unmarshaller}
 import akka.stream.scaladsl.{FileIO, Sink, Source}
 import akka.util.ByteString
-import helloscala.common.data.ApiResult
 import helloscala.common.exception.{HSBadRequestException, HSException, HSNotFoundException}
+import helloscala.common.jackson.Jackson
 import helloscala.common.page.{Page, PageInput}
 import helloscala.common.types.{AsInt, ObjectId}
 import helloscala.common.util.TimeUtils
+import helloscala.data.ApiResult
 
 import scala.annotation.tailrec
 import scala.collection.immutable
 import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 trait IAppIdKey {
   def appId: String
@@ -46,6 +48,11 @@ trait AbstractRoute extends Directives {
       contentType.charsetOption
         .map(_.nioCharset())
         .getOrElse(StandardCharsets.UTF_8)
+  }
+
+  def jacksonAs[T: ClassTag]: FromRequestUnmarshaller[T] = {
+    import JacksonSupport._
+    as[T]
   }
 
   implicit def objectIdFromStringUnmarshaller: FromStringUnmarshaller[ObjectId] =
@@ -289,14 +296,75 @@ trait AbstractRoute extends Directives {
       appIdKeyTokenConfig: IAppIdKey,
       sourceQueue: AkkaHttpSourceQueue): Route =
     extractRequestContext { ctx =>
-      val req = ctx.request
-      val request =
-        HttpUtils.applyApiToken(req.copy(uri = uri.withQuery(req.uri.query())),
-                                appIdKeyTokenConfig.appId,
-                                appIdKeyTokenConfig.appKey)
+      val request = HttpUtils.applyApiToken(ctx.request.copy(uri = uri.withQuery(ctx.request.uri.query())),
+                                            appIdKeyTokenConfig.appId,
+                                            appIdKeyTokenConfig.appKey)
       val future = HttpUtils.hostRequest(request)(sourceQueue.httpSourceQueue, ctx.executionContext)
       onSuccess(future) { response =>
         complete(response)
+      }
+    }
+
+  def reflectEntity[T](implicit ev1: ClassTag[T]): Directive1[T] =
+    extract(_.request.entity.contentType).flatMap { contentType =>
+      contentType.mediaType match {
+        case MediaTypes.`application/json` =>
+          import JacksonSupport._
+          entity(as[T])
+
+        case MediaTypes.`application/x-www-form-urlencoded` =>
+          formFieldMultiMap.flatMap { fields =>
+            val bean = fields.mapValues {
+              case elem :: Nil => elem
+              case list        => list
+            }
+            provide(Jackson.defaultObjectMapper.convertValue(bean, ev1.runtimeClass).asInstanceOf[T])
+          }
+
+        case MediaTypes.`application/xml` =>
+          // TODO 这里还可以添加xml的处理
+          ???
+
+        case _ =>
+          reject(
+            UnsupportedRequestContentTypeRejection(
+              Set(ContentTypes.`application/json`, ContentTypeRange(MediaTypes.`application/x-www-form-urlencoded`))))
+      }
+    }
+
+  /**
+   * Streams the bytes of the file submitted using multipart with the given field name into designated files on disk.
+   * If there is an error writing to disk the request will be failed with the thrown exception, if there is no such
+   * field the request will be rejected. Stored files are cleaned up on exit but not on failure.
+   *
+   * @group fileupload
+   */
+  def uploadedFiles(destFn: FileInfo ⇒ File): Directive1[immutable.Seq[(FileInfo, File)]] =
+    entity(as[Multipart.FormData]).flatMap { formData ⇒
+      extractRequestContext.flatMap { ctx ⇒
+        implicit val mat = ctx.materializer
+        implicit val ec = ctx.executionContext
+
+        val uploaded: Source[(FileInfo, File), Any] = formData.parts
+//          .mapConcat { part ⇒
+//            if (part.filename.isDefined && part.name == fieldName) part :: Nil
+//            else {
+//              part.entity.discardBytes()
+//              Nil
+//            }
+//          }
+          .mapAsync(1) { part ⇒
+            val fileInfo = FileInfo(part.name, part.filename.get, part.entity.contentType)
+            val dest = destFn(fileInfo)
+
+            part.entity.dataBytes.runWith(FileIO.toPath(dest.toPath)).map { _ ⇒
+              (fileInfo, dest)
+            }
+          }
+
+        val uploadedF = uploaded.runWith(Sink.seq[(FileInfo, File)])
+
+        onSuccess(uploadedF)
       }
     }
 

@@ -3,6 +3,7 @@ package sample.cluster.sample
 import java.util.concurrent.TimeUnit
 
 import akka.actor.{ActorSystem, Props}
+import akka.cluster.Cluster
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,6 +19,7 @@ object SimpleClusterApp extends App {
 
     // Create an Akka system
     val system = ActorSystem("ClusterSystem", config)
+    val cluster = Cluster(system)
     // Create an actor that handles cluster domain events
     val simpleClusterListener =
       system.actorOf(Props[SimpleClusterListener], name = "clusterListener")

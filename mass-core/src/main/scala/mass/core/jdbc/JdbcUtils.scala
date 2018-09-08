@@ -8,7 +8,7 @@ package mass.core.jdbc
 
 import java.sql._
 import java.time._
-import java.util.Properties
+import java.util.{Objects, Properties}
 
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.StrictLogging
@@ -20,7 +20,7 @@ import scala.collection.{immutable, mutable}
 
 object JdbcUtils extends StrictLogging {
 
-  def columnLables(metadata: ResultSetMetaData): immutable.IndexedSeq[String] =
+  def columnLabels(metadata: ResultSetMetaData): immutable.IndexedSeq[String] =
     (1 to metadata.getColumnCount).map(i => Option(metadata.getColumnLabel(i)).getOrElse(metadata.getColumnName(i)))
 
   @throws[SQLException]("if thrown by the JDBC API")
@@ -59,18 +59,19 @@ object JdbcUtils extends StrictLogging {
   }
 
   /**
-   * 将所有 ?name 命名参数替换成 ?
+   * 将所有 [TAG]name 命名参数替换成 ?
    * @param sql 采用命名参数编写的SQL语句
+   * @param TAG 命名参数前缀，默认为 '?'
    * @return (转换后SQL语句，提取出的参数和索引)，索引从1开始编号
    */
-  def namedParameterToQuestionMarked(sql: String): (String, Map[String, Int]) = {
+  def namedParameterToQuestionMarked(sql: String, TAG: Char = '?'): (String, Map[String, Int]) = {
     val sqlBuf = new java.lang.StringBuilder()
     var paramBuf = new java.lang.StringBuilder()
     val params = mutable.Map.empty[String, Int]
     var idx = 0
     var isName = false
     sql.foreach {
-      case '?' =>
+      case TAG =>
         sqlBuf.append('?')
         isName = true
       case c @ (',' | ')') if isName =>
@@ -216,9 +217,134 @@ object JdbcUtils extends StrictLogging {
    */
   def lookupColumnName(resultSetMetaData: ResultSetMetaData, columnIndex: Int): String = {
     val name = resultSetMetaData.getColumnLabel(columnIndex)
-    if (StringUtils.isEmpty(name)) resultSetMetaData.getColumnName(columnIndex)
-    else name
+    if (StringUtils.isEmpty(name)) resultSetMetaData.getColumnName(columnIndex) else name
   }
+
+  def execute[R](
+      pscFunc: ConnectionPreparedStatementCreator,
+      actionFunc: PreparedStatementAction[R],
+      ignoreWarnings: Boolean = true,
+      allowPrintLog: Boolean = true,
+      useTransaction: Boolean = false,
+      autoClose: Boolean = false
+  )(implicit con: Connection): R = {
+    assert(Objects.nonNull(con), "con: Connection must not be null")
+    assert(Objects.nonNull(pscFunc), "Connection => PreparedStatement must not be null")
+    assert(Objects.nonNull(actionFunc), "PreparedStatement => R must not be null")
+
+    var pstmt: PreparedStatement = null
+    val isAutoCommit = con.getAutoCommit
+    var commitSuccess = false
+    var beginTime: Instant = null
+    try {
+      if (autoClose && useTransaction) {
+        con.setAutoCommit(false)
+      }
+
+      if (allowPrintLog) {
+        beginTime = Instant.now()
+      }
+
+      val connection = con
+      pstmt = pscFunc.apply(connection)
+      val result = actionFunc.apply(pstmt)
+      JdbcUtils.handleWarnings(ignoreWarnings, allowPrintLog, pstmt)
+      commitSuccess = true
+      result
+    } catch {
+      case sqlEx: SQLException =>
+        //        if (logger.underlying.isDebugEnabled) {
+        //          val metaData = pstmt.getParameterMetaData
+        //          val parameterTypes = (1 to metaData.getParameterCount).map(idx => metaData.getParameterTypeName(idx))
+        //          handleSqlLogs(beginTime, parameterTypes, pscFunc, actionFunc)
+        //        }
+        throw sqlEx
+    } finally {
+      val parameterTypes =
+        try {
+          if (allowPrintLog) {
+            val metaData = pstmt.getParameterMetaData
+            (1 to metaData.getParameterCount).map(idx => metaData.getParameterTypeName(idx))
+          } else
+            Nil
+        } catch {
+          case e: Exception =>
+            handleSqlLogs(beginTime, Nil, pscFunc, actionFunc)
+            logger.warn("获取parameterTypes异常", e)
+            Nil
+        }
+
+      closeStatement(pstmt)
+
+      if (autoClose) {
+        if (useTransaction) {
+          try {
+            if (commitSuccess) {
+              con.commit()
+            } else {
+              con.rollback()
+            }
+          } catch {
+            case ex: Exception =>
+              logger.error("提交或回滚事物失败", ex)
+          }
+          con.setAutoCommit(isAutoCommit)
+        }
+        JdbcUtils.closeConnection(con)
+      }
+
+      if (allowPrintLog) {
+        handleSqlLogs(beginTime, parameterTypes, pscFunc, actionFunc)
+      }
+    }
+  }
+
+  def handleSqlLogs(
+      beginTime: Instant,
+      parameterTypes: Seq[String],
+      pscFunc: ConnectionPreparedStatementCreator,
+      actionFunc: PreparedStatementAction[_]): Unit = {
+    val endTime = Instant.now()
+    val dua = java.time.Duration.between(beginTime, endTime)
+    val sql = pscFunc match {
+      case pscFuncImpl: ConnectionPreparedStatementCreatorImpl =>
+        pscFuncImpl.getSql
+      case _ => ""
+    }
+
+    var dumpParameters = ""
+    if (parameterTypes.nonEmpty) {
+      val parameters = actionFunc match {
+        case actionFuncImpl: PreparedStatementActionImpl[_] =>
+          parameterTypes.zip(actionFuncImpl.args).map {
+            case (paramType, value) => s"\t\t$paramType: $value"
+          }
+        case _ =>
+          parameterTypes.map(paramType => s"\t\t$paramType:")
+      }
+      dumpParameters = "\n" + parameters.mkString("\n")
+    }
+
+    logger.info(s"[$dua] $sql $dumpParameters")
+  }
+
+  def handleWarnings(ignoreWarnings: Boolean, allowPrintLog: Boolean, stmt: Statement): Unit =
+    if (ignoreWarnings) {
+      if (allowPrintLog) {
+        var warningToLog = stmt.getWarnings
+        while (warningToLog != null) {
+          logger.warn(
+            "SQLWarning ignored: SQL state '" + warningToLog.getSQLState + "', error code '" + warningToLog.getErrorCode + "', message [" + warningToLog.getMessage + "]")
+          warningToLog = warningToLog.getNextWarning
+        }
+      }
+    } else {
+      handleWarnings(stmt.getWarnings)
+    }
+
+  @inline
+  @throws[SQLWarning]
+  protected def handleWarnings(warning: SQLWarning): Unit = if (warning != null) throw warning
 
   def createHikariDataSource(data: (String, String), datas: (String, String)*): HikariDataSource = {
     val props = new Properties()

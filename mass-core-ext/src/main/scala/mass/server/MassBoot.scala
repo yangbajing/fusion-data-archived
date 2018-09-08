@@ -13,12 +13,14 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.Configuration
 import helloscala.common.util.Utils
+import mass.core.Constants
 
 import scala.collection.immutable.TreeMap
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits
 import scala.concurrent.duration._
 
+@Deprecated
 object MassBoot extends StrictLogging {
 
   object StartupType extends Enumeration {
@@ -35,7 +37,7 @@ object MassBoot extends StrictLogging {
 
   def actorSystem: ActorSystem = {
     assert(_actorSystem ne null, "_actorSystem 在使用前必需先设置")
-    _actorSystem // ActorSystem(config.getString("mass.cluster.name"), config)
+    _actorSystem
   }
 
   def actorMaterializer: ActorMaterializer = {
@@ -47,14 +49,11 @@ object MassBoot extends StrictLogging {
 
   def configuration: Configuration = Configuration(config)
 
-  def init(config: Config): Unit =
-    init(ActorSystem(Utils.getClusterName(config), config))
-
   def init(s: ActorSystem): Unit = {
     _actorSystem = s
     _mat = ActorMaterializer()(_actorSystem)
 
-    val massConfig = new MassConfig(configuration)
+    val massConfig = MassSettings(configuration)
     if (massConfig.clusterSeeds.nonEmpty) {
       Cluster(actorSystem).joinSeedNodes(massConfig.clusterSeeds)
     }
@@ -94,7 +93,7 @@ object MassBoot extends StrictLogging {
       "akka.remote.artery.canonical.port" -> config.getInt("akka.remote.netty.tcp.port")
     ) ++ configuration
       .get[Map[String, String]]("mass")
-      .map(entry => ("mass." + entry._1, entry._2))
+      .map(entry => (s"${Constants.BASE_CONF}.${entry._1}", entry._2))
     kvs.map(entry => s"${entry._1} = ${entry._2}").mkString("\n")
   }
 

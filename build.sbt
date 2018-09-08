@@ -1,10 +1,26 @@
 import Commons._
 import Dependencies._
+
 import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
+import Environment._
+
+buildEnv in ThisBuild := {
+  sys.props
+    .get("build.env")
+    .orElse(sys.env.get("BUILD_ENV"))
+    .flatMap {
+      case "prod"  => Some(BuildEnv.Production)
+      case "stage" => Some(BuildEnv.Stage)
+      case "test"  => Some(BuildEnv.Test)
+      case "dev"   => Some(BuildEnv.Developement)
+      case _       => None
+    }
+    .getOrElse(BuildEnv.Developement)
+}
+
+scalaVersion in ThisBuild := Dependencies.versionScala
 
 scalafmtOnCompile in ThisBuild := true
-
-//addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.7" cross CrossVersion.binary)
 
 lazy val root = Project(id = "mass-data-root", base = file("."))
   .aggregate(
@@ -16,11 +32,10 @@ lazy val root = Project(id = "mass-data-root", base = file("."))
     massRdiCore,
     massConnector,
     massGovernance,
-    massScheduler,
+    massJob,
     massApiService,
     massConsole,
     massAuth,
-    massBroker,
     massCoreExt,
     massCore,
     massCommon
@@ -29,7 +44,7 @@ lazy val root = Project(id = "mass-data-root", base = file("."))
   .settings(Environment.settings: _*)
 
 lazy val massDocs = _project("mass-docs")
-  .enablePlugins(ParadoxPlugin)
+  .enablePlugins(ParadoxMaterialThemePlugin)
   .dependsOn(
     massFunctest,
     massRdi,
@@ -40,14 +55,12 @@ lazy val massDocs = _project("mass-docs")
     massApiService,
     massConsole,
     massAuth,
-    massBroker,
     massCoreExt % "compile->compile;test->test",
     massCore % "compile->compile;test->test",
     massCommon
   )
   .settings(
     name in (Compile, paradox) := "massData",
-    paradoxTheme := Some(builtinParadoxTheme("generic")),
     paradoxProperties ++= Map(
       "github.base_url" -> s"https://github.com/yangbajing/mass-data/tree/${version.value}",
       "scala.version" -> scalaVersion.value,
@@ -67,7 +80,6 @@ lazy val example = _project("example")
 
 lazy val massFunctest = _project("mass-functest")
   .dependsOn(massConsole,
-             massBroker,
              massCoreExt % "compile->compile;test->test",
              massCore % "compile->compile;test->test")
   .enablePlugins(MultiJvmPlugin)
@@ -164,13 +176,13 @@ lazy val massRdiCore = _project("mass-rdi-core")
   )
 
 // mass调度任务程序.
-lazy val massScheduler = _project("mass-scheduler")
+lazy val massJob = _project("mass-job")
   .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
   .settings(
-    mainClass in Compile := Some("mass.scheduler.boot.SchedulerMain"),
+    mainClass in Compile := Some("mass.job.boot.JobMain"),
     libraryDependencies ++= Seq(
       )
   )
@@ -185,20 +197,6 @@ lazy val massAuth = _project("mass-auth")
     mainClass in Compile := Some("mass.auth.boot.AuthMain"),
     libraryDependencies ++= Seq(
       )
-  )
-
-// 集群代理节点
-lazy val massBroker = _project("mass-broker")
-  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
-  .enablePlugins(JavaAppPackaging)
-  .settings(Packaging.settings: _*)
-  .settings(Publishing.noPublish: _*)
-  .settings(
-    mainClass in Compile := Some("mass.broker.boot.BrokerMain"),
-    libraryDependencies ++= Seq(
-      _alpakkaFile,
-      _alpakkaFtp
-    )
   )
 
 // 数据组件（采集、存储）
@@ -238,10 +236,11 @@ lazy val massCore = _project("mass-core")
       _scalaXml,
       _hikariCP,
       _h2,
-      "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
+      _chillAkka,
       _postgresql % Test,
       _quartz % Provided
     ) ++ _catses ++ _circes ++ _akkaHttps,
+    PB.protocVersion := "-v361",
     PB.targets in Compile := Seq(
       scalapb.gen(flatPackage = true) -> (sourceManaged in Compile).value
     )
@@ -252,12 +251,17 @@ lazy val massCommon = _project("mass-common")
   .settings(
     libraryDependencies ++= Seq(
       //      _swaggerAnnotation % Provided,
+      "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
       _config,
       "org.scala-lang" % "scala-library" % scalaVersion.value,
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       _scalaJava8Compat,
       _scalatest % Test
-    ) ++ _jsons ++ _akkas ++ _logs
+    ) ++ _jsons ++ _akkas ++ _logs,
+//    PB.protocVersion := "-v361",
+    PB.targets in Compile := Seq(
+      scalapb.gen(flatPackage = true) -> (sourceManaged in Compile).value
+    )
   )
 
 def _project(name: String, _base: String = null) =

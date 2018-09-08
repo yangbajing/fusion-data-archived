@@ -1,0 +1,24 @@
+syntax = "proto3";
+package mass.token;
+
+import "scalapb/scalapb.proto";
+//import "google/protobuf/wrappers.proto";
+
+// OAuth 2 访问凭证
+message AccessToken {
+    string access_token = 1 [(scalapb.field).scala_name = "access_token"];
+    int64 expires_in = 2 [(scalapb.field).scala_name = "expires_in"];
+    string refresh_token = 3 [(scalapb.field).scala_name = "refresh_token"];
+}
+
+// OAuth 2 获取访问凭证请求
+message ClientTokenReq {
+    // 授权类型。支持以下模式。client_credentials、authorization_code
+    string grant_type = 1 [(scalapb.field).scala_name = "grant_type"];
+    // 第三方用户唯一凭证
+    string client_id = 2 [(scalapb.field).scala_name = "client_id"];
+    // 第三方用户唯一凭证密钥，即client_key
+    string client_key = 3 [(scalapb.field).scala_name = "client_key"];
+}
+
+

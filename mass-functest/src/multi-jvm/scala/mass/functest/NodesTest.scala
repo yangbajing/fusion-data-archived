@@ -6,7 +6,7 @@ import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec}
 import akka.testkit.ImplicitSender
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import mass.broker.boot.BrokerBoot
+import mass.broker.boot.AbstractBroker
 import mass.console.boot.ConsoleBoot
 import mass.core.Constants
 
@@ -73,13 +73,13 @@ abstract class NodesTest
   "mass NodesTest" should {
     "启动服务" in {
       runOn(nodeBrokerList.head) {
-        new BrokerBoot(system).start()
+        new AbstractBroker(system).start()
         enterBarrier("startup")
       }
       for (role <- nodeBrokerList.tail) {
         runOn(role) {
           enterBarrier("startup")
-          new   BrokerBoot(system).start()
+          new   AbstractBroker(system).start()
         }
       }
       for (role <- nodeConsoleList) {

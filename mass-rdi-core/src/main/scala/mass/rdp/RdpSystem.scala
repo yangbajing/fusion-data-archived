@@ -1,25 +1,28 @@
 package mass.rdp
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.Configuration
 import mass.connector.ConnectorSystem
-import mass.core.{BaseSystem, MassSystem}
+import mass.core.Constants
+import mass.extension.MassCore
 import mass.rdp.etl.graph.{EtlGraphParserFactory, EtlStreamFactory}
 import mass.rdp.module.RdpModule
 
-trait RdpRefFactory extends BaseSystem {
-  def massSystem: MassSystem
+trait RdpRefFactory {
+  def settings: MassCore
 
   def connectorSystem: ConnectorSystem
 }
 
-private[rdp] class RdpSetup(val massSystem: MassSystem, val connectorSystem: ConnectorSystem) extends StrictLogging {
+private[rdp] class RdpSetup(val system: ActorSystem) extends StrictLogging {
+
+  val settings = MassCore(system)
 
   val extensions: Vector[RdpModule] =
-    massSystem.configuration
-      .get[Seq[String]]("mass.rdp.extensions")
+    settings.configuration
+      .get[Seq[String]](s"${Constants.BASE_CONF}.rdp.extensions")
       .flatMap { className =>
         Class.forName(className).newInstance() match {
           case v: RdpModule => Some(v)
@@ -32,8 +35,8 @@ private[rdp] class RdpSetup(val massSystem: MassSystem, val connectorSystem: Con
 
   def initialStreamFactories(): Map[String, EtlStreamFactory] = {
     val list = extensions.flatMap(_.etlStreamBuilders) ++
-      massSystem.configuration
-        .get[Seq[String]]("mass.rdp.stream-builders")
+      settings.configuration
+        .get[Seq[String]](s"${Constants.BASE_CONF}.rdp.stream-builders")
         .flatMap { className =>
           Class.forName(className).newInstance() match {
             case v: EtlStreamFactory => Some(v)
@@ -53,12 +56,17 @@ private[rdp] class RdpSetup(val massSystem: MassSystem, val connectorSystem: Con
 /**
  * RDP 系统，保存RDP运行所全局需要的各配置、资源
  */
-abstract class RdpSystem extends RdpRefFactory with StrictLogging {
-  implicit def materializer: ActorMaterializer
+final class RdpSystem private (val system: ActorSystem, setup: RdpSetup)
+    extends RdpRefFactory
+    with Extension
+    with StrictLogging {
+  override val connectorSystem = ConnectorSystem(system)
 
-  protected var _streamFactories: Map[String, EtlStreamFactory]
+  implicit val materializer: ActorMaterializer = ActorMaterializer()(system)
 
-  protected var _graphParerFactories: Map[String, EtlGraphParserFactory]
+  protected var _streamFactories: Map[String, EtlStreamFactory] = setup.initialStreamFactories()
+
+  protected var _graphParerFactories: Map[String, EtlGraphParserFactory] = setup.initialGraphParserFactories()
 
   def streamFactories: Map[String, EtlStreamFactory] = _streamFactories
 
@@ -74,40 +82,12 @@ abstract class RdpSystem extends RdpRefFactory with StrictLogging {
     logger.info(s"注册EtlGraphParserFactor: $b")
     _graphParerFactories = _graphParerFactories.updated(b.`type`, b)
   }
-
+  override def settings: MassCore = setup.settings
+  def name: String = system.name
+  def configuration: Configuration = settings.configuration
 }
 
-object RdpSystem {
-  private var _instance: RdpSystem = _
-  def instance: RdpSystem = _instance
-
-  def apply(name: String, massSystem: MassSystem, connectorSystem: ConnectorSystem): RdpSystem =
-    apply(name, new RdpSetup(massSystem, connectorSystem))
-
-  def apply(name: String, setup: RdpSetup): RdpSystem = {
-    _instance = new RdpSystemImpl(name,
-                                  setup.massSystem,
-                                  setup.connectorSystem,
-                                  setup.initialStreamFactories(),
-                                  setup.initialGraphParserFactories())
-    _instance
-  }
-
-}
-
-private[rdp] class RdpSystemImpl(
-    val name: String,
-    val massSystem: MassSystem,
-    val connectorSystem: ConnectorSystem,
-    protected var _streamFactories: Map[String, EtlStreamFactory],
-    protected var _graphParerFactories: Map[String, EtlGraphParserFactory]
-) extends RdpSystem {
-
-  override def system: ActorSystem = massSystem.system
-
-  override def configuration: Configuration = massSystem.configuration
-
-  implicit override def materializer: ActorMaterializer =
-    ActorMaterializer()(massSystem.system)
-
+object RdpSystem extends ExtensionId[RdpSystem] with ExtensionIdProvider {
+  override def createExtension(system: ExtendedActorSystem): RdpSystem = new RdpSystem(system, new RdpSetup(system))
+  override def lookup(): ExtensionId[_ <: Extension] = RdpSystem
 }

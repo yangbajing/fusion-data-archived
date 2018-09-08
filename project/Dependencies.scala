@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  val versionScala = "2.12.6"
+  val versionScala = "2.12.8"
   val versionScalaLib = "2.12"
 
   val _scalaXml = ("org.scala-lang.modules" %% "scala-xml" % "1.1.0")
@@ -17,7 +17,7 @@ object Dependencies {
 
   val _scalatest = "org.scalatest" %% "scalatest" % "3.0.5"
 
-  val versionAkka = "2.5.16"
+  val versionAkka = "2.5.17"
   lazy val _akkaRemote = "com.typesafe.akka" %% "akka-remote" % versionAkka
 
   lazy val _akkas = Seq(
@@ -46,11 +46,11 @@ object Dependencies {
   )
 
   lazy val _akkaManagements = Seq(
-    "com.lightbend.akka.management" %% "akka-management" % "0.17.0",
-    "com.lightbend.akka.management" %% "akka-management-cluster-http" % "0.17.0"
+    "com.lightbend.akka.management" %% "akka-management" % "0.18.0",
+    "com.lightbend.akka.management" %% "akka-management-cluster-http" % "0.18.0"
   ).map(_.excludeAll(ExclusionRule("com.typesafe.akka")).exclude("org.scala-lang", "scala-library"))
 
-  val versionAkkaHttp = "10.1.4"
+  val versionAkkaHttp = "10.1.5"
   val _akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % versionAkkaHttp
 
   val _akkaHttps = Seq(
@@ -145,6 +145,9 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-slf4j")
     .cross(CrossVersion.binary)
 
+  val _chillAkka = "com.twitter" %% "chill-akka" % "0.9.3"
+
+
   val _config = "com.typesafe" % "config" % "1.3.3"
 
   val _hanlp = "com.hankcs" % "hanlp" % "portable-1.6.6"
@@ -201,14 +204,14 @@ object Dependencies {
 
   val _scopt = "com.github.scopt" %% "scopt" % "3.7.0"
 
-  private val versionCats = "1.0.1"
+  private val versionCats = "1.4.0"
 
   val _catses = Seq(
     "org.typelevel" %% "cats-laws",
     "org.typelevel" %% "cats-free"
   ).map(_ % versionCats)
 
-  private val versionCirce = "0.9.3"
+  private val versionCirce = "0.10.0"
 
   val _circes = Seq(
     "io.circe" %% "circe-core" % versionCirce,
@@ -238,6 +241,13 @@ object Dependencies {
     "com.typesafe.slick" %% "slick-testkit" % "3.2.3" % Test
   )
 
+  private val versionDoobie = "0.5.3"
+
+  val _doobies = Seq(
+    "org.tpolecat" %% "doobie-core" % versionDoobie,
+    "org.tpolecat" %% "doobie-postgres" % versionDoobie
+  )
+
   private val versionPoi = "3.17"
   val _pois = Seq("org.apache.poi" % "poi-scratchpad" % versionPoi, "org.apache.poi" % "poi-ooxml" % versionPoi)
 
@@ -250,13 +260,13 @@ object Dependencies {
   private val versionQuartz = "2.2.3"
   val _quartz = "org.quartz-scheduler" % "quartz" % versionQuartz
 
-  val _postgresql = "org.postgresql" % "postgresql" % "42.2.4"
+  val _postgresql = "org.postgresql" % "postgresql" % "42.2.5"
 
   val _mysql = "mysql" % "mysql-connector-java" % "6.0.6"
 
   val _mssql = "com.microsoft.sqlserver" % "mssql-jdbc" % "6.4.0.jre8"
 
-  val _hikariCP = "com.zaxxer" % "HikariCP" % "3.2.0" // "2.7.9"
+  val _hikariCP = "com.zaxxer" % "HikariCP" % "3.2.0"
 
   val _protobuf = "com.google.protobuf" % "protobuf-java" % "3.6.1"
 

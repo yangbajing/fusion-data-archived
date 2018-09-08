@@ -1,0 +1,13 @@
+syntax = "proto3";
+package mass.model;
+
+//protoc -I=. -I=$GOPATH/src -I=$GOPATH/src/vendor --go_out=. login.proto   ,有了Any之后，只有该方式能够执行
+//import "mass/message/define.proto";
+
+////用户登录得到的登录反馈
+//message LoginReply {
+//    ErrorCode LoginCode = 1;
+//    int64 NowTime = 2; //服务器当前时间
+//    string GameServerAddr = 4;
+//    string Error = 7;
+//}

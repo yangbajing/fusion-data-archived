@@ -1,6 +1,6 @@
 package mass.rdp.module
 
-import mass.core.Module.Module
+import mass.core.module.Module
 import mass.rdp.etl.graph.{EtlGraphParserFactory, EtlStreamFactory}
 
 trait RdpModule extends Module {

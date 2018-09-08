@@ -8,7 +8,7 @@
 **MassData** 由以下主要系统、组件组成：
 
 - @ref[**数据连接器**](../connector/index.md)：基于 <a href="https://doc.akka.io/docs/akka/current/stream/index.html?language=scala" target="_blank">Akka Stream</a>，Massdata提供各种数据源的连接器。包括：读取、转换、写入等功能。Akka Stream 提供了功能强大的反应式流处理，Massdata数据连接器构建在 Akka Stream 之上。可提供批量、流式ETL数据处理。
-- @ref[**任务调度**](../scheduler/index.md)：MassData提供完善的任务调度功能，支持间隔调度和日历调度，支持任务依赖控制。
+- @ref[**任务调度**](../job/index.md)：MassData提供完善的任务调度功能，支持间隔调度和日历调度，支持任务依赖控制。
 - @ref[**mass-rdi（反应式数据处理）**](../rdi/index.md)：提供数据处理业务所需支持的各种数据模拟，即可作为单独的程序执行，也可作为组件供引擎子系统调用执行。
 - @ref[**Broker**](../broker/core.md)：解析业务流程，执行每个任务（子任务）的所有阶段业务逻辑，包括通用阶段（如日志、数据库操作、消息通知……），以及业务阶段（如文件采集等）。
 - @ref[**Broker Leader-协调模块**](../broker/leader.md)：加载业务（数据）处理流程文件，生成任务并对任务进行调度，对调度资源和策略进行管理。
