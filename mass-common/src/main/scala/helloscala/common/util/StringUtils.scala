@@ -18,9 +18,11 @@ package helloscala.common.util
 
 import java.io._
 import java.security.SecureRandom
+import java.util.{Map => JMap, HashMap => JHashMap}
 
 import scala.annotation.tailrec
 import scala.collection.immutable
+import scala.compat.java8.FunctionConverters.asJavaBiConsumer
 
 object StringUtils {
 
@@ -128,6 +130,97 @@ object StringUtils {
       val arr = name.split('_')
       arr.head + arr.tail.map(item => item.head.toUpper + item.tail).mkString
     }
+
+  def convertUnderscoreNameToPropertyName(obj: Map[String, Any]): Map[String, Any] =
+    obj.map { case (key, value) => convertUnderscoreNameToPropertyName(key) -> value }
+
+  def convertUnderscoreNameToPropertyName(obj: JMap[String, Object]): JMap[String, Object] = {
+    val result = new JHashMap[String, Object]()
+    val func: (String, Object) => Unit = (key, value) => result.put(convertUnderscoreNameToPropertyName(key), value)
+    obj.forEach(asJavaBiConsumer(func))
+    result
+  }
+
+  def convertUnderscoreNameToPropertyName(name: String): String = {
+    val result = new StringBuilder
+    var nextIsUpper = false
+    if (name != null && name.length > 0) {
+      if (name.length > 1 && name.substring(1, 2) == "_") {
+        result.append(name.substring(0, 1).toUpperCase)
+      } else {
+        result.append(name.substring(0, 1).toLowerCase)
+      }
+
+      var i = 1
+      val len = name.length
+      while (i < len) {
+        val s = name.substring(i, i + 1)
+        if (s == "_") {
+          nextIsUpper = true
+        } else if (nextIsUpper) {
+          result.append(s.toUpperCase)
+          nextIsUpper = false
+        } else {
+          result.append(s.toLowerCase)
+        }
+
+        i += 1
+      }
+    }
+    result.toString
+  }
+
+  /**
+   * Check that the given {@code CharSequence} is neither {@code null} nor
+   * of length 0.
+   * <p>Note: this method returns {@code true} for a {@code CharSequence}
+   * that purely consists of whitespace.
+   * <p><pre class="code">
+   * StringUtils.hasLength(null) = false
+   * StringUtils.hasLength("") = false
+   * StringUtils.hasLength(" ") = true
+   * StringUtils.hasLength("Hello") = true
+   * </pre>
+   *
+   * @param str the {@code CharSequence} to check (may be {@code null})
+   * @return {@code true} if the {@code CharSequence} is not {@code null} and has length
+   * @see #hasText(String)
+   */
+  def hasLength(str: CharSequence): Boolean = { str != null && str.length > 0 }
+
+  /**
+   * Check that the given {@code String} is neither {@code null} nor of length 0.
+   * <p>Note: this method returns {@code true} for a {@code String} that
+   * purely consists of whitespace.
+   *
+   * @param str the {@code String} to check (may be {@code null})
+   * @return {@code true} if the {@code String} is not {@code null} and has length
+   * @see #hasLength(CharSequence)
+   * @see #hasText(String)
+   */
+  def hasLength(str: String): Boolean = hasLength(str.asInstanceOf[CharSequence])
+
+  /**
+   * Trim <i>all</i> whitespace from the given {@code String}:
+   * leading, trailing, and in between characters.
+   *
+   * @param str the {@code String} to check
+   * @return the trimmed {@code String}
+   * @see Character#isWhitespace
+   */
+  def trimAllWhitespace(str: String): String = {
+    if (!hasLength(str)) { return str }
+    val len = str.length
+    val sb = new StringBuilder(str.length)
+    var i = 0
+    while ({ i < len }) {
+      val c = str.charAt(i)
+      if (!Character.isWhitespace(c)) { sb.append(c) }
+
+      { i += 1; i - 1 }
+    }
+    sb.toString
+  }
 
   def toString(e: Throwable): String = {
     val pw = new PrintWriter(new StringWriter())

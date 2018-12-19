@@ -177,8 +177,12 @@ lazy val massRdiCore = _project("mass-rdi-core")
 
 // mass调度任务程序.
 lazy val massJob = _project("mass-job")
-  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(
+    massCoreExt % "compile->compile;test->test",
+    massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
+  .enablePlugins(MultiJvmPlugin)
+  .configs(MultiJvm)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
   .settings(

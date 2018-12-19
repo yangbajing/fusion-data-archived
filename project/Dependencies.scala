@@ -17,7 +17,7 @@ object Dependencies {
 
   val _scalatest = "org.scalatest" %% "scalatest" % "3.0.5"
 
-  val versionAkka = "2.5.17"
+  val versionAkka = "2.5.19"
   lazy val _akkaRemote = "com.typesafe.akka" %% "akka-remote" % versionAkka
 
   lazy val _akkas = Seq(
@@ -46,8 +46,8 @@ object Dependencies {
   )
 
   lazy val _akkaManagements = Seq(
-    "com.lightbend.akka.management" %% "akka-management" % "0.18.0",
-    "com.lightbend.akka.management" %% "akka-management-cluster-http" % "0.18.0"
+    "com.lightbend.akka.management" %% "akka-management" % "0.20.0",
+    "com.lightbend.akka.management" %% "akka-management-cluster-http" % "0.20.0"
   ).map(_.excludeAll(ExclusionRule("com.typesafe.akka")).exclude("org.scala-lang", "scala-library"))
 
   val versionAkkaHttp = "10.1.5"

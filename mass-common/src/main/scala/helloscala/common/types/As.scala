@@ -101,7 +101,7 @@ object AsLong {
     //    case null              => None
     case l: Long           => Some(l)
     case l: java.lang.Long => Some(l)
-    case _                 => None
+    case _                 => AsInt.unapply(v).map(_.toLong) orElse AsShort.unapply(v).map(_.toLong)
   }
 }
 

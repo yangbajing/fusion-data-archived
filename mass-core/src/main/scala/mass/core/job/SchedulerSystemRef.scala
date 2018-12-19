@@ -2,7 +2,7 @@ package mass.core.job
 
 import scala.concurrent.ExecutionContext
 
-abstract class SchedulerSystemRef {
+trait SchedulerSystemRef {
   val waitForJobsToComplete: Boolean
   implicit def executionContext: ExecutionContext
 }

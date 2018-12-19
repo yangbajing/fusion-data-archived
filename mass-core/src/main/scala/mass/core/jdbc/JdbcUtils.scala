@@ -6,6 +6,7 @@
 
 package mass.core.jdbc
 
+import java.lang.reflect.{Field, Modifier}
 import java.sql._
 import java.time._
 import java.util.{Objects, Properties}
@@ -14,16 +15,150 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.StrictLogging
 import com.zaxxer.hikari.{HikariConfig, HikariDataSource}
 import helloscala.common.Configuration
-import helloscala.common.util.{StringUtils, TimeUtils}
+import helloscala.common.util._
+import javax.sql.DataSource
 
 import scala.collection.{immutable, mutable}
+import scala.reflect.ClassTag
 
 object JdbcUtils extends StrictLogging {
+  val BeanIgnoreClass = classOf[BeanIgnore]
+  // Check for JDBC 4.1 getObject(int, Class) method - available on JDK 7 and higher
+
+  private val getObjectWithTypeAvailable =
+    ClassUtils.hasMethod(classOf[ResultSet], "getObject", classOf[Int], classOf[Class[_]])
 
   def columnLabels(metadata: ResultSetMetaData): immutable.IndexedSeq[String] =
     (1 to metadata.getColumnCount).map(i => Option(metadata.getColumnLabel(i)).getOrElse(metadata.getColumnName(i)))
 
-  @throws[SQLException]("if thrown by the JDBC API")
+  def getResultSetValue(
+      rs: ResultSet,
+      index: Int,
+      requiredType: Class[_],
+      defaultTimeZone: ZoneOffset = TimeUtils.ZONE_CHINA_OFFSET): Any = {
+    val columnType = rs.getMetaData.getColumnType(index)
+
+    if (requiredType == null) {
+      getResultSetValue(rs, index)
+    } else if (classOf[String] == requiredType) {
+      rs.getString(index)
+    } else if (classOf[BigDecimal] == requiredType) {
+      rs.getBigDecimal(index)
+    } else if (classOf[java.sql.Timestamp] == requiredType) {
+      rs.getTimestamp(index)
+    } else if (classOf[java.sql.Date] == requiredType) {
+      rs.getDate(index)
+    } else if (classOf[LocalDate] == requiredType) {
+      rs.getDate(index).toLocalDate
+    } else if (classOf[LocalTime] == requiredType) {
+      rs.getTime(index).toLocalTime
+    } else if (classOf[OffsetDateTime] == requiredType) {
+      if (Types.BIGINT == columnType) {
+        TimeUtils.toOffsetDateTime(rs.getLong(index))
+      } else if (Types.INTEGER == columnType) {
+        Instant.ofEpochSecond(rs.getInt(index)).atOffset(defaultTimeZone)
+      } else {
+        rs.getTimestamp(index).toInstant.atOffset(defaultTimeZone)
+      }
+    } else if (classOf[ZonedDateTime] == requiredType) {
+      if (Types.BIGINT == columnType) {
+        Instant.ofEpochMilli(rs.getInt(index)).atZone(defaultTimeZone)
+      } else if (Types.INTEGER == columnType) {
+        Instant.ofEpochSecond(rs.getInt(index)).atZone(defaultTimeZone)
+      } else {
+        rs.getTimestamp(index).toInstant.atZone(defaultTimeZone)
+      }
+    } else if (classOf[LocalDateTime] == requiredType) {
+      if (Types.BIGINT == columnType) {
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(rs.getInt(index)), defaultTimeZone)
+      } else if (Types.INTEGER == columnType) {
+        LocalDateTime.ofInstant(Instant.ofEpochSecond(rs.getInt(index)), defaultTimeZone)
+      } else {
+        rs.getTimestamp(index).toLocalDateTime
+      }
+    } else if (classOf[java.sql.Time] == requiredType) {
+      rs.getTime(index)
+    } else if (classOf[scala.Array[Byte]] == requiredType) {
+      rs.getBytes(index)
+    } else if (classOf[Blob] == requiredType) {
+      rs.getBlob(index)
+    } else if (classOf[Clob] == requiredType) {
+      rs.getClob(index)
+    } else if (requiredType.isEnum) {
+      rs.getObject(index) match {
+        case s: String => s
+        case n: Number => NumberUtils.convertNumberToTargetClass(n, classOf[Integer])
+        case _         => rs.getString(index)
+      }
+    } else {
+      var value: Any = null
+      if (classOf[Boolean] == requiredType || classOf[java.lang.Boolean] == requiredType) {
+        value = rs.getBoolean(index)
+      } else if (classOf[Byte] == requiredType || classOf[java.lang.Byte] == requiredType) {
+        value = rs.getByte(index)
+      } else if (classOf[Short] == requiredType || classOf[java.lang.Short] == requiredType) {
+        value = rs.getShort(index)
+      } else if (classOf[Int] == requiredType || classOf[Integer] == requiredType) {
+        value = rs.getInt(index)
+      } else if (classOf[Long] == requiredType || classOf[java.lang.Long] == requiredType) {
+        value = rs.getLong(index)
+      } else if (classOf[Float] == requiredType || classOf[java.lang.Float] == requiredType) {
+        value = rs.getFloat(index)
+      } else if (classOf[Double] == requiredType || classOf[java.lang.Double] == requiredType || classOf[Number] == requiredType) {
+        value = rs.getDouble(index)
+      } else {
+        // Some unknown type desired -> rely on getObject.
+        if (getObjectWithTypeAvailable) {
+          try value = rs.getObject(index, requiredType)
+          catch {
+            case err: AbstractMethodError =>
+              logger.debug("JDBC driver does not implement JDBC 4.1 'getObject(int, Class)' method", err)
+            case ex: SQLFeatureNotSupportedException =>
+              logger.debug("JDBC driver does not support JDBC 4.1 'getObject(int, Class)' method", ex)
+            case ex: SQLException =>
+              logger.debug("JDBC driver has limited support for JDBC 4.1 'getObject(int, Class)' method", ex)
+          }
+          //        } else {
+          //          // Corresponding SQL types for JSR-310, left up
+          //          // to the caller to convert them (e.g. through a ConversionService).
+          //          val typeName = requiredType.getSimpleName
+          //          value = typeName match {
+          //            case "ZonedDateTime" => rs.getTimestamp(index).toInstant.atZone(TimeUtils.ZONE_CHINA_OFFSET)
+          //            case "LocalDateTime" => rs.getTimestamp(index).toLocalDateTime
+          //            case "LocalDate"     => rs.getDate(index).toLocalDate
+          //            case "LocalTime"     => rs.getTime(index).toLocalTime
+          //            case _ =>
+          //              // Fall back to getObject without type specification, again
+          //              // left up to the caller to convert the value if necessary.
+          //              getResultSetValue(rs, index)
+          //          }
+        }
+      }
+
+      if (rs.wasNull()) null else value
+    }
+  }
+
+  /**
+   * Retrieve a JDBC column value from a ResultSet, using the most appropriate
+   * value type. The returned value should be a detached value object, not having
+   * any ties to the active ResultSet: in particular, it should not be a Blob or
+   * Clob object but rather a byte array or String representation, respectively.
+   * <p>Uses the {@code getObject(index)} method, but includes additional "hacks"
+   * to get around Oracle 10g returning a non-standard object for its TIMESTAMP
+   * datatype and a {@code java.sql.Date} for DATE columns leaving out the
+   * time portion: These columns will explicitly be extracted as standard
+   * {@code java.sql.Timestamp} object.
+   *
+   * @param rs    is the ResultSet holding the data
+   * @param index is the column index
+   * @return the value object
+   * @throws SQLException if thrown by the JDBC API
+   * @see java.sql.Blob
+   * @see java.sql.Clob
+   * @see java.sql.Timestamp
+   */
+  @throws[SQLException]
   def getResultSetValue(rs: ResultSet, index: Int): AnyRef = {
     val obj = rs.getObject(index)
     val className: String = if (obj == null) null else obj.getClass.getName
@@ -164,6 +299,48 @@ object JdbcUtils extends StrictLogging {
     pstmt.setObject(i, obj)
   }
 
+  private def filterFields(fields: scala.Array[Field]): Map[String, Field] = {
+    val result = mutable.Map.empty[String, Field]
+    val len = fields.length
+    var i = 0
+    while (i < len) {
+      val field = fields(i)
+      val anns = field.getDeclaredAnnotations
+      val isInvalid = Modifier.isStatic(field.getModifiers) ||
+        anns.exists(ann => ann.annotationType() == BeanIgnoreClass)
+      if (!isInvalid) {
+        field.setAccessible(true)
+        result.put(field.getName, field)
+      }
+      i += 1
+    }
+    result.toMap
+  }
+
+  def resultSetToBean[T](rs: ResultSet)(implicit ev1: ClassTag[T]): T = resultSetToBean(rs, toPropertiesName = true)
+
+  def resultSetToBean[T](rs: ResultSet, toPropertiesName: Boolean)(implicit ev1: ClassTag[T]): T = {
+    val dest = ev1.runtimeClass.newInstance().asInstanceOf[T]
+    val cls = dest.getClass
+    val fields = filterFields(cls.getDeclaredFields)
+    val metaData = rs.getMetaData
+    var col = 1
+    val columnCount = metaData.getColumnCount
+    while (col <= columnCount) {
+      var label = metaData.getColumnLabel(col)
+      if (toPropertiesName) {
+        label = StringUtils.convertUnderscoreNameToPropertyName(label)
+      }
+      for (field <- fields.get(label)) {
+        val requiredType = field.getType
+        val value = getResultSetValue(rs, col, requiredType)
+        field.set(dest, value)
+      }
+      col += 1
+    }
+    dest
+  }
+
   def closeStatement(stmt: Statement): Unit =
     if (stmt ne null) {
       try stmt.close()
@@ -199,6 +376,24 @@ object JdbcUtils extends StrictLogging {
           logger.error("Unexpected exception on closing JDBC Connection", ex)
       }
     }
+
+  def closeDataSource(ds: HikariDataSource): Unit = {
+    if (ds != null) {
+      try ds.close()
+      catch {
+        case ex: SQLException =>
+          logger.error("Could not close JDBC Connection", ex)
+        case ex: Throwable =>
+          // We don't trust the JDBC driver: It might throw RuntimeException or Error.
+          logger.error("Unexpected exception on closing JDBC Connection", ex)
+      }
+    }
+  }
+
+  def closeDataSource(ds: DataSource): Unit = ds match {
+    case hds: HikariDataSource => closeDataSource(hds)
+    case _                     => // do nothing
+  }
 
   def isString(sqlType: Int): Boolean =
     Types.VARCHAR == sqlType || Types.VARCHAR == Types.CHAR || Types.VARCHAR == Types.LONGNVARCHAR ||

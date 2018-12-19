@@ -22,10 +22,8 @@ object JobSystem extends ExtensionId[JobSystem] with ExtensionIdProvider {
   override def lookup(): ExtensionId[_ <: Extension] = JobSystem
 }
 
-final class JobSystem private (
-    val system: ExtendedActorSystem,
-    val waitForJobsToComplete: Boolean
-) extends SchedulerSystemRef
+final class JobSystem private (val system: ExtendedActorSystem, val waitForJobsToComplete: Boolean)
+    extends SchedulerSystemRef
     with Extension
     with LazyLogging {
   import org.quartz._
