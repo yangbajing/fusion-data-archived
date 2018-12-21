@@ -1,8 +1,8 @@
 import Commons._
 import Dependencies._
-
 import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 import Environment._
+import sbtassembly.PathList
 
 buildEnv in ThisBuild := {
   sys.props
@@ -75,13 +75,11 @@ lazy val example = _project("example")
   .settings(Publishing.publishing: _*)
   .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .settings(
-    libraryDependencies ++= _akkaClusters ++ _akkaHttps //++ _kamons
+    libraryDependencies ++= _akkaClusters ++ _akkaHttps
   )
 
 lazy val massFunctest = _project("mass-functest")
-  .dependsOn(massConsole,
-             massCoreExt % "compile->compile;test->test",
-             massCore % "compile->compile;test->test")
+  .dependsOn(massConsole, massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
   .enablePlugins(MultiJvmPlugin)
   .configs(MultiJvm)
   .settings(Publishing.noPublish: _*)
@@ -89,7 +87,7 @@ lazy val massFunctest = _project("mass-functest")
     jvmOptions in MultiJvm := Seq("-Xmx1024M"),
     libraryDependencies ++= Seq(
       _akkaMultiNodeTestkit
-    ) //++ _kamons
+    )
   )
 
 // API Service
@@ -162,7 +160,14 @@ lazy val massRdiCli = _project("mass-rdi-cli")
   .settings(
     //    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
     assemblyJarName in assembly := "rdi.jar",
-    mainClass in Compile := Some("mass.rdi.cli.boot.RdiCliMain")
+    mainClass in Compile := Some("mass.rdi.cli.boot.RdiCliMain"),
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", "aop.xml") => 
+        Packaging.aopMerge
+      case s =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(s)
+    }
   )
 
 lazy val massRdiCore = _project("mass-rdi-core")
@@ -177,15 +182,14 @@ lazy val massRdiCore = _project("mass-rdi-core")
 
 // mass调度任务程序.
 lazy val massJob = _project("mass-job")
-  .dependsOn(
-    massCoreExt % "compile->compile;test->test",
-    massCore % "compile->compile;test->test")
-  .enablePlugins(JavaAppPackaging)
-  .enablePlugins(MultiJvmPlugin)
+  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .enablePlugins(JavaAppPackaging, JavaAgent, MultiJvmPlugin)
   .configs(MultiJvm)
   .settings(Packaging.settings: _*)
   .settings(Publishing.noPublish: _*)
   .settings(
+    javaAgents += "org.aspectj" % "aspectjweaver" % "1.9.2",
+    javaOptions in Universal += "-Dorg.aspectj.tracing.factory=default",
     mainClass in Compile := Some("mass.job.boot.JobMain"),
     libraryDependencies ++= Seq(
       )
@@ -226,7 +230,7 @@ lazy val massCoreExt = _project("mass-core-ext")
       _quartz,
       _jsch,
       _sigarLoader
-    ) ++ _akkaClusters ++ _slicks ++ _macwires ++ _akkaManagements
+    ) ++ _akkaClusters ++ _slicks ++ _macwires ++ _akkaManagements ++ _kamons
   )
 
 lazy val massCore = _project("mass-core")

@@ -3,6 +3,8 @@ logLevel := Level.Warn
 
 resolvers += Resolver.sbtPluginRepo("releases")
 
+resolvers += Resolver.bintrayRepo("kamon-io", "sbt-plugins")
+
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.0.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-multi-jvm" % "0.4.0")
@@ -20,6 +22,10 @@ addSbtPlugin("io.github.jonas" % "sbt-paradox-material-theme" % "0.5.1")
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "3.0.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.3")
+
+addSbtPlugin("io.kamon" % "sbt-aspectj-runner" % "1.1.1")
+
+addSbtPlugin("com.lightbend.sbt" % "sbt-javaagent" % "0.1.4")
 
 addSbtPlugin("com.thesamet" % "sbt-protoc" % "0.99.19")
 

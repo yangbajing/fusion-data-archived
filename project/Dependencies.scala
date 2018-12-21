@@ -147,7 +147,6 @@ object Dependencies {
 
   val _chillAkka = "com.twitter" %% "chill-akka" % "0.9.3"
 
-
   val _config = "com.typesafe" % "config" % "1.3.3"
 
   val _hanlp = "com.hankcs" % "hanlp" % "portable-1.6.6"
@@ -161,18 +160,18 @@ object Dependencies {
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % versionJackson
   )
 
-  val _aspectjweaver = "org.aspectj" % "aspectjweaver" % "1.9.1"
+  val _aspectjweaver = "org.aspectj" % "aspectjweaver" % "1.9.2"
 
   val _sigarLoader = "io.kamon" % "sigar-loader" % "1.6.6" //-rev002"
 
-  private val versionKamon = "1.1.2"
+  private val versionKamon = "1.1.3"
 
   val _kamonAkka = ("io.kamon" %% "kamon-akka-2.5" % versionKamon)
-    .exclude("com.typesafe.akka", "akka-actor")
+    .excludeAll("com.typesafe.akka")
     .cross(CrossVersion.binary)
     .exclude("org.scala-lang", "scala-library")
 
-  val _kamonAkkaHttp = ("io.kamon" %% "kamon-akka-http-2.5" % "1.1.0")
+  val _kamonAkkaHttp = ("io.kamon" %% "kamon-akka-http-2.5" % "1.1.1")
     .exclude("io.kamon", "kamon-akka-2.5")
     .cross(CrossVersion.binary)
     .exclude("com.typesafe.akka", "akka-http")
@@ -184,7 +183,9 @@ object Dependencies {
     .exclude("org.scala-lang", "scala-library")
 
   // need aspectjweaver
-  val _kamonAkkaRemote = ("io.kamon" %% "kamon-akka-remote-2.5" % versionKamon)
+  val _kamonAkkaRemote = ("io.kamon" %% "kamon-akka-remote-2.5" % "1.1.0")
+    .exclude("io.kamon", "kamon-akka-2.5")
+    .cross(CrossVersion.binary)
     .excludeAll(ExclusionRule("com.typesafe.akka"))
     .cross(CrossVersion.binary)
     .exclude("org.scala-lang", "scala-library")
@@ -194,12 +195,17 @@ object Dependencies {
     .cross(CrossVersion.binary)
     .exclude("org.scala-lang", "scala-library")
 
+  val _kamonPrometheus = "io.kamon" %% "kamon-prometheus" % "1.1.1"
+
+  val _kamonZipkin = "io.kamon" %% "kamon-zipkin" % "1.0.0"
+
   val _kamons = Seq(
     _kamonAkka,
     _kamonAkkaRemote,
     _kamonAkkaHttp,
-    _kamonSystemMetrics,
-    _aspectjweaver // kamon-akka-remote 需要
+    _kamonZipkin,
+    _kamonPrometheus,
+    _kamonSystemMetrics
   )
 
   val _scopt = "com.github.scopt" %% "scopt" % "3.7.0"
@@ -251,7 +257,7 @@ object Dependencies {
   private val versionPoi = "3.17"
   val _pois = Seq("org.apache.poi" % "poi-scratchpad" % versionPoi, "org.apache.poi" % "poi-ooxml" % versionPoi)
 
-  val _logs = Seq("io.kamon" %% "kamon-logback" % "1.0.2",
+  val _logs = Seq("io.kamon" %% "kamon-logback" % "1.0.4",
                   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0",
                   "ch.qos.logback" % "logback-classic" % "1.2.3")
 
