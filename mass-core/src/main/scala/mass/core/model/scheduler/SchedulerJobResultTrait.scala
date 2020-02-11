@@ -1,6 +1,6 @@
 package mass.core.model.scheduler
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.{ Files, Paths }
 
 import mass.core.job.JobResult
 

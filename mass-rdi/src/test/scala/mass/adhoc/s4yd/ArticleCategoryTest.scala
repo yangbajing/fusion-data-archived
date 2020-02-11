@@ -1,26 +1,24 @@
 package mass.adhoc.s4yd
 
-import java.time.{Instant, OffsetDateTime}
+import java.time.{ Instant, OffsetDateTime }
 import java.util.UUID
 
+import fusion.jdbc.JdbcTemplate
+import fusion.jdbc.util.JdbcUtils
 import helloscala.common.test.HelloscalaSpec
-import helloscala.common.types.{AsBoolean, AsLong, AsString}
-import helloscala.common.util.{StringUtils, TimeUtils}
-import mass.core.jdbc.{JdbcTemplate, JdbcUtils}
+import helloscala.common.types.{ AsBoolean, AsLong, AsString }
+import helloscala.common.util.{ StringUtils, TimeUtils }
 import org.scalatest.BeforeAndAfterAll
 
 import scala.io.Source
 
 class ArticleCategoryTest extends HelloscalaSpec with BeforeAndAfterAll {
-
   val s4yd = JdbcTemplate(
-    JdbcUtils.createHikariDataSource(
-      Map(
-        "poolName" -> "s4yd",
-        "jdbcUrl" -> "jdbc:mysql://cqph96:3306/s4yd?useSSL=false",
-        "username" -> sys.props("mysql.username"),
-        "password" -> sys.props("mysql.password")
-      )))
+    JdbcUtils.createHikariDataSource(Map(
+      "poolName" -> "s4yd",
+      "jdbcUrl" -> "jdbc:mysql://cqph96:3306/s4yd?useSSL=false",
+      "username" -> sys.props("mysql.username"),
+      "password" -> sys.props("mysql.password"))))
 
   val reading = JdbcTemplate(
     JdbcUtils.createHikariDataSource(Map(
@@ -33,8 +31,7 @@ class ArticleCategoryTest extends HelloscalaSpec with BeforeAndAfterAll {
       "dataSource.password" -> sys.props("pg.password"),
       "maximumPoolSize" -> "2",
       "allowPrintLog" -> "true",
-      "numThreads" -> "2",
-    )))
+      "numThreads" -> "2")))
 
   "ArticleCategory" should {
     "Category from s4yd to reading" in {
@@ -44,8 +41,7 @@ class ArticleCategoryTest extends HelloscalaSpec with BeforeAndAfterAll {
                          |values (?, ?, ?, 1, now())
                          |on conflict(id)
                          |   do update set parent_id = EXCLUDED.parent_id, name = EXCLUDED.name;""".stripMargin,
-          List(data("id"), data("parent_id"), data("name"))
-        )
+          List(data("id"), data("parent_id"), data("name")))
       }
     }
 
@@ -102,8 +98,7 @@ class ArticleCategoryTest extends HelloscalaSpec with BeforeAndAfterAll {
             .unapply(data("create_time"))
             .map(s => Instant.ofEpochSecond(s).atOffset(TimeUtils.ZONE_CHINA_OFFSET))
             .getOrElse(OffsetDateTime.now()),
-          1L
-        )
+          1L)
         args.foreach(_.getClass)
         val ret = reading.update(insertSql, args)
         println(ret)
@@ -122,16 +117,14 @@ class ArticleCategoryTest extends HelloscalaSpec with BeforeAndAfterAll {
           1L,
           OffsetDateTime.now(),
           "1",
-          "/opt/haishu/app/reading/upload-file" + a.cover
-        )
+          "/opt/haishu/app/reading/upload-file" + a.cover)
         println(baseFile)
         val coverId = reading
           .findForObject(
             """insert into td_base_file(origin_name, suffixes, create_by, create_time, status, path)
                                 |values (?, ?, ?, ?, ?, ?) returning id;""".stripMargin,
             baseFile.productIterator.toList,
-            _.getLong(1)
-          )
+            _.getLong(1))
           .get
         val ret = reading.update("update td_art_book set cover_id = ? where id = ?;", List(coverId, a.id))
         println(s"update book cover_id return is $ret")
@@ -212,8 +205,7 @@ class ArticleCategoryTest extends HelloscalaSpec with BeforeAndAfterAll {
             UUID.randomUUID().toString,
             c.order,
             c.isvip.toString,
-            c.publishTime
-          )
+            c.publishTime)
         }
 
         if (articles.nonEmpty) {
@@ -343,22 +335,9 @@ class ArticleCategoryTest extends HelloscalaSpec with BeforeAndAfterAll {
         user.email,
         if (user.mobile.forall(_.isDigit)) user.mobile else null,
         0,
-        user.id
-      )
+        user.id)
 
-      val p = TdUserAuthor(
-        user.id,
-        user.id,
-        user.realname,
-        user.penname,
-        1L,
-        user.regtime,
-        "",
-        0,
-        0L,
-        0,
-        "1"
-      )
+      val p = TdUserAuthor(user.id, user.id, user.realname, user.penname, 1L, user.regtime, "", 0, 0L, 0, "1")
 
       (u, p)
     }.unzip
@@ -368,10 +347,10 @@ class ArticleCategoryTest extends HelloscalaSpec with BeforeAndAfterAll {
       saveUserAuthorizationSql,
       users.map(
         user =>
-          List(user.id,
-               "DGXGZ7C2R0SMKFAE1A1HLV0R2A8HM2AP",
-               "7cdd43adc02e695ea3d0e1bb636a9daafacdea510aa475ed010b9c9bed6924f6"))
-    )
+          List(
+            user.id,
+            "DGXGZ7C2R0SMKFAE1A1HLV0R2A8HM2AP",
+            "7cdd43adc02e695ea3d0e1bb636a9daafacdea510aa475ed010b9c9bed6924f6")))
 
     reading.updateBatch(saveUserAuthorSql, authorPayloads.map(_.productIterator.toList))
 

@@ -12,5 +12,4 @@ object Databases {
     databases :+= Database(idSeq.getAndIncrement(), name)
     databases
   }
-
 }

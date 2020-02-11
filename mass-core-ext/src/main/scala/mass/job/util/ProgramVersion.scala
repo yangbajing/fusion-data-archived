@@ -1,6 +1,6 @@
 package mass.job.util
 
-import mass.model.job.Program
+import mass.data.job.Program
 
 sealed trait ProgramVersion {
   val NAME: Program
@@ -80,5 +80,4 @@ object ProgramVersion {
 
   @inline def getStringOrElse(program: Program, version: String, deft: => String): String =
     getString(program, version).getOrElse(deft)
-
 }

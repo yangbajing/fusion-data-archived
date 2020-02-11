@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import helloscala.common.Configuration
 import mass.core.Constants
-import mass.http.{AbstractRoute, HSAkkaHttpServer}
+import mass.http.{ AbstractRoute, HSAkkaHttpServer }
 import mass.job.JobSystem
 import mass.job.service.Services
 import mass.job.service.job.JobActor
@@ -14,7 +14,6 @@ import mass.job.web.route.Routes
 import scala.concurrent.Future
 
 class JobServer(jobSystem: JobSystem) extends HSAkkaHttpServer {
-
   override def actorSystem: ActorSystem = jobSystem.system
 
   override def actorMaterializer: ActorMaterializer = ActorMaterializer()(jobSystem.system)
@@ -33,5 +32,4 @@ class JobServer(jobSystem: JobSystem) extends HSAkkaHttpServer {
    */
   def startServer(): (Future[Http.ServerBinding], Option[Future[Http.ServerBinding]]) =
     startServer(s"${Constants.BASE_CONF}.job.")
-
 }

@@ -1,7 +1,6 @@
 package sample.cluster.transformation
 
 object TransformationApp {
-
   def main(args: Array[String]): Unit = {
     // starting 2 frontend nodes and 3 backend nodes
     TransformationFrontend.main(Seq("2551").toArray)
@@ -10,5 +9,4 @@ object TransformationApp {
     TransformationBackend.main(Array.empty)
     TransformationFrontend.main(Array.empty)
   }
-
 }

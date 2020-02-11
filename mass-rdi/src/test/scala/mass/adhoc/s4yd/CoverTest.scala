@@ -5,12 +5,11 @@ import java.nio.file.attribute.PosixFilePermission
 import java.time.OffsetDateTime
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import akka.stream.alpakka.ftp.FtpCredentials.NonAnonFtpCredentials
-import akka.stream.alpakka.ftp.SftpSettings
+import akka.stream.alpakka.ftp.{ FtpCredentials, SftpSettings }
 import akka.stream.alpakka.ftp.scaladsl.Sftp
+import fusion.jdbc.JdbcTemplate
+import fusion.jdbc.util.JdbcUtils
 import helloscala.common.test.HelloscalaSpec
-import mass.core.jdbc.{JdbcTemplate, JdbcUtils}
 import org.scalatest.BeforeAndAfterAll
 
 import scala.concurrent.Await
@@ -27,18 +26,14 @@ class BaseFile {
 }
 
 class CoverTest extends HelloscalaSpec with BeforeAndAfterAll {
-
   implicit val system = ActorSystem()
-  implicit val mat = ActorMaterializer()
 
   val s4yd = JdbcTemplate(
-    JdbcUtils.createHikariDataSource(
-      Map(
-        "poolName" -> "s4yd",
-        "jdbcUrl" -> "jdbc:mysql://cqph96:3306/s4yd?useSSL=false",
-        "username" -> sys.props("mysql.username"),
-        "password" -> sys.props("mysql.password")
-      )))
+    JdbcUtils.createHikariDataSource(Map(
+      "poolName" -> "s4yd",
+      "jdbcUrl" -> "jdbc:mysql://cqph96:3306/s4yd?useSSL=false",
+      "username" -> sys.props("mysql.username"),
+      "password" -> sys.props("mysql.password"))))
 
   val reading = JdbcTemplate(
     JdbcUtils.createHikariDataSource(Map(
@@ -51,22 +46,23 @@ class CoverTest extends HelloscalaSpec with BeforeAndAfterAll {
       "dataSource.password" -> sys.props("pg.password"),
       "maximumPoolSize" -> "2",
       "allowPrintLog" -> "true",
-      "numThreads" -> "2",
-    )))
+      "numThreads" -> "2")))
 
   "ArticleCategory" should {
     "Book's Cover from s4yd to reading" in {
       val updateBookSql = "update td_art_book set cover_id = ? where id = ? and cover_id is null;"
       val updateConfigRecommend = "update td_config_recommend set cover_id = ? where book_id = ? and cover_id is null;"
 
-      val books = s4yd.listForObject("select id, cover from rv_article where cover is not null and cover != '';",
-                                     Nil,
-                                     JdbcUtils.resultSetToBean[Cover])
+      val books = s4yd.listForObject(
+        "select id, cover from rv_article where cover is not null and cover != '';",
+        Nil,
+        JdbcUtils.resultSetToBean[Cover])
 
       def selectCoverIdPath(path: String) =
-        reading.findForObject("select id, path from td_base_file where path = ?;",
-                              List(path),
-                              JdbcUtils.resultSetToBean[BaseFile])
+        reading.findForObject(
+          "select id, path from td_base_file where path = ?;",
+          List(path),
+          JdbcUtils.resultSetToBean[BaseFile])
 
       books.foreach { book =>
         val mayBeBaseFile = selectCoverIdPath("/opt/haishu/app/reading/upload-file" + book.cover)
@@ -89,12 +85,11 @@ class CoverTest extends HelloscalaSpec with BeforeAndAfterAll {
           |     suffixes = EXCLUDED.suffixes,
           |     status = EXCLUDED.status;
           |""".stripMargin
-      val ftpSettings = SftpSettings(
-        InetAddress.getByName("cqph96"),
-        22,
-        NonAnonFtpCredentials("haishu", "Hlw..2018"),
-        strictHostKeyChecking = false
-      )
+      val ftpSettings =
+        SftpSettings(InetAddress.getByName("cqph96"))
+          .withPort(22)
+          .withCredentials(FtpCredentials.create("haishu", "Hlw..2018"))
+          .withStrictHostKeyChecking(false)
 
       val source = Sftp.ls("/opt/haishu/app/reading/upload-file/covers", ftpSettings)
       val now = OffsetDateTime.now()

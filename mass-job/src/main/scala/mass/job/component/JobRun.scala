@@ -1,17 +1,17 @@
 package mass.job.component
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path}
+import java.nio.file.{ Files, Path }
 import java.util.stream.Collectors
 
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.exception.HSBadRequestException
 import helloscala.common.util.FileUtils
 import mass.core.Constants
-import mass.job.{JobConstants, JobSettings}
-import mass.job.util.{JobUtils, ProgramVersion}
+import mass.job.{ JobConstants, JobSettings }
+import mass.job.util.{ JobUtils, ProgramVersion }
 import mass.message.job.SchedulerJobResult
-import mass.model.job.{JobItem, Program}
+import mass.data.job.{ JobItem, Program }
 
 /**
  * 阻塞API
@@ -53,8 +53,7 @@ object JobRun extends StrictLogging {
           dist,
           envs,
           Some(logDist.resolve(Constants.OUT_LOG_SUFFIX)),
-          Some(logDist.resolve(Constants.ERR_LOG_SUFFIX))
-        )
+          Some(logDist.resolve(Constants.ERR_LOG_SUFFIX)))
     }
   }
 
@@ -63,8 +62,7 @@ object JobRun extends StrictLogging {
       dist: Path,
       extraEnvs: Seq[(String, String)] = Nil,
       outPath: Option[Path] = None,
-      errPath: Option[Path] = None
-  ): SchedulerJobResult = {
+      errPath: Option[Path] = None): SchedulerJobResult = {
     val p = FileUtils.processBuilder(commands, dist, extraEnvs, outPath, errPath)
     try {
       val exitValue = p.exitValue()
@@ -78,8 +76,7 @@ object JobRun extends StrictLogging {
   private def parseCommands(
       detail: JobItem,
       schedulerConfig: JobSettings,
-      dist: Path
-  ): (Seq[String], Seq[(String, String)]) =
+      dist: Path): (Seq[String], Seq[(String, String)]) =
     detail.program match {
       case Program.SCALA =>
         val options =
@@ -126,5 +123,4 @@ object JobRun extends StrictLogging {
       case _ =>
         (Nil, Nil)
     }
-
 }

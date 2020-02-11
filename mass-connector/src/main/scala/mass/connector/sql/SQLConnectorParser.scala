@@ -3,13 +3,12 @@ package mass.connector.sql
 import java.util.Properties
 
 import helloscala.common.Configuration
-import mass.connector.{ConnectorParser, ConnectorSetting}
+import mass.connector.{ ConnectorParser, ConnectorSetting }
 import mass.core.XmlUtils
 
 import scala.xml.Node
 
 class SQLConnectorParser extends ConnectorParser {
-
   import mass.core.XmlUtils.XmlRich
 
   override val `type` = "jdbc"
@@ -24,7 +23,7 @@ class SQLConnectorParser extends ConnectorParser {
       val value = getText(prop)
       props.put(key, value)
     }
-    ConnectorSetting(Configuration(props))
+    ConnectorSetting(Configuration.load(props))
   }
 
   override def parseFromXML(node: Node): SQLConnector = {
@@ -34,5 +33,4 @@ class SQLConnectorParser extends ConnectorParser {
 
   @inline private def getText(prop: Node): String =
     prop.getAttr("value").getOrElse(XmlUtils.text(prop \ "value"))
-
 }

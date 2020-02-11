@@ -1,6 +1,6 @@
 package sample.cluster.stats
 
-import akka.actor.{Actor, ActorRef, Props, ReceiveTimeout}
+import akka.actor.{ Actor, ActorRef, Props, ReceiveTimeout }
 import akka.routing.ConsistentHashingRouter.ConsistentHashableEnvelope
 import akka.routing.FromConfig
 
@@ -8,7 +8,6 @@ import scala.concurrent.duration._
 
 //#service
 class StatsService extends Actor {
-
   // This router is used both with lookup and deploy of routees. If you
   // have a router with only lookup of routees you can use Props.empty
   // instead of Props[StatsWorker.class].

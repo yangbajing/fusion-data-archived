@@ -3,12 +3,12 @@ package mass.job.component
 import helloscala.common.Configuration
 import helloscala.common.jackson.Jackson
 import helloscala.common.test.HelloscalaSpec
+import mass.data.job.{ JobItem, Program }
 import mass.job.JobSettings
-import mass.model.job.{JobItem, Program}
 import mass.server.MassSettings
 
 class JobRunTest extends HelloscalaSpec {
-  val configuration = Configuration()
+  val configuration = Configuration.load()
   val schedulerConfig = JobSettings(MassSettings(configuration))
 
   "JobRunTest" should {
@@ -43,7 +43,5 @@ class JobRunTest extends HelloscalaSpec {
       result.exitValue mustBe 0
       result.start must be < result.end
     }
-
   }
-
 }

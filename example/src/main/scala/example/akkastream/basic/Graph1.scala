@@ -2,8 +2,8 @@ package example.akkastream.basic
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, ClosedShape}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge, RunnableGraph, Sink, Source}
+import akka.stream.{ ActorMaterializer, ClosedShape }
+import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, Merge, RunnableGraph, Sink, Source }
 
 import scala.collection.immutable
 import scala.io.StdIn
@@ -35,5 +35,4 @@ object Graph1 extends App {
 
       ClosedShape
     })
-
 }

@@ -1,4 +1,4 @@
-# MassData（反映式数据治理）
+# MassData（反应式数据治理）
 
 *数据治理*
 
@@ -22,9 +22,9 @@
 * [rdi/index](rdi/index.md)
 * [console/index](console/index.md)
 * [broker/index](broker/index.md)
-<!--* [spec/index](spec/index.md)-->
+* [spec/index](spec/index.md)
 
 @@@
 
-<!-- - 作者：杨景（羊八井，yangbajing at gmail com） -->
-<!-- - 官网：[http://mass-data.yangbajing.me](http://mass-data.yangbajing.me) -->
+- 官网：[http://mass-data.yangbajing.me](http://mass-data.yangbajing.me) 
+- 作者：杨景（羊八井，yangbajing at gmail com） 

@@ -1,11 +1,10 @@
 package mass.core.broker
 
 import akka.actor.Actor
-import akka.cluster.{Cluster, Member, MemberStatus}
+import akka.cluster.{ Cluster, Member, MemberStatus }
 import akka.cluster.ClusterEvent._
 
 trait ClusterActor extends Actor {
-
   var members: Set[Member] = Set()
 
   val cluster: Cluster = Cluster(context.system)

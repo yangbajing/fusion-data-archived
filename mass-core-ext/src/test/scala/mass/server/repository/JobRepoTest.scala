@@ -1,6 +1,6 @@
 package mass.server.repository
 
-import java.time.{LocalDateTime, OffsetDateTime}
+import java.time.{ LocalDateTime, OffsetDateTime }
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
@@ -14,7 +14,6 @@ import mass.slick.SlickProfile.api._
 import org.scalatest.BeforeAndAfterAll
 
 class JobRepoTest extends TestKit(ActorSystem("test")) with HelloscalaSpec with BeforeAndAfterAll {
-
   private val massSystem: MassSystem = MassSystem(system)
 
   "JobRepositoryTest" should {
@@ -54,5 +53,4 @@ class JobRepoTest extends TestKit(ActorSystem("test")) with HelloscalaSpec with 
       println(OffsetDateTime.of(2018, 9, 12, 13, 0, 11, 0, TimeUtils.ZONE_CHINA_OFFSET))
     }
   }
-
 }

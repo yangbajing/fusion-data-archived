@@ -31,5 +31,4 @@ object Constants {
 
     val CONSOLE = "mass-console"
   }
-
 }

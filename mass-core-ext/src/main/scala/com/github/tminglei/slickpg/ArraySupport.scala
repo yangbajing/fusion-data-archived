@@ -1,16 +1,16 @@
 package com.github.tminglei.slickpg
 
-import java.sql.{Date, Time, Timestamp}
+import java.sql.{ Date, Time, Timestamp }
 import java.util.UUID
 
-import com.github.tminglei.slickpg.array.{PgArrayExtensions, PgArrayJdbcTypes}
+import com.github.tminglei.slickpg.array.{ PgArrayExtensions, PgArrayJdbcTypes }
 import com.github.tminglei.slickpg.utils.SimpleArrayUtils
 import helloscala.common.types.ObjectId
 import slick.jdbc._
 
-import scala.language.{higherKinds, implicitConversions}
+import scala.language.{ higherKinds, implicitConversions }
 import scala.reflect.classTag
-import scala.reflect.runtime.{universe => u}
+import scala.reflect.runtime.{ universe => u }
 
 trait ArraySupport extends PgArrayExtensions with PgArrayJdbcTypes { driver: PostgresProfile =>
 
@@ -54,7 +54,7 @@ trait ArraySupport extends PgArrayExtensions with PgArrayJdbcTypes { driver: Pos
 
     private def simpleNextArray[T](r: PositionedResult): Option[Seq[T]] = {
       val value = r.rs.getArray(r.skip.currentPos)
-      if (r.rs.wasNull) None else Some(value.getArray.asInstanceOf[Array[Any]].map(_.asInstanceOf[T]))
+      if (r.rs.wasNull) None else Some(value.getArray.asInstanceOf[Array[Any]].toSeq.map(_.asInstanceOf[T]))
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -124,7 +124,6 @@ trait ArraySupport extends PgArrayExtensions with PgArrayJdbcTypes { driver: Pos
   }
 
   trait ArrayImplicits extends SimpleArrayCodeGenSupport {
-
     /** for type/name, @see [[org.postgresql.core.Oid]] and [[org.postgresql.jdbc.TypeInfoCache]]*/
     implicit val simpleUUIDListTypeMapper: JdbcType[Seq[UUID]] = new SimpleArrayJdbcType[UUID]("uuid")
     implicit val simpleStrSeqTypeMapper: JdbcType[Seq[String]] = new SimpleArrayJdbcType[String]("text")
@@ -139,14 +138,14 @@ trait ArraySupport extends PgArrayExtensions with PgArrayJdbcTypes { driver: Pos
     implicit val simpleTsListTypeMapper: JdbcType[Seq[Timestamp]] = new SimpleArrayJdbcType[Timestamp]("timestamp")
 
     ///
-    implicit def simpleArrayColumnExtensionMethods[B1, SEQ[B1] <: Seq[B1]](
-        c: Rep[SEQ[B1]]
-    )(implicit tm: JdbcType[B1], tm1: JdbcType[SEQ[B1]]): ArrayColumnExtensionMethods[B1, SEQ, SEQ[B1]] =
+    implicit def simpleArrayColumnExtensionMethods[B1, SEQ[B1] <: Seq[B1]](c: Rep[SEQ[B1]])(
+        implicit tm: JdbcType[B1],
+        tm1: JdbcType[SEQ[B1]]): ArrayColumnExtensionMethods[B1, SEQ, SEQ[B1]] =
       new ArrayColumnExtensionMethods[B1, SEQ, SEQ[B1]](c)
 
-    implicit def simpleArrayOptionColumnExtensionMethods[B1, SEQ[B1] <: Seq[B1]](
-        c: Rep[Option[SEQ[B1]]]
-    )(implicit tm: JdbcType[B1], tm1: JdbcType[SEQ[B1]]): ArrayColumnExtensionMethods[B1, SEQ, Option[SEQ[B1]]] =
+    implicit def simpleArrayOptionColumnExtensionMethods[B1, SEQ[B1] <: Seq[B1]](c: Rep[Option[SEQ[B1]]])(
+        implicit tm: JdbcType[B1],
+        tm1: JdbcType[SEQ[B1]]): ArrayColumnExtensionMethods[B1, SEQ, Option[SEQ[B1]]] =
       new ArrayColumnExtensionMethods[B1, SEQ, Option[SEQ[B1]]](c)
 
     /// custom array mapper
@@ -154,9 +153,6 @@ trait ArraySupport extends PgArrayExtensions with PgArrayJdbcTypes { driver: Pos
       new AdvancedArrayJdbcType[ObjectId](
         "text",
         s => SimpleArrayUtils.fromString[ObjectId](ObjectId.apply)(s).orNull,
-        v => SimpleArrayUtils.mkString[ObjectId](_.toString())(v)
-      )
-
+        v => SimpleArrayUtils.mkString[ObjectId](_.toString())(v))
   }
-
 }

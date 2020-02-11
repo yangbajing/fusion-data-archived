@@ -1,7 +1,7 @@
 package sample.multinode
 
-import akka.remote.testkit.{MultiNodeSpec, MultiNodeSpecCallbacks}
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import akka.remote.testkit.{ MultiNodeSpec, MultiNodeSpecCallbacks }
+import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpecLike }
 
 import scala.language.implicitConversions
 

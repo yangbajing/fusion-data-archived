@@ -1,13 +1,14 @@
 package mass.slick
 
 import com.typesafe.scalalogging.StrictLogging
+import com.zaxxer.hikari.HikariDataSource
+import fusion.jdbc.JdbcTemplate
+import fusion.jdbc.util.JdbcUtils
 import helloscala.common.Configuration
-import javax.sql.DataSource
 import mass.core.Constants
-import mass.core.jdbc.{JdbcTemplate, JdbcUtils}
 import slick.basic.DatabasePublisher
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Failure
 
 /**
@@ -18,7 +19,7 @@ class SqlManager private (config: Configuration) extends StrictLogging {
   import SlickProfile.api._
 
   val profile: SlickProfile.type = SlickProfile
-  val dataSource: DataSource = JdbcUtils.createHikariDataSource(config)
+  val dataSource: HikariDataSource = JdbcUtils.createHikariDataSource(config)
   val slickDatabase: SlickProfile.backend.DatabaseDef = createDatabase(dataSource, config)
   val jdbcTemplate: JdbcTemplate = JdbcTemplate(dataSource, config)
 
@@ -50,5 +51,4 @@ object SqlManager {
 
   def apply(configuration: Configuration, path: String = DEFAULT_PATH): SqlManager =
     new SqlManager(configuration.getConfiguration(path))
-
 }

@@ -2,7 +2,7 @@ package mass.connector
 
 import java.nio.file.Path
 
-import akka.actor.{ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
+import akka.actor.{ ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.Configuration
 import mass.core.Constants
@@ -20,14 +20,12 @@ final class ConnectorSystem private (val system: ActorSystem) extends Extension 
   init()
 
   private def init(): Unit = {
-    settings.configuration
-      .get[Seq[String]](s"${Constants.BASE_CONF}.connector.parsers")
-      .foreach { className =>
-        Class.forName(className).newInstance() match {
-          case parse: ConnectorParser => registerConnectorParser(parse)
-          case unknown                => logger.error(s"未知的ConnectorParse: $unknown")
-        }
+    settings.configuration.get[Seq[String]](s"${Constants.BASE_CONF}.connector.parsers").foreach { className =>
+      Class.forName(className).newInstance() match {
+        case parse: ConnectorParser => registerConnectorParser(parse)
+        case unknown                => logger.error(s"未知的ConnectorParse: $unknown")
       }
+    }
     system.registerOnTermination {
       connectors.foreach { case (_, c) => c.close() }
     }

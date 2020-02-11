@@ -29,13 +29,9 @@ class AkkaHttpTest {
       HttpMethods.POST,
       "/api/signin",
       headers = List(headers.`Content-Type`(ContentTypes.`application/json`)),
-      entity = """{"account":"yangbajing@gmail.com", "password": "yangbajing"}"""
-    ))
+      entity = """{"account":"yangbajing@gmail.com", "password": "yangbajing"}"""))
 
-  resultFuture
-    .flatMap(httpResponse => Unmarshal(httpResponse.entity).to[String])
-    .foreach { str =>
-      println(str)
-    }
-
+  resultFuture.flatMap(httpResponse => Unmarshal(httpResponse.entity).to[String]).foreach { str =>
+    println(str)
+  }
 }

@@ -11,10 +11,9 @@ import mass.job.model.JobUploadJobReq
 import mass.server.MassSettings
 
 class JobUtilsTest extends HelloscalaSpec {
-
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  val configuration = Configuration()
+  val configuration = Configuration.load()
   val schedulerConf = JobSettings(MassSettings(configuration))
 
   "JobService" should {
@@ -23,9 +22,7 @@ class JobUtilsTest extends HelloscalaSpec {
       val file =
         new File(sys.props.get("user.dir").get + "/mass-scheduler/src/universal/examples/sample-job/" + fileName)
       val result =
-        JobUtils
-          .uploadJob(schedulerConf, JobUploadJobReq(file, fileName, StandardCharsets.UTF_8))
-          .futureValue
+        JobUtils.uploadJob(schedulerConf, JobUploadJobReq(file, fileName, StandardCharsets.UTF_8)).futureValue
       println(result)
     }
   }

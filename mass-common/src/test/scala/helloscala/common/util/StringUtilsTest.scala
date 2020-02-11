@@ -3,7 +3,6 @@ package helloscala.common.util
 import helloscala.common.test.HelloscalaSpec
 
 class StringUtilsTest extends HelloscalaSpec {
-
   import StringUtils._
 
   "StringUtils" should {
@@ -44,5 +43,4 @@ class StringUtilsTest extends HelloscalaSpec {
       convertPropertyToUnderscore("aBCdeFg") mustBe "a_b_cde_fg"
     }
   }
-
 }

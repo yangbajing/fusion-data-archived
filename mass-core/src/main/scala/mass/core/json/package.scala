@@ -1,6 +1,6 @@
 package mass.core
-import mass.model.CommonStatus
-import mass.model.job.{Program, TriggerType}
+import mass.data.CommonStatus
+import mass.data.job.{ Program, TriggerType }
 import scalapb.GeneratedEnum
 
 package object json {

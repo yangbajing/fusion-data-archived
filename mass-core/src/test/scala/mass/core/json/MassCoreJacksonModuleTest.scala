@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.node.IntNode
 import helloscala.common.jackson.Jackson
 import helloscala.common.test.HelloscalaSpec
 import mass.core.ScalaPBProtos
-import mass.model.job.TriggerType
-import scalapb.{GeneratedEnum, GeneratedEnumCompanion}
+import mass.data.job.TriggerType
+import scalapb.{ GeneratedEnum, GeneratedEnumCompanion }
 
 class MassCoreJacksonModuleTest extends HelloscalaSpec {
-
   "ScalaPBJacksonModule" should {
     "test" in {
       val clz1 = TriggerType.CRON.getClass
@@ -39,5 +38,4 @@ class MassCoreJacksonModuleTest extends HelloscalaSpec {
       println(Jackson.treeToValue[TriggerType](node))
     }
   }
-
 }

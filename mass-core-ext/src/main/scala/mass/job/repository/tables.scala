@@ -2,8 +2,8 @@ package mass.job.repository
 
 import java.time.OffsetDateTime
 
-import mass.model.CommonStatus
-import mass.model.job._
+import mass.data.CommonStatus
+import mass.data.job._
 import mass.slick.SlickProfile.api._
 
 class JobScheduleTable(tag: Tag) extends Table[JobSchedule](tag, "job_schedule") {
@@ -20,17 +20,18 @@ class JobScheduleTable(tag: Tag) extends Table[JobSchedule](tag, "job_schedule")
   def lastScheduledAt = column[Option[OffsetDateTime]]("last_scheduled_at")
 
   def * =
-    (key,
-     job.?,
-     trigger.?,
-     description,
-     runStatus,
-     status,
-     creator,
-     createdAt,
-     scheduleCount,
-     lastScheduleStart,
-     lastScheduledAt) <> ((JobSchedule.apply _).tupled, JobSchedule.unapply)
+    (
+      key,
+      job.?,
+      trigger.?,
+      description,
+      runStatus,
+      status,
+      creator,
+      createdAt,
+      scheduleCount,
+      lastScheduleStart,
+      lastScheduledAt) <> ((JobSchedule.apply _).tupled, JobSchedule.unapply)
 }
 
 class JobLogTable(tag: Tag) extends Table[JobLog](tag, "job_log") {

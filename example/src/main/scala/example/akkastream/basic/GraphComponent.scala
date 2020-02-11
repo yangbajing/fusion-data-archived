@@ -1,9 +1,9 @@
 package example.akkastream.basic
 
 import akka.actor.ActorSystem
-import akka.stream.FanInShape.{Init, Name}
+import akka.stream.FanInShape.{ Init, Name }
 import akka.stream._
-import akka.stream.scaladsl.{Balance, Flow, GraphDSL, Merge, MergePreferred, RunnableGraph, Sink, Source}
+import akka.stream.scaladsl.{ Balance, Flow, GraphDSL, Merge, MergePreferred, RunnableGraph, Sink, Source }
 
 import scala.collection.immutable
 import scala.io.StdIn
@@ -29,7 +29,6 @@ case class PriorityWorkerPoolShape2[In, Out](_init: Init[Out] = Name("PriorityWo
 }
 
 object PriorityWorkerPool {
-
   def apply[In, Out](worker: Flow[In, Out, Any], workerCount: Int) =
     GraphDSL.create() { implicit b =>
       import GraphDSL.Implicits._
@@ -56,7 +55,7 @@ object GraphComponent extends App {
   val worker1 = Flow[String].map("step 1 " + _)
   val worker2 = Flow[String].map("step 2 " + _)
 
-  val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit b ⇒
+  val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit b =>
     import GraphDSL.Implicits._
 
     val priorityPool1 = b.add(PriorityWorkerPool(worker1, 4))
@@ -66,8 +65,7 @@ object GraphComponent extends App {
     Source(1 to 10).map("priority job: " + _) ~> priorityPool1.priorityJobsIn
 
     priorityPool1.resultsOut ~> priorityPool2.jobsIn
-    Source(1 to 10)
-      .map("one-step, priority " + _) ~> priorityPool2.priorityJobsIn
+    Source(1 to 10).map("one-step, priority " + _) ~> priorityPool2.priorityJobsIn
 
     priorityPool2.resultsOut ~> Sink.foreach(println)
     ClosedShape

@@ -2,15 +2,14 @@ package sample.cluster.stats
 
 import java.util.concurrent.ThreadLocalRandom
 
-import akka.actor.{Actor, ActorSystem, Address, Props, RelativeActorPath, RootActorPath}
+import akka.actor.{ Actor, ActorSystem, Address, Props, RelativeActorPath, RootActorPath }
 import akka.cluster.ClusterEvent._
-import akka.cluster.{Cluster, MemberStatus}
+import akka.cluster.{ Cluster, MemberStatus }
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.duration._
 
 object StatsSample {
-
   def main(args: Array[String]): Unit =
     if (args.isEmpty) {
       startup(Seq("2551", "2552", "0"))
@@ -38,7 +37,6 @@ object StatsSample {
 }
 
 object StatsSampleClient {
-
   def main(args: Array[String]): Unit = {
     // note that client is not a compute node, role not defined
     val system = ActorSystem("ClusterSystem")
@@ -90,5 +88,4 @@ class StatsSampleClient(servicePath: String) extends Actor {
     case UnreachableMember(m)                       => nodes -= m.address
     case ReachableMember(m) if m.hasRole("compute") => nodes += m.address
   }
-
 }

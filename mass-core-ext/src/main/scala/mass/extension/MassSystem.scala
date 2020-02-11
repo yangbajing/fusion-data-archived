@@ -2,7 +2,7 @@ package mass.extension
 
 import java.nio.file.Path
 
-import akka.actor.{ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
+import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 import helloscala.common.Configuration
 import mass.server.MassSettings
 import mass.slick.SqlManager

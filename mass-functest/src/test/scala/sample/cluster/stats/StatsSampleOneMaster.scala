@@ -1,6 +1,6 @@
 package sample.cluster.stats
 
-import akka.actor.{ActorSystem, PoisonPill, Props}
+import akka.actor.{ ActorSystem, PoisonPill, Props }
 import akka.cluster.singleton.{
   ClusterSingletonManager,
   ClusterSingletonManagerSettings,
@@ -10,7 +10,6 @@ import akka.cluster.singleton.{
 import com.typesafe.config.ConfigFactory
 
 object StatsSampleOneMaster {
-
   def main(args: Array[String]): Unit =
     if (args.isEmpty) {
       startup(Seq("2551", "2552", "0"))
@@ -34,23 +33,21 @@ object StatsSampleOneMaster {
       val system = ActorSystem("ClusterSystem", config)
 
       system.actorOf(
-        ClusterSingletonManager.props(singletonProps = Props[StatsService],
-                                      terminationMessage = PoisonPill,
-                                      settings = ClusterSingletonManagerSettings(system)
-                                        .withRole("compute")),
-        name = "statsService"
-      )
+        ClusterSingletonManager.props(
+          singletonProps = Props[StatsService],
+          terminationMessage = PoisonPill,
+          settings = ClusterSingletonManagerSettings(system).withRole("compute")),
+        name = "statsService")
 
       system.actorOf(
-        ClusterSingletonProxy.props(singletonManagerPath = "/user/statsService",
-                                    settings = ClusterSingletonProxySettings(system).withRole("compute")),
-        name = "statsServiceProxy"
-      )
+        ClusterSingletonProxy.props(
+          singletonManagerPath = "/user/statsService",
+          settings = ClusterSingletonProxySettings(system).withRole("compute")),
+        name = "statsServiceProxy")
     }
 }
 
 object StatsSampleOneMasterClient {
-
   def main(args: Array[String]): Unit = {
     // note that client is not a compute node, role not defined
     val system = ActorSystem("ClusterSystem")

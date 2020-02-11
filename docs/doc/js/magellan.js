@@ -1,25 +1,24 @@
 $(function() {
 
-  // add magellan targets to anchor headers, up to depth 3
+  // add magellan targets to anchor headers, for h1 and h2
   $("a.anchor").each(function() {
     var anchor = $(this);
     var name = anchor.attr("name");
     var header = anchor.parent();
-    if (header.is("h1") || header.is("h2") || header.is("h3")) {
-      header.attr("id", name).attr("data-magellan-target", name);
+    header.attr("id", name);
+    if (header.is("h1") || header.is("h2")) {
+      header.attr("data-magellan-target", name);
     }
   });
 
-  // enable magellan plugin on the page navigation
-  $(".page-nav").each(function() {
-    var nav = $(this);
-
-    // strip page navigation links down to just the hash fragment
-    nav.find("a").attr('href', function(_, current){
+  // enable magellan plugin on the active page header links in the navigation
+  var nav = $(".site-nav a.active.page").parent("li");
+  if (nav.length > 0) {
+    // strip navigation links down to just the hash fragment
+    nav.find("a.active.page, a.header").attr('href', function(_, current){
         return this.hash ? this.hash : current;
     });
-
     new Foundation.Magellan(nav);
-  });
+  }
 
 });

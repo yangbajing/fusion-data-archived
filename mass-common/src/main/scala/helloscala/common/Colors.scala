@@ -20,7 +20,6 @@ package helloscala.common
  * Created by yangbajing(yangbajing@gmail.com) on 2017-02-21.
  */
 object Colors {
-
   import scala.Console._
 
   lazy val isANSISupported: Boolean = {
@@ -57,5 +56,4 @@ object Colors {
 
   def yellow(str: String): String =
     if (isANSISupported) YELLOW + str + RESET else str
-
 }

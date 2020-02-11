@@ -1,18 +1,18 @@
 package mass.connector.sql
 
 import java.nio.file.Paths
-import java.sql.{ResultSet, Timestamp}
+import java.sql.{ ResultSet, Timestamp }
 
 import akka.stream.IOResult
-import akka.stream.alpakka.csv.scaladsl.{CsvFormatting, CsvParsing}
-import akka.stream.scaladsl.{FileIO, Sink}
+import akka.stream.alpakka.csv.scaladsl.{ CsvFormatting, CsvParsing }
+import akka.stream.scaladsl.{ FileIO, Sink }
 import akka.util.ByteString
+import fusion.jdbc.util.JdbcUtils
 import helloscala.common.test.HelloscalaSpec
-import mass.core.jdbc.JdbcUtils
 import mass.core.test.AkkaSpec
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 
 /**
  * Postgres:
@@ -42,7 +42,6 @@ import scala.concurrent.{Await, Future}
  * );
  */
 class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
-
   "Database" should {
     "Postgres foreach" in {
       val sql =
@@ -65,8 +64,7 @@ class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
           val meta = rs.getMetaData
           (1 to meta.getColumnCount).foreach(i => JdbcUtils.setParameter(pstmt, i, rs.getObject(i)))
         },
-        1000
-      )(TestSchema.mysql)
+        1000)(TestSchema.mysql)
 
       val f = source.runWith(sink)
       val ret = Await.result(f, 5.minutes)
@@ -82,8 +80,7 @@ class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
           conn.prepareStatement(
             "insert into t_book(id, isbn, title, description, publish_at, created_at) values (?, ?, ?, ?, ?, ?);"),
         (jrs, pstmt) => JdbcUtils.setStatementParameters(pstmt, jrs.values.updated(0, 100L)),
-        1000
-      )(TestSchema.postgres)
+        1000)(TestSchema.postgres)
       val f = source.via(JdbcFlow.flowJdbcResultSet).runWith(sink)
       val ret = Await.result(f, 1.minutes)
       println(s"MySQL -> Postgres result: $ret")
@@ -121,8 +118,7 @@ class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
             pstmt,
             List(id.toLong, isbn, title, description, java.sql.Date.valueOf(publishAt), Timestamp.valueOf(createdAt)))
         },
-        1000
-      )(TestSchema.mysql)
+        1000)(TestSchema.mysql)
 
       val f = FileIO
         .fromPath(Paths.get("/tmp/t_book.txt"))
@@ -140,5 +136,4 @@ class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
     TestSchema.postgres.close()
     super.afterAll()
   }
-
 }

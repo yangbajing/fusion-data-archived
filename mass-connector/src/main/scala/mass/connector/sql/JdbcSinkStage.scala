@@ -6,22 +6,23 @@
 
 package mass.connector.sql
 
-import java.sql.{Connection, PreparedStatement}
+import java.sql.{ Connection, PreparedStatement }
 
-import akka.stream.stage.{GraphStageLogic, GraphStageWithMaterializedValue, InHandler}
-import akka.stream.{Attributes, Inlet, SinkShape}
+import akka.stream.stage.{ GraphStageLogic, GraphStageWithMaterializedValue, InHandler }
+import akka.stream.{ Attributes, Inlet, SinkShape }
+import fusion.jdbc.ConnectionPreparedStatementCreator
+import fusion.jdbc.util.JdbcUtils
 import javax.sql.DataSource
-import mass.core.jdbc.{ConnectionPreparedStatementCreator, JdbcUtils}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ Future, Promise }
 import scala.util.control.NonFatal
 
 class JdbcSinkStage[T](
     dataSource: DataSource,
     creator: ConnectionPreparedStatementCreator,
     actionBinder: (T, PreparedStatement) => Unit,
-    batchSize: Int = 100
-) extends GraphStageWithMaterializedValue[SinkShape[T], Future[JdbcSinkResult]] {
+    batchSize: Int = 100)
+    extends GraphStageWithMaterializedValue[SinkShape[T], Future[JdbcSinkResult]] {
   val in: Inlet[T] = Inlet("JdbcSink.in")
 
   override def shape: SinkShape[T] = SinkShape(in)
@@ -108,5 +109,4 @@ class JdbcSinkStage[T](
 
     (logic, promise.future)
   }
-
 }

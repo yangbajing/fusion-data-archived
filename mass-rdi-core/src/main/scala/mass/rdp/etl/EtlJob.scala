@@ -1,6 +1,6 @@
 package mass.rdp.etl
 
-import mass.core.job.{JobResult, SchedulerContext, SchedulerJob}
+import mass.core.job.{ JobResult, SchedulerContext, SchedulerJob }
 import mass.rdp.RdpSystem
 import mass.rdp.etl.graph.EtlGraphException
 
@@ -22,7 +22,6 @@ class EtlJob extends SchedulerJob {
         EtlJobResult(result)
       }(rdpSystem.system.dispatcher)
   }
-
 }
 
 object EtlJob {

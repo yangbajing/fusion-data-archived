@@ -8,22 +8,18 @@ import mass.job.service.Services
 import mass.message.job._
 
 class JobRoute(services: Services) extends AbstractRoute with StrictLogging {
-  private val pagePDM = (
-    'page.as[Int].?(Page.DEFAULT_PAGE),
-    'size.as[Int].?(Page.DEFAULT_SIZE),
-    'key.?("")
-  )
+  private val pagePDM = ('page.as[Int].?(Page.DEFAULT_PAGE), 'size.as[Int].?(Page.DEFAULT_SIZE), 'key.?(""))
 
   override def route: Route = pathPrefix("job") {
     pathEndOrSingleSlash {
       createJobRoute ~
-        updateJobRoute
+      updateJobRoute
     } ~
-      pageRoute ~
-      itemByKeyRoute ~
-      uploadJobZipRoute ~
-      optionRoute ~
-      uploadFileRoute
+    pageRoute ~
+    itemByKeyRoute ~
+    uploadJobZipRoute ~
+    optionRoute ~
+    uploadFileRoute
   }
 
   def createJobRoute: Route = post {
@@ -43,7 +39,7 @@ class JobRoute(services: Services) extends AbstractRoute with StrictLogging {
   }
 
   def pageRoute: Route = pathGet("page") {
-    parameters(pagePDM).as(JobPageReq.apply) { req =>
+    parameters(pagePDM).as(JobPageReq.apply _) { req =>
       futureComplete(services.page(req))
     }
   }
@@ -68,5 +64,4 @@ class JobRoute(services: Services) extends AbstractRoute with StrictLogging {
   def optionRoute: Route = pathPrefix("option" / "all") {
     futureComplete(services.listOption())
   }
-
 }

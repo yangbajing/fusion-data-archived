@@ -1,0 +1,103 @@
+syntax = "proto3";
+package mass.data;
+
+/// #CommonStatus
+enum CommonStatus {
+    DISABLE = 0;
+    ENABLE = 1;
+
+    Continue = 100;
+    SwitchingProtocols = 101;
+    Processing = 102;
+
+    OK = 200;
+    Created = 201;
+    Accepted = 202;
+    NonAuthoritativeInformation = 203;
+    NoContent = 204;
+    ResetContent = 205;
+    PartialContent = 206;
+    MultiStatus = 207;
+    AlreadyReported = 208;
+    IMUsed = 226;
+
+    MultipleChoices = 300;
+    MovedPermanently = 301;
+    Found = 302;
+    SeeOther = 303;
+    NotModified = 304;
+    UseProxy = 305;
+    TemporaryRedirect = 307;
+    PermanentRedirect = 308;
+
+    BadRequest = 400;
+    Unauthorized = 401;
+    PaymentRequired = 402;
+    Forbidden = 403;
+    NotFound = 404;
+    MethodNotAllowed = 405;
+    NotAcceptable = 406;
+    ProxyAuthenticationRequired = 407;
+    RequestTimeout = 408;
+    Conflict = 409;
+    Gone = 410;
+
+    InternalServerError = 500;
+    NotImplemented = 501;
+    BadGateway = 502;
+    ServiceUnavailable = 503;
+    GatewayTimeout = 504;
+    HTTPVersionNotSupported = 505;
+    VariantAlsoNegotiates = 506;
+}
+/// #CommonStatus
+
+/// #KeyValue
+message KeyValue {
+    string key = 1;
+    string value = 2;
+    string show = 3;
+}
+
+message KeyValues {
+    string key = 1;
+    repeated string values = 2;
+}
+/// #KeyValue
+
+message IdValue {
+    int32 id = 1;
+    string value = 2;
+    string show = 3;
+}
+
+message NameValue {
+    string name = 1;
+    string value = 2;
+}
+
+message TitleValue {
+    string title = 1;
+    string value = 2;
+    string show = 3;
+}
+
+message TitleIdValue {
+    string title = 1;
+    int32 value = 2;
+    string show = 3;
+}
+
+message County {
+    string county = 1;
+    string postCode = 2;
+}
+
+message Province {
+    string provice = 1;
+    repeated County counties = 2;
+}
+
+message ProvinceData {
+    repeated Province provinces = 1;
+}

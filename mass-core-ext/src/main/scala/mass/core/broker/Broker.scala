@@ -1,6 +1,6 @@
 package mass.core.broker
 
-import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
+import akka.actor.{ ActorRef, ActorSystem, PoisonPill, Props }
 import akka.cluster.singleton._
 
 trait Broker {
@@ -33,11 +33,8 @@ trait Broker {
     initLeader(leaderProps, ClusterSingletonManagerSettings(system).withRole(role), name)
 
   protected def initLeader(leaderProps: Props, settings: ClusterSingletonManagerSettings, name: String): Unit = {
-    val props = ClusterSingletonManager.props(
-      singletonProps = leaderProps,
-      terminationMessage = PoisonPill,
-      settings = settings
-    )
+    val props =
+      ClusterSingletonManager.props(singletonProps = leaderProps, terminationMessage = PoisonPill, settings = settings)
     _managerLeader = system.actorOf(props, name)
   }
 
@@ -51,5 +48,4 @@ trait Broker {
     val props = ClusterSingletonProxy.props(s"/user/$leaderName", proxySettings)
     _proxyLeader = system.actorOf(props, proxyName)
   }
-
 }

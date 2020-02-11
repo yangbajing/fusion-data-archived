@@ -3,7 +3,7 @@ package example.akkastream.dynamichub
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{MergeHub, RunnableGraph, Sink, Source}
+import akka.stream.scaladsl.{ MergeHub, RunnableGraph, Sink, Source }
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.io.StdIn

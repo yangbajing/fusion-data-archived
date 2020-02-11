@@ -1,6 +1,6 @@
 package mass.job.service.job
 
-import java.nio.file.{Files, Paths, StandardCopyOption}
+import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.time.OffsetDateTime
 
 import com.typesafe.scalalogging.StrictLogging
@@ -8,30 +8,28 @@ import helloscala.common.util.DigestUtils
 import mass.core.protobuf.ProtoUtils
 import mass.job.JobSystem
 import mass.job.component.DefaultSchedulerJob
-import mass.job.model.{JobUploadFilesReq, JobUploadJobReq}
+import mass.job.model.{ JobUploadFilesReq, JobUploadJobReq }
 import mass.job.repository.JobRepo
-import mass.job.util.{JobUtils, ProgramVersion}
+import mass.job.util.{ JobUtils, ProgramVersion }
 import mass.message.job.JobGetAllOptionResp.ProgramVersionItem
 import mass.message.job._
-import mass.model.job._
-import mass.model.{IdValue, TitleValue}
+import mass.data.job._
+import mass.data.{ IdValue, TitleValue }
 import mass.slick.SqlManager
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait JobService extends StrictLogging {
-
   val jobSystem: JobSystem
 
   protected val JOB_CLASS_NAME: String = classOf[DefaultSchedulerJob].getName
   protected lazy val db: SqlManager = jobSystem.massSystem.sqlManager
 
   def executionJob(event: JobExecuteEvent)(implicit ec: ExecutionContext): Unit = {
-    db.run(JobRepo.findJob(event.key))
-      .foreach {
-        case Some(schedule) => jobSystem.triggerJob(schedule.key)
-        case None           => logger.error(s"作业未找到，jobKey: ${event.key}")
-      }
+    db.run(JobRepo.findJob(event.key)).foreach {
+      case Some(schedule) => jobSystem.triggerJob(schedule.key)
+      case None           => logger.error(s"作业未找到，jobKey: ${event.key}")
+    }
   }
 
   def handleList(req: JobListReq)(implicit ec: ExecutionContext): Future[JobListResp] = {
@@ -84,7 +82,7 @@ trait JobService extends StrictLogging {
     val jobSettings = jobSystem.jobSettings
     val resources = req.items.zipWithIndex.map {
       case ((fileInfo, file), idx) =>
-        val sha256 = DigestUtils.sha256Hex(file.toPath)
+        val sha256 = DigestUtils.sha256HexFromPath(file.toPath)
         val relativePath = Paths.get(sha256.take(2), sha256, fileInfo.fileName)
         val dist = jobSettings.jobSavedDir.resolve(relativePath)
         Files.move(file.toPath, dist, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
@@ -96,5 +94,4 @@ trait JobService extends StrictLogging {
   private def schedulerJob(schedule: JobSchedule): OffsetDateTime = {
     jobSystem.scheduleJob(schedule.key, schedule.item.get, schedule.trigger.get, JOB_CLASS_NAME, None)
   }
-
 }

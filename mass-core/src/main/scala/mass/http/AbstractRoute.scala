@@ -1,25 +1,25 @@
 package mass.http
 
 import java.io.File
-import java.nio.charset.{Charset, StandardCharsets}
-import java.nio.file.{Files, Path, Paths}
-import java.time.{LocalDate, LocalDateTime, LocalTime}
+import java.nio.charset.{ Charset, StandardCharsets }
+import java.nio.file.{ Files, Path, Paths }
+import java.time.{ LocalDate, LocalDateTime, LocalTime }
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.CacheDirectives.{`no-cache`, `no-store`}
-import akka.http.scaladsl.server.PathMatcher.{Matched, Unmatched}
+import akka.http.scaladsl.model.headers.CacheDirectives.{ `no-cache`, `no-store` }
+import akka.http.scaladsl.server.PathMatcher.{ Matched, Unmatched }
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.directives.FileInfo
 import akka.http.scaladsl.server.util.Tuple
-import akka.http.scaladsl.unmarshalling.{FromRequestUnmarshaller, FromStringUnmarshaller, Unmarshaller}
-import akka.stream.scaladsl.{FileIO, Sink, Source}
+import akka.http.scaladsl.unmarshalling.{ FromRequestUnmarshaller, FromStringUnmarshaller, Unmarshaller }
+import akka.stream.scaladsl.{ FileIO, Sink, Source }
 import akka.util.ByteString
-import helloscala.common.exception.{HSBadRequestException, HSException, HSNotFoundException}
+import helloscala.common.exception.{ HSBadRequestException, HSException, HSNotFoundException }
 import helloscala.common.jackson.Jackson
-import helloscala.common.page.{Page, PageInput}
-import helloscala.common.types.{AsInt, ObjectId}
+import helloscala.common.page.{ Page, PageInput }
+import helloscala.common.types.{ AsInt, ObjectId }
 import helloscala.common.util.TimeUtils
-import helloscala.data.ApiResult
+import mass.data.ApiResult
 
 import scala.annotation.tailrec
 import scala.collection.immutable
@@ -38,16 +38,12 @@ trait AbstractRoute extends Directives {
   def createTempFileFunc(
       dir: Path = Paths.get("/tmp"),
       prefix: String = "mass-",
-      suffix: String = ".tmp"
-  ): FileInfo => File =
+      suffix: String = ".tmp"): FileInfo => File =
     fileInfo => Files.createTempFile(dir, prefix, suffix).toFile
 
   implicit class ContentTypeRich(contentType: ContentType) {
-
     def charset: Charset =
-      contentType.charsetOption
-        .map(_.nioCharset())
-        .getOrElse(StandardCharsets.UTF_8)
+      contentType.charsetOption.map(_.nioCharset()).getOrElse(StandardCharsets.UTF_8)
   }
 
   def jacksonAs[T: ClassTag]: FromRequestUnmarshaller[T] = {
@@ -80,7 +76,7 @@ trait AbstractRoute extends Directives {
     PathMatcher("""[\da-fA-F]{24}""".r) flatMap { string =>
       try ObjectId.parse(string).toOption
       catch {
-        case _: IllegalArgumentException ⇒ None
+        case _: IllegalArgumentException => None
       }
     }
 
@@ -106,10 +102,7 @@ trait AbstractRoute extends Directives {
 
   def extractPageInput: Directive1[PageInput] = extract { ctx =>
     val query = ctx.request.uri.query()
-    val page = query
-      .get("page")
-      .flatMap(AsInt.unapply)
-      .getOrElse(Page.DEFAULT_PAGE)
+    val page = query.get("page").flatMap(AsInt.unapply).getOrElse(Page.DEFAULT_PAGE)
     val size =
       query.get("size").flatMap(AsInt.unapply).getOrElse(Page.DEFAULT_SIZE)
     PageInput(page, size, query.filterNot {
@@ -123,10 +116,10 @@ trait AbstractRoute extends Directives {
   def rawNotPathPrefixTest[L](pm: PathMatcher[L]): Directive0 = {
     implicit val LIsTuple: Tuple[L] = pm.ev
     extract(ctx => pm(ctx.unmatchedPath)).flatMap {
-      case Matched(v, values) ⇒
+      case Matched(v, values) =>
         println(s"notPathPrefixTest v: $v, values: $values")
         reject
-      case Unmatched ⇒ pass
+      case Unmatched => pass
     }
   }
 
@@ -164,8 +157,7 @@ trait AbstractRoute extends Directives {
   def futureComplete(
       future: Future[Any],
       needContainer: Boolean = false,
-      successCode: StatusCode = StatusCodes.OK
-  ): Route = {
+      successCode: StatusCode = StatusCodes.OK): Route = {
     val f: Any => Route = objectComplete(_, needContainer, successCode)
     onSuccess(future).apply(f)
   }
@@ -174,8 +166,7 @@ trait AbstractRoute extends Directives {
   final def objectComplete(
       obj: Any,
       needContainer: Boolean = false,
-      successCode: StatusCode = StatusCodes.OK
-  ): Route = {
+      successCode: StatusCode = StatusCodes.OK): Route = {
     import JacksonSupport._
     obj match {
       case Right(result) =>
@@ -224,9 +215,9 @@ trait AbstractRoute extends Directives {
 
   def multiUploadedFile: Directive1[immutable.Seq[(FileInfo, Path)]] =
     entity(as[Multipart.FormData])
-      .flatMap { formData ⇒
-        extractRequestContext.flatMap { ctx ⇒
-          import ctx.{executionContext, materializer}
+      .flatMap { formData =>
+        extractRequestContext.flatMap { ctx =>
+          import ctx.{ executionContext, materializer }
 
           val multiPartF = formData.parts
             .map { part =>
@@ -250,12 +241,12 @@ trait AbstractRoute extends Directives {
 
   def multiFileUpload: Directive1[immutable.Seq[(FileInfo, Source[ByteString, Any])]] =
     entity(as[Multipart.FormData])
-      .flatMap { formData ⇒
-        extractRequestContext.flatMap { ctx ⇒
+      .flatMap { formData =>
+        extractRequestContext.flatMap { ctx =>
           import ctx.materializer
 
           val multiPartF = formData.parts
-            .map(part ⇒ (FileInfo(part.name, part.filename.get, part.entity.contentType), part.entity.dataBytes))
+            .map(part => (FileInfo(part.name, part.filename.get, part.entity.contentType), part.entity.dataBytes))
             .runWith(Sink.seq)
 
           onSuccess(multiPartF)
@@ -296,9 +287,10 @@ trait AbstractRoute extends Directives {
       appIdKeyTokenConfig: IAppIdKey,
       sourceQueue: AkkaHttpSourceQueue): Route =
     extractRequestContext { ctx =>
-      val request = HttpUtils.applyApiToken(ctx.request.copy(uri = uri.withQuery(ctx.request.uri.query())),
-                                            appIdKeyTokenConfig.appId,
-                                            appIdKeyTokenConfig.appKey)
+      val request = HttpUtils.applyApiToken(
+        ctx.request.copy(uri = uri.withQuery(ctx.request.uri.query())),
+        appIdKeyTokenConfig.appId,
+        appIdKeyTokenConfig.appKey)
       val future = HttpUtils.hostRequest(request)(sourceQueue.httpSourceQueue, ctx.executionContext)
       onSuccess(future) { response =>
         complete(response)
@@ -339,25 +331,25 @@ trait AbstractRoute extends Directives {
    *
    * @group fileupload
    */
-  def uploadedFiles(destFn: FileInfo ⇒ File): Directive1[immutable.Seq[(FileInfo, File)]] =
-    entity(as[Multipart.FormData]).flatMap { formData ⇒
-      extractRequestContext.flatMap { ctx ⇒
+  def uploadedFiles(destFn: FileInfo => File): Directive1[immutable.Seq[(FileInfo, File)]] =
+    entity(as[Multipart.FormData]).flatMap { formData =>
+      extractRequestContext.flatMap { ctx =>
         implicit val mat = ctx.materializer
         implicit val ec = ctx.executionContext
 
         val uploaded: Source[(FileInfo, File), Any] = formData.parts
-//          .mapConcat { part ⇒
-//            if (part.filename.isDefined && part.name == fieldName) part :: Nil
-//            else {
-//              part.entity.discardBytes()
-//              Nil
-//            }
-//          }
-          .mapAsync(1) { part ⇒
+        //          .mapConcat { part =>
+        //            if (part.filename.isDefined && part.name == fieldName) part :: Nil
+        //            else {
+        //              part.entity.discardBytes()
+        //              Nil
+        //            }
+        //          }
+          .mapAsync(1) { part =>
             val fileInfo = FileInfo(part.name, part.filename.get, part.entity.contentType)
             val dest = destFn(fileInfo)
 
-            part.entity.dataBytes.runWith(FileIO.toPath(dest.toPath)).map { _ ⇒
+            part.entity.dataBytes.runWith(FileIO.toPath(dest.toPath)).map { _ =>
               (fileInfo, dest)
             }
           }
@@ -367,5 +359,4 @@ trait AbstractRoute extends Directives {
         onSuccess(uploadedF)
       }
     }
-
 }

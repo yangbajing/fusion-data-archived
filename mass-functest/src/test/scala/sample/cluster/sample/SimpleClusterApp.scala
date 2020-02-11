@@ -2,11 +2,11 @@ package sample.cluster.sample
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ ActorSystem, Props }
 import akka.cluster.Cluster
 import com.typesafe.config.ConfigFactory
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 object SimpleClusterApp extends App {
   var tm = 0
@@ -30,5 +30,4 @@ object SimpleClusterApp extends App {
       simpleClusterListener ! "Leave"
     }(ExecutionContext.Implicits.global)
   }
-
 }

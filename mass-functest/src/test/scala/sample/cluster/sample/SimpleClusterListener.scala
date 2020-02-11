@@ -34,5 +34,4 @@ class SimpleClusterListener extends Actor with StrictLogging {
         TimeUnit.SECONDS.sleep(3)
       }(Implicits.global)
   }
-
 }

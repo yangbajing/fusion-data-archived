@@ -4,12 +4,12 @@ import java.nio.file.Path
 
 import mass.connector.Connector
 import mass.rdp.RdpSystem
-import mass.rdp.etl.graph.{EtlGraph, EtlGraphException, EtlGraphImpl, EtlGraphXmlParserFactory}
+import mass.rdp.etl.graph.{ EtlGraph, EtlGraphException, EtlGraphImpl, EtlGraphXmlParserFactory }
 import mass.core.workflow.Workflow
 
 import scala.collection.immutable
-import scala.util.{Failure, Try}
-import scala.xml.{Elem, XML}
+import scala.util.{ Failure, Try }
+import scala.xml.{ Elem, XML }
 
 /**
  * ETL工作流定义
@@ -18,17 +18,14 @@ import scala.xml.{Elem, XML}
 case class EtlWorkflow(connectors: immutable.Seq[Connector], graph: EtlGraph, rdpSystem: RdpSystem)
     extends Workflow[EtlResult]
     with AutoCloseable {
-
   override def close(): Unit =
     connectors.foreach(_.close())
 
   override def run(): EtlWorkflowExecution =
     graph.run(connectors, rdpSystem)
-
 }
 
 object EtlWorkflow {
-
   def fromFile(path: Path, rdpSystem: RdpSystem): Try[EtlWorkflow] =
     fromXML(XML.loadFile(path.toFile), rdpSystem)
 
@@ -50,5 +47,4 @@ object EtlWorkflow {
         Failure(new EtlGraphException("EtlGraphParserFactory type: xml 不存在"))
     }
   }
-
 }

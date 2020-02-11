@@ -5,10 +5,9 @@ import helloscala.common.jackson.Jackson
 import mass.job.SchedulerSpec
 import mass.job.service.Services
 import mass.job.service.job.JobActor
-import mass.message.job.{JobCreateReq, JobPageResp}
+import mass.message.job.{ JobCreateReq, JobPageResp }
 
 class JobRouteTest extends SchedulerSpec {
-
   private lazy val services = new Services(jobSystem, List(JobActor.props))
   private lazy val route = new JobRoute(services).route
 
@@ -22,7 +21,6 @@ class JobRouteTest extends SchedulerSpec {
         resp must not be null
       }
     }
-
   }
 
   val jsonCreateJob =
@@ -49,5 +47,4 @@ class JobRouteTest extends SchedulerSpec {
       println(jd.toScala)
     }
   }
-
 }

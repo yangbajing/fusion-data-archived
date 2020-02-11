@@ -1,30 +1,29 @@
 package mass.rdp.etl.graph
 
 import akka.NotUsed
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{ Sink, Source }
 import com.typesafe.scalalogging.StrictLogging
 import javax.script.SimpleBindings
 import mass.connector.Connector
 import mass.connector.sql._
-import mass.core.event.{EventData, EventDataSimple}
+import mass.core.event.{ EventData, EventDataSimple }
 import mass.core.script.ScriptManager
 import mass.rdp.RdpSystem
-import mass.rdp.etl.{EtlResult, EtlWorkflowExecution, SqlEtlResult}
+import mass.rdp.etl.{ EtlResult, EtlWorkflowExecution, SqlEtlResult }
 
 import scala.collection.immutable
-import scala.concurrent.{Future, Promise}
-import scala.util.{Failure, Success}
+import scala.concurrent.{ Future, Promise }
+import scala.util.{ Failure, Success }
 
 case class EtlGraphImpl(graphSetting: EtlGraphSetting) extends EtlGraph with StrictLogging {
-
   override def run(connectors: immutable.Seq[Connector], rdpSystem: RdpSystem): EtlWorkflowExecution = {
     implicit val ec = rdpSystem.materializer.system.dispatcher
     implicit val mat = rdpSystem.materializer
 
     def getConnector(name: String): Connector =
       connectors.find(_.name == name) orElse
-        rdpSystem.connectorSystem.getConnector(name) getOrElse
-        (throw new EtlGraphException(s"connector ref: $name 不存在"))
+      rdpSystem.connectorSystem.getConnector(name) getOrElse
+      (throw new EtlGraphException(s"connector ref: $name 不存在"))
 
     val promise = Promise[EtlResult]()
 
@@ -43,7 +42,7 @@ case class EtlGraphImpl(graphSetting: EtlGraphSetting) extends EtlGraph with Str
           logger.debug(s"engine: $engine, event: $event, result data: $data")
 
           EventDataSimple(data)
-      })
+        })
       .runWith(sink)
       .onComplete {
         case Success(result) => promise.success(SqlEtlResult(result))
@@ -64,5 +63,4 @@ case class EtlGraphImpl(graphSetting: EtlGraphSetting) extends EtlGraph with Str
       case Some(b) => b.buildSink(connector, graphSink)
       case _       => throw new EtlGraphException(s"未知Connector: $connector")
     }
-
 }

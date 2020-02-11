@@ -1,11 +1,11 @@
 package example.akkastream.basic
 
-import akka.actor.{ActorSystem, Cancellable}
-import akka.stream.scaladsl.{Flow, GraphDSL, Keep, RunnableGraph, Sink, Source}
-import akka.stream.{ActorMaterializer, ClosedShape, OverflowStrategy}
+import akka.actor.{ ActorSystem, Cancellable }
+import akka.stream.scaladsl.{ Flow, GraphDSL, Keep, RunnableGraph, Sink, Source }
+import akka.stream.{ ActorMaterializer, ClosedShape, OverflowStrategy }
 
 import scala.concurrent.duration._
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ Future, Promise }
 import scala.io.StdIn
 
 object CombiningMaterializedValues extends App {
@@ -88,7 +88,7 @@ object CombiningMaterializedValues extends App {
     // doubly nested pair, but we want to flatten it out
     val r11: RunnableGraph[(Promise[Option[Int]], Cancellable, Future[Int])] =
       r9.mapMaterializedValue {
-        case ((promise, cancellable), future) ⇒
+        case ((promise, cancellable), future) =>
           (promise, cancellable, future)
       }
 
@@ -102,11 +102,10 @@ object CombiningMaterializedValues extends App {
 
     // The result of r11 can be also achieved by using the Graph API
     val r12: RunnableGraph[(Promise[Option[Int]], Cancellable, Future[Int])] =
-      RunnableGraph.fromGraph(GraphDSL.create(source, flow, sink)((_, _, _)) { implicit builder ⇒ (src, f, dst) ⇒
+      RunnableGraph.fromGraph(GraphDSL.create(source, flow, sink)((_, _, _)) { implicit builder => (src, f, dst) =>
         import GraphDSL.Implicits._
         src ~> f ~> dst
         ClosedShape
       })
   }
-
 }

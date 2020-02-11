@@ -1,19 +1,18 @@
 package mass.connector.sql
 
-import java.nio.charset.{Charset, StandardCharsets}
+import java.nio.charset.{ Charset, StandardCharsets }
 import java.sql.ResultSet
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
-import mass.core.jdbc.JdbcUtils
+import fusion.jdbc.util.JdbcUtils
 
 import scala.collection.immutable
 
 case class JdbcResultSet(rs: ResultSet, values: immutable.IndexedSeq[AnyRef])
 
 object JdbcFlow {
-
   def flowToText(valueSeparator: Char = ','): Flow[immutable.IndexedSeq[AnyRef], String, NotUsed] =
     Flow[immutable.IndexedSeq[AnyRef]].map { values =>
       val builder = new java.lang.StringBuilder()
@@ -61,5 +60,4 @@ object JdbcFlow {
       val metaData = rs.getMetaData
       JdbcResultSet(rs, (1 to metaData.getColumnCount).map(i => rs.getObject(i)))
     }
-
 }

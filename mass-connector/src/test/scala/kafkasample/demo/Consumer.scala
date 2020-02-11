@@ -1,6 +1,6 @@
 package kafkasample.demo
 
-import java.util.{Collections, Properties}
+import java.util.{ Collections, Properties }
 import java.util.concurrent.TimeUnit
 
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -39,5 +39,4 @@ object Consumer {
       consumer.commitAsync()
     }
   }
-
 }

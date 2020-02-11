@@ -4,15 +4,15 @@ import java.nio.file.Files
 import java.time.OffsetDateTime
 import java.util.Properties
 
-import akka.actor.{ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
+import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 import com.typesafe.scalalogging.LazyLogging
 import helloscala.common.Configuration
 import helloscala.common.exception.HSBadRequestException
 import helloscala.common.util.TimeUtils
 import mass.core.Constants
-import mass.core.job.{SchedulerJob, SchedulerSystemRef}
+import mass.core.job.{ SchedulerJob, SchedulerSystemRef }
 import mass.extension.MassSystem
-import mass.model.job.{JobItem, JobTrigger, TriggerType}
+import mass.data.job.{ JobItem, JobTrigger, TriggerType }
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
@@ -171,20 +171,16 @@ final class JobSystem private (val system: ExtendedActorSystem, val waitForJobsT
       key: String,
       item: JobItem,
       className: String,
-      data: Option[Map[String, String]]
-  ): JobDetail = {
-    require(classOf[SchedulerJob].isAssignableFrom(Class.forName(className)),
-            s"className 必需为 ${classOf[SchedulerJob].getName} 的子类")
+      data: Option[Map[String, String]]): JobDetail = {
+    require(
+      classOf[SchedulerJob].isAssignableFrom(Class.forName(className)),
+      s"className 必需为 ${classOf[SchedulerJob].getName} 的子类")
     val dataMap = new JobDataMap()
     dataMap.put(JobConstants.JOB_CLASS, className)
     for ((key, value) <- data.getOrElse(item.data)) {
       dataMap.put(key, value)
     }
-    JobBuilder
-      .newJob(classOf[JobClassJob])
-      .withIdentity(JobKey.jobKey(key))
-      .setJobData(dataMap)
-      .build()
+    JobBuilder.newJob(classOf[JobClassJob]).withIdentity(JobKey.jobKey(key)).setJobData(dataMap).build()
   }
 
   override def toString: String = s"JobSystem($name, $system, $waitForJobsToComplete)"

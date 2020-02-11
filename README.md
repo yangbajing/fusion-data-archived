@@ -1,10 +1,10 @@
-# MassData
+# Fusion Data
 
-*反映式*数据治理平台（mass-rdi, Reactive MassData asset management Platform）
+*反应式* 数据治理平台（fusion-data, Reactive Massive Data Asset Management Platform）
 
-- Java 8+
-- Scala 2.12+
-- Akka 2.5+
+- Java 11+
+- Scala 2.13+
+- Akka 2.6+
 
 ## 文档
 

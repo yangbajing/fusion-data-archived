@@ -1,11 +1,11 @@
 package mass.http
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.{complete, extractUri}
+import akka.http.scaladsl.server.Directives.{ complete, extractUri }
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.pattern.AskTimeoutException
 import com.typesafe.scalalogging.StrictLogging
-import helloscala.data.ApiResult
+import mass.data.ApiResult
 import helloscala.common.exception.HSException
 
 /**
@@ -13,7 +13,6 @@ import helloscala.common.exception.HSException
  * Created by yangbajing(yangbajing@gmail.com) on 2017-03-01.
  */
 trait BaseExceptionPF extends StrictLogging {
-
   def exceptionHandlerPF: ExceptionHandler.PF = {
     case ex: Exception =>
       extractUri { uri =>
@@ -22,10 +21,7 @@ trait BaseExceptionPF extends StrictLogging {
             val t = e.getCause
             //            if (t != null) logger.warn(s"URI[$uri] ${e.toString}", t) else logger.warn(s"URI[$uri] ${e.toString}")
             logger.warn(s"Exception[${e.getClass.getSimpleName}] URI[$uri] ${e.getMessage}", t)
-            (StatusCodes
-               .getForKey(e.getHttpStatus)
-               .getOrElse(StatusCodes.Conflict),
-             ApiResult.error(e.getErrCode, e.getErrMsg, e.getData))
+            (StatusCodes.getForKey(e.httpStatus).getOrElse(StatusCodes.Conflict), ApiResult.error(e.status, e.msg))
 
           case e: IllegalArgumentException =>
             logger.debug(s"Illegal Argument: ${e.getMessage}", e)

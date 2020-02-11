@@ -5,9 +5,7 @@ import helloscala.common.util.StringUtils
 import scala.xml.NodeSeq
 
 object XmlUtils {
-
   implicit class XmlRich(node: NodeSeq) {
-
     @inline def attr(attr: String): String = (node \ s"@$attr").text.trim
 
     @inline def getAttr(attr: String): Option[String] =
@@ -17,7 +15,6 @@ object XmlUtils {
 
     @inline def getText: Option[String] =
       StringUtils.option(node.text).map(_.trim)
-
   }
 
   def attr(ns: NodeSeq, attr: String): String = ns.attr(attr)
@@ -27,5 +24,4 @@ object XmlUtils {
   def text(ns: NodeSeq): String = ns.text
 
   def getText(ns: NodeSeq): Option[String] = ns.getText
-
 }

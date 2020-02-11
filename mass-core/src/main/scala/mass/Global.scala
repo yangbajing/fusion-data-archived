@@ -5,7 +5,6 @@ import com.typesafe.config.Config
 import mass.core.Constants
 
 object Global {
-
   private var _system: ActorSystem = _
 
   def registerActorSystem(config: Config): ActorSystem =
@@ -23,5 +22,4 @@ object Global {
     require(_system ne null, "ActorSystem未设置")
     _system
   }
-
 }

@@ -21,7 +21,7 @@ import java.security.MessageDigest
 import java.util
 import java.util.Base64
 import javax.crypto.spec.SecretKeySpec
-import javax.crypto.{Cipher, Mac}
+import javax.crypto.{ Cipher, Mac }
 
 object Crypto {
   import SessionUtil._
@@ -40,9 +40,7 @@ object Crypto {
     val key = secret.getBytes("UTF-8")
     val mac = Mac.getInstance("HmacSHA256")
     mac.init(new SecretKeySpec(key, "HmacSHA256"))
-    Base64.getUrlEncoder
-      .withoutPadding()
-      .encodeToString(mac.doFinal(message.getBytes(StandardCharsets.UTF_8)))
+    Base64.getUrlEncoder.withoutPadding().encodeToString(mac.doFinal(message.getBytes(StandardCharsets.UTF_8)))
   }
 
   def encryptAES(value: String, secret: String): String = {
@@ -65,5 +63,4 @@ object Crypto {
     val digest = MessageDigest.getInstance("SHA-256")
     toHexString(digest.digest(value.getBytes(StandardCharsets.UTF_8)))
   }
-
 }

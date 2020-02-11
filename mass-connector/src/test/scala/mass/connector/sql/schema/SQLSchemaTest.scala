@@ -31,5 +31,4 @@ class SQLSchemaTest extends HelloscalaSpec with BeforeAndAfterAll {
       columns.foreach(println)
     }
   }
-
 }

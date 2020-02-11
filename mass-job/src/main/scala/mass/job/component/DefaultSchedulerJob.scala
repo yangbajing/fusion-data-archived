@@ -4,17 +4,16 @@ import java.nio.file.Paths
 
 import com.typesafe.scalalogging.StrictLogging
 import mass.core.job._
-import mass.job.{JobConstants, JobSystem}
+import mass.job.{ JobConstants, JobSystem }
 import mass.message.job.SchedulerJobResult
 
 import scala.concurrent.Future
 
 class DefaultSchedulerJob extends SchedulerJob with StrictLogging {
-
   override def run(context: SchedulerContext): Future[JobResult] = {
     val jobSystem = JobSystem(context.system)
     context.jobItem.resources.get(JobConstants.Resources.ZIP_PATH).map(handleZip(_, jobSystem, context)) getOrElse
-      handle(jobSystem, context)
+    handle(jobSystem, context)
   }
 
   private def handleZip(zipPath: String, jobSystem: JobSystem, ctx: SchedulerContext): Future[SchedulerJobResult] =
@@ -26,5 +25,4 @@ class DefaultSchedulerJob extends SchedulerJob with StrictLogging {
     Future {
       JobRun.run(ctx.jobItem, ctx.key, jobSystem.jobSettings)
     }(jobSystem.executionContext)
-
 }

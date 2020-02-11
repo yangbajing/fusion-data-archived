@@ -1,13 +1,13 @@
 package mass.rdp
 
-import akka.actor.{ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
+import akka.actor.{ ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 import akka.stream.ActorMaterializer
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.Configuration
 import mass.connector.ConnectorSystem
 import mass.core.Constants
 import mass.extension.MassCore
-import mass.rdp.etl.graph.{EtlGraphParserFactory, EtlStreamFactory}
+import mass.rdp.etl.graph.{ EtlGraphParserFactory, EtlStreamFactory }
 import mass.rdp.module.RdpModule
 
 trait RdpRefFactory {
@@ -17,7 +17,6 @@ trait RdpRefFactory {
 }
 
 private[rdp] class RdpSetup(val system: ActorSystem) extends StrictLogging {
-
   val settings = MassCore(system)
 
   val extensions: Vector[RdpModule] =
@@ -35,22 +34,19 @@ private[rdp] class RdpSetup(val system: ActorSystem) extends StrictLogging {
 
   def initialStreamFactories(): Map[String, EtlStreamFactory] = {
     val list = extensions.flatMap(_.etlStreamBuilders) ++
-      settings.configuration
-        .get[Seq[String]](s"${Constants.BASE_CONF}.rdp.stream-builders")
-        .flatMap { className =>
-          Class.forName(className).newInstance() match {
-            case v: EtlStreamFactory => Some(v)
-            case unknown =>
-              logger.warn(s"初始化找到未知EtlStreamBuilder: $unknown")
-              None
-          }
+      settings.configuration.get[Seq[String]](s"${Constants.BASE_CONF}.rdp.stream-builders").flatMap { className =>
+        Class.forName(className).newInstance() match {
+          case v: EtlStreamFactory => Some(v)
+          case unknown =>
+            logger.warn(s"初始化找到未知EtlStreamBuilder: $unknown")
+            None
         }
+      }
     list.map(v => v.`type` -> v).toMap
   }
 
   def initialGraphParserFactories(): Map[String, EtlGraphParserFactory] =
     extensions.flatMap(_.graphParserFactories).map(v => v.`type` -> v).toMap
-
 }
 
 /**

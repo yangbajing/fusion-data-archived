@@ -1,15 +1,14 @@
+import bintray.BintrayKeys._
+import com.typesafe.sbt.SbtNativePackager.autoImport.maintainer
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{HeaderLicense, headerLicense}
 import sbt.Keys._
 import sbt._
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerLicense
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.HeaderLicense
-import sbtassembly.AssemblyPlugin.autoImport.{assembly, assemblyMergeStrategy}
-import sbtassembly.{MergeStrategy, PathList}
+import sbtassembly.MergeStrategy
 
 object Commons {
-
+  import Environment.{BuildEnv, buildEnv}
   import sbtassembly.AssemblyKeys.{assembly, assemblyMergeStrategy}
   import sbtassembly.{MergeStrategy, PathList}
-  import Environment.{buildEnv, BuildEnv}
 
   def basicSettings =
     Seq(
@@ -28,15 +27,9 @@ object Commons {
           "-deprecation",
           "-unchecked",
           "-Xlint",
-          "-Yno-adapted-args", //akka-http heavily depends on adapted args and => Unit implicits break otherwise
-          "-Ypartial-unification",
           "-opt:l:inline",
           "-opt-inline-from",
-          "-Ywarn-dead-code"
-        )
-        if (scalaVersion.value.startsWith("2.12")) {
-          list ++= Seq("-opt:l:inline", "-opt-inline-from")
-        }
+          "-Ywarn-dead-code")
         if (buildEnv.value != BuildEnv.Developement) {
           list ++= Seq("-Xelide-below", "2001")
         }
@@ -69,57 +62,47 @@ object Commons {
       //  )
       fork in run := true,
       fork in Test := true,
-      parallelExecution in Test := false
-    ) ++ Environment.settings // ++ Formatting.settings
-
+      parallelExecution in Test := false) ++ Environment.settings // ++ Formatting.settings
 }
 
 object Publishing {
-
-  import Environment._
-
   lazy val publishing = Seq(
-    publishTo := (if (buildEnv.value == BuildEnv.Developement) {
-                    Some(
-                      "hualongdata-sbt-dev-local" at "https://artifactory.hualongdata.com/artifactory/sbt-dev-local;build.timestamp=" + new java.util.Date().getTime)
-                  } else {
-                    Some(
-                      "hualongdata-sbt-release-local" at "https://artifactory.hualongdata.com/artifactory/sbt-release-local")
-                  }),
-    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials_yangbajing")
-  )
-
-  lazy val noPublish = Seq(
-    publish := ((): Unit),
-    publishLocal := ((): Unit),
-    publishTo := None
-  )
+    bintrayOrganization := Some("akka-fusion"),
+    bintrayRepository := "maven",
+    maintainer := "Yang Jing <yangbajing@gmail.com>",
+    scmInfo := Some(
+        ScmInfo(
+          url("https://github.com/akka-fusion/fusion-discoveryx.git"),
+          "scm:git@github.com:akka-fusion/fusion-discoveryx.git")),
+    developers := List(
+        Developer(
+          id = "yangbajing",
+          name = "Yang Jing",
+          email = "yangbajing@gmail.com",
+          url = url("https://github.com/yangbajing"))))
 }
 
 object Environment {
-
   object BuildEnv extends Enumeration {
     val Production, Stage, Test, Developement = Value
   }
 
   val buildEnv = settingKey[BuildEnv.Value]("The current build environment")
 
-  val settings = Seq(
-    onLoadMessage := {
-      // old message as well
-      val defaultMessage = onLoadMessage.value
-      val env = buildEnv.value
-      s"""|$defaultMessage
+  val settings = Seq(onLoadMessage := {
+    // old message as well
+    val defaultMessage = onLoadMessage.value
+    val env = buildEnv.value
+    s"""|$defaultMessage
           |Working in build environment: $env""".stripMargin
-    }
-  )
+  })
 }
 
 object Packaging {
   // Good example https://github.com/typesafehub/activator/blob/master/project/Packaging.scala
+  import Environment.{BuildEnv, buildEnv}
   import com.typesafe.sbt.SbtNativePackager._
   import com.typesafe.sbt.packager.Keys._
-  import Environment.{buildEnv, BuildEnv}
 
   // This is dirty, but play has stolen our keys, and we must mimc them here.
   val stage = TaskKey[File]("stage")
@@ -138,14 +121,12 @@ object Packaging {
       (sourceDirectory(_ / "universal" / "conf").value / confFile) -> "conf/application.conf"
     },
     bashScriptExtraDefines ++= Seq(
-      """addJava "-Dconfig.file=${app_home}/../conf/application.conf"""",
-      """addJava "-Dpidfile.path=${app_home}/../run/%s.pid"""".format(name.value),
-      """addJava "-Dlogback.configurationFile=${app_home}/../conf/logback.xml""""
-    ),
+        """addJava "-Dconfig.file=${app_home}/../conf/application.conf"""",
+        """addJava "-Dpidfile.path=${app_home}/../run/%s.pid"""".format(name.value),
+        """addJava "-Dlogback.configurationFile=${app_home}/../conf/logback.xml""""),
     bashScriptConfigLocation := Some("${app_home}/../conf/jvmopts"),
     scriptClasspath := Seq("*"),
-    mappings in (Compile, packageDoc) := Seq()
-  )
+    mappings in (Compile, packageDoc) := Seq())
 
   // Create a new MergeStrategy for aop.xml files
   val aopMerge: MergeStrategy = new MergeStrategy {
@@ -170,5 +151,4 @@ object Packaging {
       Right(Seq(file -> path))
     }
   }
-
 }

@@ -6,7 +6,6 @@ import helloscala.common.test.HelloscalaSpec
 import org.scalatest.BeforeAndAfterAll
 
 class JobSystemTest extends TestKit(ActorSystem("mass")) with HelloscalaSpec with BeforeAndAfterAll {
-
   var jobSystem: JobSystem = _
 
   override protected def beforeAll(): Unit = {
@@ -22,5 +21,4 @@ class JobSystemTest extends TestKit(ActorSystem("mass")) with HelloscalaSpec wit
       println(jobSystem)
     }
   }
-
 }

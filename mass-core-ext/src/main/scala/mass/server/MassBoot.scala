@@ -22,7 +22,6 @@ import scala.concurrent.duration._
 
 @Deprecated
 object MassBoot extends StrictLogging {
-
   object StartupType extends Enumeration {
     type StartupType = Value
 
@@ -83,18 +82,16 @@ object MassBoot extends StrictLogging {
 
   def startupDump(): String = {
     val kvs = TreeMap(
-      "akka.loglevel" -> config.getString("akka.loglevel"),
-      "akka.stdout-loglevel" -> config.getString("akka.stdout-loglevel"),
-      "akka.cluster.seed-nodes" -> config.getStringList("akka.cluster.seed-nodes"),
-      "akka.cluster.roles" -> config.getStringList("akka.cluster.roles"),
-      "akka.remote.netty.tcp.hostname" -> config.getString("akka.remote.netty.tcp.hostname"),
-      "akka.remote.netty.tcp.port" -> config.getInt("akka.remote.netty.tcp.port"),
-      "akka.remote.artery.canonical.hostname" -> config.getString("akka.remote.artery.canonical.hostname"),
-      "akka.remote.artery.canonical.port" -> config.getInt("akka.remote.netty.tcp.port")
-    ) ++ configuration
-      .get[Map[String, String]]("mass")
-      .map(entry => (s"${Constants.BASE_CONF}.${entry._1}", entry._2))
+        "akka.loglevel" -> config.getString("akka.loglevel"),
+        "akka.stdout-loglevel" -> config.getString("akka.stdout-loglevel"),
+        "akka.cluster.seed-nodes" -> config.getStringList("akka.cluster.seed-nodes"),
+        "akka.cluster.roles" -> config.getStringList("akka.cluster.roles"),
+        "akka.remote.netty.tcp.hostname" -> config.getString("akka.remote.netty.tcp.hostname"),
+        "akka.remote.netty.tcp.port" -> config.getInt("akka.remote.netty.tcp.port"),
+        "akka.remote.artery.canonical.hostname" -> config.getString("akka.remote.artery.canonical.hostname"),
+        "akka.remote.artery.canonical.port" -> config.getInt("akka.remote.netty.tcp.port")) ++ configuration
+        .get[Map[String, String]]("mass")
+        .map(entry => (s"${Constants.BASE_CONF}.${entry._1}", entry._2))
     kvs.map(entry => s"${entry._1} = ${entry._2}").mkString("\n")
   }
-
 }

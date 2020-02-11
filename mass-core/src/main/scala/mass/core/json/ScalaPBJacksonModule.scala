@@ -1,6 +1,6 @@
 package mass.core.json
 
-import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
+import com.fasterxml.jackson.core.{ JsonGenerator, JsonParser }
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.deser.Deserializers
 import com.fasterxml.jackson.databind.ser.Serializers
@@ -22,7 +22,6 @@ abstract private class ScalaPBEnumDeser[T](clz: Class[T]) extends JsonDeserializ
 }
 
 private object ScalaPBJacksonDeserializerResolver extends Deserializers.Base {
-
   object CommonStatusDeser extends ScalaPBEnumDeser(ClassCommonStatus)
   object ProgramDeser extends ScalaPBEnumDeser(ClassProgram)
   object TriggerTypeDeser extends ScalaPBEnumDeser(ClassTriggerType)
@@ -58,7 +57,6 @@ private object ScalaPBJacksonSerializerResolver extends Serializers.Base {
       super.findSerializer(config, javaType, beanDesc)
     }
   }
-
 }
 
 trait ScalaPBJacksonModule extends JacksonModule {

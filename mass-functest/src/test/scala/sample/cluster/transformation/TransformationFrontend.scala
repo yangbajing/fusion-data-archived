@@ -3,7 +3,7 @@ package sample.cluster.transformation
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props, Terminated}
+import akka.actor.{ Actor, ActorRef, ActorSystem, Props, Terminated }
 import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -15,7 +15,6 @@ import scala.language.postfixOps
 
 //#frontend
 class TransformationFrontend extends Actor {
-
   var backends = IndexedSeq.empty[ActorRef]
   var jobCounter = 0
 
@@ -38,7 +37,6 @@ class TransformationFrontend extends Actor {
 //#frontend
 
 object TransformationFrontend {
-
   def main(args: Array[String]): Unit = {
     // Override the configuration of the port when specified as program argument
     val port = if (args.isEmpty) "0" else args(0)

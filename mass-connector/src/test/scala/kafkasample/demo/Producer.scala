@@ -3,10 +3,9 @@ package kafkasample.demo
 import java.util.Properties
 import java.util.concurrent.TimeUnit
 
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
+import org.apache.kafka.clients.producer.{ KafkaProducer, ProducerRecord, RecordMetadata }
 
 object Producer {
-
   def main(args: Array[String]): Unit = {
     val props = new Properties()
     props.put("bootstrap.servers", "localhost:9092")
@@ -32,5 +31,4 @@ object Producer {
       println(s"metadata: $metadata")
     })
   }
-
 }

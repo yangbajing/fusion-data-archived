@@ -1,8 +1,8 @@
 package example.akkastream.basic
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{ Actor, ActorSystem, Props }
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Broadcast, Merge, Sink, Source}
+import akka.stream.scaladsl.{ Broadcast, Merge, Sink, Source }
 
 import scala.io.StdIn
 
@@ -24,8 +24,7 @@ object SimplifiedAPI extends App {
   val sendRemotely =
     Sink.actorRef(system.actorOf(Props[Remotely], "remotely"), "Done")
   val localProcessing = Sink.foreach[Int](v => println(s"foreach($v)"))
-  Source(List(0, 1, 1))
-    .runWith(Sink.combine(sendRemotely, localProcessing)(strategy => Broadcast[Int](strategy)))
+  Source(List(0, 1, 1)).runWith(Sink.combine(sendRemotely, localProcessing)(strategy => Broadcast[Int](strategy)))
 
   StdIn.readLine()
   system.terminate()

@@ -7,7 +7,6 @@ import mass.extension.MassSystem
 import org.scalatest.BeforeAndAfterAll
 
 class MassSystemExtensionTest extends TestKit(ActorSystem("mass")) with HelloscalaSpec with BeforeAndAfterAll {
-
   "MassSystemExtension" should {
     "as[MassSystemExtension]" in {
       val massSystem = MassSystem(system)
@@ -15,5 +14,4 @@ class MassSystemExtensionTest extends TestKit(ActorSystem("mass")) with Hellosca
       println(massSystem)
     }
   }
-
 }

@@ -31,7 +31,6 @@ object ConnectorType extends Enumeration {
  * 数据连接
  */
 trait Connector extends AutoCloseable {
-
   /**
    * 连接名，由用户设置。在整个应用业务生命周期内应保持唯一。
    */

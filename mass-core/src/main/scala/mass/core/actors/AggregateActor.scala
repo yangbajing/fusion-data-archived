@@ -1,7 +1,7 @@
 package mass.core.actors
 
-import akka.actor.{ActorRef, Props, Status}
-import helloscala.common.exception.{HSBadRequestException, HSNotFoundException}
+import akka.actor.{ ActorRef, Props, Status }
+import helloscala.common.exception.{ HSBadRequestException, HSNotFoundException }
 import helloscala.common.util.StringUtils
 
 /**
@@ -35,5 +35,4 @@ trait AggregateActor extends MassActor {
       case Some(actor) => actor forward msg
       case None        => sender() ! Status.Failure(HSNotFoundException(s"服务: $name 未找到，发送消息为：$msg"))
     }
-
 }

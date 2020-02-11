@@ -24,7 +24,6 @@ class EtlSchedulerWorkflowTest extends TestKit(ActorSystem("etl-test")) with Hel
     super.afterAll()
 
   "EtlSchedulerWorkflowTest" should {
-
     "scheduler" in {
 //      val conf = JobConf
 //        .builder("test", "test")
@@ -34,7 +33,5 @@ class EtlSchedulerWorkflowTest extends TestKit(ActorSystem("etl-test")) with Hel
 //
 //      TimeUnit.MINUTES.sleep(5)
     }
-
   }
-
 }

@@ -1,10 +1,10 @@
 package sample.cluster.factorial
 
-import akka.actor.{Actor, ActorLogging}
+import akka.actor.{ Actor, ActorLogging }
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent.CurrentClusterState
-import akka.cluster.metrics.{ClusterMetricsChanged, ClusterMetricsExtension, NodeMetrics}
-import akka.cluster.metrics.StandardMetrics.{Cpu, HeapMemory}
+import akka.cluster.metrics.{ ClusterMetricsChanged, ClusterMetricsExtension, NodeMetrics }
+import akka.cluster.metrics.StandardMetrics.{ Cpu, HeapMemory }
 
 class MetricsListener extends Actor with ActorLogging {
   val selfAddress = Cluster(context.system).selfAddress

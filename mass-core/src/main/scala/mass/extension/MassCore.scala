@@ -1,8 +1,8 @@
 package mass.extension
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{ Files, Path, Paths }
 
-import akka.actor.{ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
+import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.Configuration
 import mass.core.Constants

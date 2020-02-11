@@ -26,7 +26,6 @@ class EtlWorkflowTest extends TestKit(ActorSystem("etl-test")) with HelloscalaSp
   }
 
   "EtlWorkflow" should {
-
     "show" in {
       etlWorkflow.connectors must not be empty
       etlWorkflow.connectors.foreach(c => println(s"connector: $c"))
@@ -44,7 +43,5 @@ class EtlWorkflowTest extends TestKit(ActorSystem("etl-test")) with HelloscalaSp
       val result = Await.result(execution.future, Duration.Inf)
       println(result)
     }
-
   }
-
 }

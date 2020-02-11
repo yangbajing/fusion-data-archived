@@ -3,15 +3,15 @@ package mass.slick
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.github.tminglei.slickpg.json.PgJsonExtensions
-import com.github.tminglei.slickpg.utils.{PgCommonJdbcTypes, SimpleArrayUtils}
-import com.github.tminglei.slickpg.{ArraySupport, ExPostgresProfile}
+import com.github.tminglei.slickpg.utils.{ PgCommonJdbcTypes, SimpleArrayUtils }
+import com.github.tminglei.slickpg.{ ArraySupport, ExPostgresProfile }
 import helloscala.common.jackson.Jackson
-import helloscala.data.NameValue
-import mass.model.job.{JobItem, JobTrigger}
+import mass.data.NameValue
+import mass.data.job.{ JobItem, JobTrigger }
 import slick.jdbc._
 
 import scala.language.implicitConversions
-import scala.reflect.{classTag, ClassTag}
+import scala.reflect.{ classTag, ClassTag }
 import scala.util.Try
 
 trait PgJacksonJsonSupport extends PgJsonExtensions with PgCommonJdbcTypes {
@@ -41,16 +41,16 @@ trait PgJacksonJsonSupport extends PgJsonExtensions with PgCommonJdbcTypes {
       new AdvancedArrayJdbcType[JsonNode](
         pgjson,
         s => SimpleArrayUtils.fromString[JsonNode](jstr => Jackson.defaultObjectMapper.readTree(jstr))(s).orNull,
-        v => SimpleArrayUtils.mkString[JsonNode](jnode => Jackson.defaultObjectMapper.writeValueAsString(jnode))(v)
-      )
+        v => SimpleArrayUtils.mkString[JsonNode](jnode => Jackson.defaultObjectMapper.writeValueAsString(jnode))(v))
 
     implicit val passportColumnType: JdbcType[NameValue] = mkJsonColumnType[NameValue]
     implicit val triggerConfTypeMapper: JdbcType[JobTrigger] = mkJsonColumnType[JobTrigger]
     implicit val jobItemTypeMapper: JdbcType[JobItem] = mkJsonColumnType[JobItem]
 
     def mkJsonColumnType[T](implicit ev1: ClassTag[T]): JdbcType[T] =
-      MappedColumnType.base[T, JsonNode](Jackson.defaultObjectMapper.valueToTree,
-                                         Jackson.defaultObjectMapper.treeToValue(_, ev1.runtimeClass).asInstanceOf[T])
+      MappedColumnType.base[T, JsonNode](
+        Jackson.defaultObjectMapper.valueToTree,
+        Jackson.defaultObjectMapper.treeToValue(_, ev1.runtimeClass).asInstanceOf[T])
 
     implicit def jacksonJsonColumnExtensionMethods(c: Rep[JsonNode]): JsonColumnExtensionMethods[JsonNode, JsonNode] =
       new JsonColumnExtensionMethods[JsonNode, JsonNode](c)

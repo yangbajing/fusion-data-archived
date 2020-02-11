@@ -35,5 +35,4 @@ case class MassSettings(configuration: Configuration) extends StrictLogging {
         Address(clusterProtocol, clusterName, host, port.toInt)
       }
       .toList
-
 }

@@ -16,17 +16,16 @@
 
 package helloscala.common.util
 
-import java.io.{IOException, InputStream, OutputStream}
+import java.io.{ IOException, InputStream, OutputStream }
 import java.nio.charset.Charset
-import java.nio.file.{Files, Path, StandardOpenOption}
+import java.nio.file.{ Files, Path, StandardOpenOption }
 import java.time.OffsetDateTime
 
 import com.typesafe.scalalogging.StrictLogging
 
-import scala.sys.process.{Process, ProcessLogger}
+import scala.sys.process.{ Process, ProcessLogger }
 
 object FileUtils extends StrictLogging {
-
   def getString(in: InputStream, charset: Charset, lineSplit: String = ""): String = {
     val s = scala.io.Source.fromInputStream(in, charset.toString)
     try {
@@ -66,15 +65,13 @@ object FileUtils extends StrictLogging {
       dist: Path,
       extraEnvs: Seq[(String, String)] = Nil,
       outPath: Option[Path] = None,
-      errPath: Option[Path] = None
-  ): MassProcessBuilder = {
+      errPath: Option[Path] = None): MassProcessBuilder = {
     val start = OffsetDateTime.now()
     val prefix = start.format(TimeUtils.formatterDateTime)
     val _outPath = outPath getOrElse Files.createTempFile(dist, prefix, "out")
     val _errPath = errPath getOrElse Files.createTempFile(dist, prefix, "err")
     new MassProcessBuilder(commands, dist, extraEnvs, start, _outPath, _errPath)
   }
-
 }
 
 class MassProcessBuilder(
@@ -83,8 +80,8 @@ class MassProcessBuilder(
     extraEnvs: Seq[(String, String)],
     val start: OffsetDateTime,
     val outPath: Path,
-    val errPath: Path
-) extends Process
+    val errPath: Path)
+    extends Process
     with StrictLogging {
   if (!Files.isDirectory(outPath.getParent)) {
     Files.createDirectories(outPath.getParent)
@@ -101,7 +98,7 @@ class MassProcessBuilder(
 
   println("PATH: " + System.getenv("PATH"))
 
-  logger.info(s"$commands\t$dist\5$envs\t$start\t$outPath\t$errPath")
+  logger.info(s"$commands\t$dist\t$envs\t$start\t$outPath\t$errPath")
 
   private val p = Process(commands, dist.toFile, envs: _*).run(ProcessLogger(fout => {
     outWriter.write(fout)
@@ -121,5 +118,4 @@ class MassProcessBuilder(
     FileUtils.close(errWriter)
     p.destroy()
   }
-
 }

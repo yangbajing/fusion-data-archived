@@ -3,7 +3,6 @@ package helloscala.common.types
 import helloscala.common.test.HelloscalaSpec
 
 class AsTest extends HelloscalaSpec {
-
   "As" should {
     "AsInt" in {
       val intNull: Integer = null
@@ -19,5 +18,4 @@ class AsTest extends HelloscalaSpec {
       AsString.unapply(s) mustBe Some("ss")
     }
   }
-
 }

@@ -23,5 +23,4 @@ object Events {
   }
 
   def listTypes: Vector[String] = _types
-
 }

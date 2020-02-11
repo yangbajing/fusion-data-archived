@@ -1,7 +1,7 @@
 package mass.core.protobuf
 
-import mass.model.{IdValue, TitleIdValue}
-import scalapb.{GeneratedEnum, GeneratedEnumCompanion, UnrecognizedEnum}
+import mass.data.{ IdValue, TitleIdValue }
+import scalapb.{ GeneratedEnum, GeneratedEnumCompanion, UnrecognizedEnum }
 
 import scala.collection.mutable
 
@@ -22,5 +22,4 @@ object ProtoUtils {
   def enumToTitleIdValues(obj: GeneratedEnumCompanion[_ <: GeneratedEnum]): Seq[TitleIdValue] = {
     cacheTitleIdValues.getOrElseUpdate(obj, enumToTitleIdValues(obj.values))
   }
-
 }

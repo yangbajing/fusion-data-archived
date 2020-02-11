@@ -3,10 +3,10 @@ package example.akkastream.graph
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source, Tcp}
+import akka.stream.scaladsl.{ Flow, Keep, RunnableGraph, Sink, Source, Tcp }
 import akka.util.ByteString
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ Future, Promise }
 
 object MaterializeValue {
   implicit val system = ActorSystem()
@@ -24,9 +24,8 @@ object MaterializeValue {
   val flow1: Flow[Int, Int, NotUsed] = Flow[Int].take(100)
 
   // Materializes to Promise[Int]
-  val nestedSource: Source[Int, Promise[Option[Int]]] = source
-    .viaMat(flow1)(Keep.left)
-    .named("nestedSource") // viaMat === via()(Keep.left)
+  val nestedSource
+      : Source[Int, Promise[Option[Int]]] = source.viaMat(flow1)(Keep.left).named("nestedSource") // viaMat === via()(Keep.left)
   //  val nestedSource2: Source[Int, NotUsed] = source.viaMat(flow1)(Keep.right)
 
   // Materializes to NotUsed

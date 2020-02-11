@@ -5,13 +5,12 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.RejectionHandler.Builder
 import akka.http.scaladsl.server._
 import com.typesafe.scalalogging.StrictLogging
-import helloscala.data.ApiResult
+import mass.data.ApiResult
 
 /**
  * Created by yangbajing(yangbajing@gmail.com) on 2017-03-01.
  */
 trait BaseRejectionBuilder extends StrictLogging {
-
   import JacksonSupport._
 
   def rejectionBuilder: Builder =
@@ -72,5 +71,4 @@ trait BaseRejectionBuilder extends StrictLogging {
       }
 
   final val rejectionHandler: RejectionHandler = rejectionBuilder.result()
-
 }

@@ -20,9 +20,9 @@ import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import helloscala.common.util.{DigestUtils, StringUtils}
+import helloscala.common.util.{ DigestUtils, StringUtils }
 
-import scala.util.{Failure, Try}
+import scala.util.{ Failure, Try }
 
 /**
  * BSON ObjectId value.
@@ -34,7 +34,6 @@ import scala.util.{Failure, Try}
  */
 @SerialVersionUID(239421902L) //@ApiModel(parent = classOf[String])
 class ObjectId private (private val raw: Array[Byte]) extends Serializable with Equals {
-
   /** ObjectId hexadecimal String representation */
   @JsonIgnore
   lazy val stringify: String = StringUtils.hex2Str(raw)
@@ -58,15 +57,12 @@ class ObjectId private (private val raw: Array[Byte]) extends Serializable with 
   def timeSecond: Int = ByteBuffer.wrap(raw.take(4)).getInt
 
   def valueAsArray: Array[Byte] = java.util.Arrays.copyOf(raw, 12)
-
 }
 
 object ObjectId {
   val STR_LENGTH = 24
   private val maxCounterValue = 16777216
-  private val increment = new java.util.concurrent.atomic.AtomicInteger(
-    scala.util.Random.nextInt(maxCounterValue)
-  )
+  private val increment = new java.util.concurrent.atomic.AtomicInteger(scala.util.Random.nextInt(maxCounterValue))
 
   private def counter() =
     (increment.getAndIncrement + maxCounterValue) % maxCounterValue
@@ -106,9 +102,8 @@ object ObjectId {
 
     if (validPlatform && permitted) {
       val networkInterfacesEnum = NetworkInterface.getNetworkInterfaces
-      val networkInterfaces = scala.collection.JavaConverters
-        .enumerationAsScalaIteratorConverter(networkInterfacesEnum)
-        .asScala
+      val networkInterfaces =
+        scala.collection.JavaConverters.enumerationAsScalaIteratorConverter(networkInterfacesEnum).asScala
       val ha = networkInterfaces
         .find(ha =>
           Try(ha.getHardwareAddress).isSuccess && ha.getHardwareAddress != null && ha.getHardwareAddress.length == 6)
@@ -146,9 +141,7 @@ object ObjectId {
 
   def apply(array: Array[Byte]): ObjectId = {
     if (array.length != 12)
-      throw new IllegalArgumentException(
-        s"wrong byte array for an ObjectId (size ${array.length})"
-      )
+      throw new IllegalArgumentException(s"wrong byte array for an ObjectId (size ${array.length})")
     new ObjectId(java.util.Arrays.copyOf(array, 12))
   }
 
@@ -161,9 +154,7 @@ object ObjectId {
       Failure(new IllegalArgumentException(s"Wrong ObjectId (It is not a valid 16 Decimal 24 bit string): '$id'"))
 
   def isValid(id: String): Boolean =
-    StringUtils.isNoneBlank(id) && id.length == 24 && id.forall(
-      StringUtils.isHex
-    )
+    StringUtils.isNoneBlank(id) && id.length == 24 && id.forall(StringUtils.isHex)
 
   def isValid(ids: Iterable[String]): Boolean =
     ids.forall(isValid)
@@ -233,5 +224,4 @@ object ObjectId {
 
     ObjectId(id)
   }
-
 }

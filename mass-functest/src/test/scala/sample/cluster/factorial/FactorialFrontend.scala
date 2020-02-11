@@ -1,6 +1,6 @@
 package sample.cluster.factorial
 
-import akka.actor.{Actor, ActorLogging, ActorSystem, Props, ReceiveTimeout}
+import akka.actor.{ Actor, ActorLogging, ActorSystem, Props, ReceiveTimeout }
 import akka.cluster.Cluster
 import akka.routing.FromConfig
 import com.typesafe.config.ConfigFactory
@@ -10,7 +10,6 @@ import scala.concurrent.duration._
 import scala.util.Try
 
 class FactorialFrontend(upToN: Int, repeat: Boolean) extends Actor with ActorLogging {
-
   val backend =
     context.actorOf(FromConfig.props(), name = "factorialBackendRouter")
 
@@ -39,13 +38,11 @@ class FactorialFrontend(upToN: Int, repeat: Boolean) extends Actor with ActorLog
 }
 
 object FactorialFrontend {
-
   def main(args: Array[String]): Unit = {
     val upToN = 200
 
-    val config = ConfigFactory
-      .parseString("akka.cluster.roles = [frontend]")
-      .withFallback(ConfigFactory.load("factorial"))
+    val config =
+      ConfigFactory.parseString("akka.cluster.roles = [frontend]").withFallback(ConfigFactory.load("factorial"))
 
     val system = ActorSystem("ClusterSystem", config)
     system.log.info("Factorials will start when 2 backend members in the cluster.")

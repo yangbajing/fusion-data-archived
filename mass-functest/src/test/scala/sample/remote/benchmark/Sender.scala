@@ -1,6 +1,6 @@
 package sample.remote.benchmark
 
-import akka.actor.{Actor, ActorIdentity, ActorRef, ActorSystem, Identify, Props, ReceiveTimeout, Terminated}
+import akka.actor.{ Actor, ActorIdentity, ActorRef, ActorSystem, Identify, Props, ReceiveTimeout, Terminated }
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.duration._
@@ -68,8 +68,8 @@ class Sender(path: String, totalMessages: Int, burstSize: Int, payloadSize: Int)
       val throughtput = (totalMessages * 1000.0 / took).toInt
       println(
         s"一共花费 ${took}ms 发送了 ${totalMessages}消息, 吞吐量 ${throughtput}msg/s, " +
-          s"最大往返时间 ${maxRoundTripMillis}ms, 分帧数据大小 $burstSize, " +
-          s"有效负载 $payloadSize")
+        s"最大往返时间 ${maxRoundTripMillis}ms, 分帧数据大小 $burstSize, " +
+        s"有效负载 $payloadSize")
       actor ! Shutdown
 
     case Terminated(`actor`) =>
@@ -129,5 +129,4 @@ object Sender {
 
   def props(path: String, totalMessages: Int, burstSize: Int, payloadSize: Int) =
     Props(new Sender(path, totalMessages, burstSize, payloadSize))
-
 }

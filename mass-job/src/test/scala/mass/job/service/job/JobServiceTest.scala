@@ -10,7 +10,7 @@ import mass.Global
 import mass.job.JobSystem
 import mass.job.util.ProgramVersion
 import mass.message.job._
-import mass.model.job.{JobItem, JobTrigger, Program, TriggerType}
+import mass.data.job.{ JobItem, JobTrigger, Program, TriggerType }
 
 import scala.concurrent.duration._
 
@@ -28,8 +28,7 @@ class JobServiceTest extends TestKit(ActorSystem("job-service-test")) with Hello
       Program.SCALA,
       programMain = "test.Main",
       programVersion = ProgramVersion.Scala212.VERSION,
-      description = "测试描述"
-    )
+      description = "测试描述")
     val trigger = JobTrigger(TriggerType.SIMPLE, repeat = 5, duration = 10.seconds)
 
     "handleJobPage be empty" in {
@@ -90,5 +89,4 @@ class JobServiceTest extends TestKit(ActorSystem("job-service-test")) with Hello
       TimeUnit.SECONDS.sleep(30)
     }
   }
-
 }

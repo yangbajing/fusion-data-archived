@@ -1,6 +1,6 @@
 package mass.job.service.job
 
-import akka.actor.{Actor, Props}
+import akka.actor.{ Actor, Props }
 import akka.pattern._
 import mass.job.JobSystem
 import mass.job.model._
@@ -17,7 +17,6 @@ object JobActor {
 }
 
 class JobActor extends Actor with JobService {
-
   import context.dispatcher
 
   override val jobSystem: JobSystem = JobSystem(context.system)
@@ -41,5 +40,4 @@ class JobActor extends Actor with JobService {
   def receiveEvent(v: JobEvent): Unit = v match {
     case event: JobExecuteEvent => executionJob(event)
   }
-
 }

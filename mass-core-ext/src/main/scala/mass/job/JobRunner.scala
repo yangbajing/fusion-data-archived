@@ -1,20 +1,20 @@
 package mass.job
+
 import java.time.OffsetDateTime
 
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.exception.HSNotFoundException
 import helloscala.common.types.ObjectId
 import helloscala.common.util.StringUtils
-import mass.core.job.{SchedulerContext, SchedulerJob}
+import mass.core.job.{ SchedulerContext, SchedulerJob }
+import mass.data.job.{ JobLog, RunStatus }
 import mass.job.repository.JobRepo
-import mass.model.job.{JobLog, RunStatus}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ Failure, Success }
 
 object JobRunner extends StrictLogging {
-
-  def execute(jobSystem: JobSystem, key: String, extData: Map[String, String], jobClass: String) {
+  def execute(jobSystem: JobSystem, key: String, extData: Map[String, String], jobClass: String): Unit = {
     val db = jobSystem.massSystem.sqlManager
     val logId = ObjectId.getString()
     val createdAt = OffsetDateTime.now()
@@ -57,5 +57,4 @@ object JobRunner extends StrictLogging {
       db.runTransaction(JobRepo.completionJobLog(logId, OffsetDateTime.now(), RunStatus.JOB_FAILURE, msg))
     }
   }
-
 }

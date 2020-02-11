@@ -12,7 +12,6 @@ import org.scalatest.BeforeAndAfterAll
 import scala.concurrent.duration._
 
 trait SchedulerSpec extends HelloscalaSpec with BeforeAndAfterAll with ScalatestRouteTest with StrictLogging {
-
   private[this] var _massSystem: MassSystem = _
   private[this] var _jobSystem: JobSystem = _
 
@@ -33,5 +32,4 @@ trait SchedulerSpec extends HelloscalaSpec with BeforeAndAfterAll with Scalatest
     AkkaUtils.shutdownActorSystem(system, 10.seconds)
     super.afterAll()
   }
-
 }

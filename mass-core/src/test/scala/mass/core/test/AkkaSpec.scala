@@ -16,11 +16,7 @@ trait AkkaSpec extends BeforeAndAfterAll {
 
   override protected def afterAll(): Unit = {
     import scala.concurrent.ExecutionContext.Implicits.global
-    Await
-      .ready(system.terminate(), 1.minute)
-      .failed
-      .foreach(e => println(s"Exit ActorSystem error: ${e.getMessage}"))
+    Await.ready(system.terminate(), 1.minute).failed.foreach(e => println(s"Exit ActorSystem error: ${e.getMessage}"))
     super.afterAll()
   }
-
 }

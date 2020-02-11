@@ -9,13 +9,13 @@ import com.github.tminglei.slickpg.str.PgStringSupport
 import helloscala.common.Configuration
 import helloscala.common.jackson.Jackson
 import helloscala.common.types.ObjectId
-import helloscala.data.NameValue
+import mass.data.NameValue
 import javax.sql.DataSource
-import mass.model.CommonStatus
-import mass.model.job._
+import mass.data.CommonStatus
+import mass.data.job._
 import slick.ast.TypedType
 import slick.basic.Capability
-import slick.jdbc.{GetResult, JdbcCapabilities, JdbcType, SetParameter}
+import slick.jdbc.{ GetResult, JdbcCapabilities, JdbcType, SetParameter }
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -27,7 +27,6 @@ trait SlickProfile
     with ArraySupport
     with PgJacksonJsonSupport
     with PgStringSupport {
-
   override protected def computeCapabilities: Set[Capability] =
     super.computeCapabilities + JdbcCapabilities.insertOrUpdate
 
@@ -157,16 +156,13 @@ trait SlickProfile
         numThreads,
         conf.getOrElse[Int]("queueSize", 1000),
         maximumPoolSize,
-        registerMbeans = conf.getOrElse[Boolean]("registerMbeans", false)
-      )
+        registerMbeans = conf.getOrElse[Boolean]("registerMbeans", false))
       Database.forDataSource(ds, Some(maximumPoolSize), executor)
     }
-
   }
 
   trait AggImplicits {
     this: ArraySupport =>
-
   }
 
   trait ColumnOptions extends super.ColumnOptions {
@@ -175,7 +171,6 @@ trait SlickProfile
   }
 
   override val columnOptions: ColumnOptions = new ColumnOptions {}
-
 }
 
 object SlickProfile extends SlickProfile

@@ -6,28 +6,24 @@
 
 package mass.connector.sql
 
-import java.sql.{Connection, PreparedStatement, ResultSet}
+import java.sql.{ Connection, PreparedStatement, ResultSet }
 
-import akka.stream.stage.{GraphStage, GraphStageLogic, OutHandler}
-import akka.stream.{Attributes, Outlet, SourceShape}
+import akka.stream.stage.{ GraphStage, GraphStageLogic, OutHandler }
+import akka.stream.{ Attributes, Outlet, SourceShape }
 import javax.sql.DataSource
-import mass.core.jdbc.{ConnectionPreparedStatementCreator, JdbcUtils}
+import fusion.jdbc.ConnectionPreparedStatementCreator
+import fusion.jdbc.util.JdbcUtils
 
 import scala.util.control.NonFatal
 
-class JdbcSourceStage(
-    dataSource: DataSource,
-    creator: ConnectionPreparedStatementCreator,
-    fetchRowSize: Int
-) extends GraphStage[SourceShape[ResultSet]] {
-
+class JdbcSourceStage(dataSource: DataSource, creator: ConnectionPreparedStatementCreator, fetchRowSize: Int)
+    extends GraphStage[SourceShape[ResultSet]] {
   private val out: Outlet[ResultSet] = Outlet("JdbcSource.out")
 
   override def shape: SourceShape[ResultSet] = SourceShape(out)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new GraphStageLogic(shape) with OutHandler {
-
       var maybeConn =
         Option.empty[(Connection, Boolean, PreparedStatement, ResultSet)]
 
@@ -67,5 +63,4 @@ class JdbcSourceStage(
           JdbcUtils.closeConnection(conn)
         }
     }
-
 }

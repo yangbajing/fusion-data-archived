@@ -1,9 +1,9 @@
 package mass.core.protobuf
 
-import java.time.{Duration, OffsetDateTime}
+import java.time.{ Duration, OffsetDateTime }
 import java.util.concurrent.TimeUnit
 
-import helloscala.common.util.{StringUtils, TimeUtils}
+import helloscala.common.util.{ StringUtils, TimeUtils }
 import scalapb.TypeMapper
 
 import scala.concurrent.duration.FiniteDuration
@@ -17,7 +17,7 @@ object MassProtoImplicits {
       if (millis == 0L) None else Some(TimeUtils.toOffsetDateTime(millis)))(
       _.map(_.toInstant.toEpochMilli).getOrElse(0L))
   implicit val int64ValueToOffsetDateTimeOptionMapper
-    : TypeMapper[com.google.protobuf.wrappers.Int64Value, OffsetDateTime] =
+      : TypeMapper[com.google.protobuf.wrappers.Int64Value, OffsetDateTime] =
     TypeMapper[com.google.protobuf.wrappers.Int64Value, OffsetDateTime](millis =>
       TimeUtils.toOffsetDateTime(millis.value))(c => com.google.protobuf.wrappers.Int64Value(c.toInstant.toEpochMilli))
 

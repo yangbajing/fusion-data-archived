@@ -1,6 +1,6 @@
 package mass.core.script
 
-import javax.script.{ScriptEngine, ScriptEngineManager}
+import javax.script.{ ScriptEngine, ScriptEngineManager }
 
 object ScriptEngineType extends Enumeration {
   type ScriptEngineType = Value

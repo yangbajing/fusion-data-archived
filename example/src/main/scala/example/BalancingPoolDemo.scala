@@ -1,6 +1,6 @@
 package example
 
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
+import akka.actor.{ Actor, ActorLogging, ActorRef, ActorSystem, Props }
 import example.Worker.FibonacciNumber
 
 import scala.annotation.tailrec
@@ -8,17 +8,14 @@ import scala.concurrent.duration._
 import scala.io.StdIn
 
 object Worker {
-
   case class FibonacciNumber(nbr: Int, delay: FiniteDuration)
 
   case class GetResult(nr: Int, source: ActorRef)
 
   def props: Props = Props(new Worker)
-
 }
 
 class Worker extends Actor with ActorLogging {
-
   import Worker._
   import context.dispatcher
 
@@ -30,8 +27,7 @@ class Worker extends Actor with ActorLogging {
 
   override def receive: Receive = {
     case FibonacciNumber(nr, delay) =>
-      context.system.scheduler
-        .scheduleOnce(delay, self, GetResult(nr, sender()))
+      context.system.scheduler.scheduleOnce(delay, self, GetResult(nr, sender()))
 
     case GetResult(nr, source) =>
       val result = fibonacci(nr)
@@ -47,7 +43,6 @@ class Worker extends Actor with ActorLogging {
     }
     fib(n, 1, 0)
   }
-
 }
 
 object BalancingPoolDemo extends App {

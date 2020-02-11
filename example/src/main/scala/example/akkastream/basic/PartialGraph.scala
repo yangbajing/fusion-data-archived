@@ -1,8 +1,8 @@
 package example.akkastream.basic
 
 import akka.actor.ActorSystem
-import akka.stream.scaladsl.{GraphDSL, RunnableGraph, Sink, Source, ZipWith}
-import akka.stream.{ActorMaterializer, ClosedShape, UniformFanInShape}
+import akka.stream.scaladsl.{ GraphDSL, RunnableGraph, Sink, Source, ZipWith }
+import akka.stream.{ ActorMaterializer, ClosedShape, UniformFanInShape }
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

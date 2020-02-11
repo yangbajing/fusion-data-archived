@@ -5,10 +5,9 @@ import helloscala.common.util.StringUtils
 import mass.core.XmlUtils
 
 import scala.util.Try
-import scala.xml.{NodeSeq, XML}
+import scala.xml.NodeSeq
 
 trait EtlGraphParser {
-
   def parse(): Try[EtlGraphSetting]
 
   def validation(setting: EtlGraphSetting): Try[EtlGraphSetting] = Try {
@@ -18,8 +17,7 @@ trait EtlGraphParser {
       throw new EtlGraphException("source.out未找到指定的flow或sink")
     }
 
-    if (!(setting.flows
-          .exists(_.outs.exists(_ == sinkName)) || sourceOut == sinkName)) {
+    if (!(setting.flows.exists(_.outs.exists(_ == sinkName)) || sourceOut == sinkName)) {
       throw new EtlGraphException("graph不是闭合的")
     }
 
@@ -27,7 +25,6 @@ trait EtlGraphParser {
 
     setting
   }
-
 }
 
 trait EtlGraphParserFactory {
@@ -35,13 +32,11 @@ trait EtlGraphParserFactory {
 }
 
 class EtlGraphXmlParserFactory extends EtlGraphParserFactory {
-
   override def `type`: String = "xml"
 
   def build(elem: NodeSeq): EtlGraphParser = new EtlGraphXmlParser(elem)
 
   class EtlGraphXmlParser(elem: NodeSeq) extends EtlGraphParser with StrictLogging {
-
     import mass.core.XmlUtils.XmlRich
 
     logger.trace(s"parse elem:\n$elem")
@@ -86,7 +81,5 @@ class EtlGraphXmlParserFactory extends EtlGraphParserFactory {
 
     @inline private def parseConnector(node: NodeSeq): EtlConnector =
       EtlConnector(node.attr("ref"))
-
   }
-
 }

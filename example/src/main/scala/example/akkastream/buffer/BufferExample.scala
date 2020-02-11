@@ -2,7 +2,7 @@ package example.akkastream.buffer
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{ Sink, Source }
 
 import scala.io.StdIn
 

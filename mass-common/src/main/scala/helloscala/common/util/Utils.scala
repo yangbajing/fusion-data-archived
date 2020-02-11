@@ -18,9 +18,9 @@ package helloscala.common.util
 
 import java.lang.management.ManagementFactory
 import java.nio.ByteBuffer
-import java.nio.file.{Files, Path}
+import java.nio.file.{ Files, Path }
 import java.security.SecureRandom
-import java.time.{LocalDate, LocalDateTime}
+import java.time.{ LocalDate, LocalDateTime }
 import java.util.Properties
 import java.util.concurrent.ThreadLocalRandom
 
@@ -82,7 +82,7 @@ object Utils {
     case l: Long    => Some(l)
     case i: Int     => Some(i.toLong)
     case s: String  => Try(s.toLong).toOption
-    case bi: BigInt => Some(bi.longValue())
+    case bi: BigInt => Some(bi.longValue)
     case _          => None
   }
 
@@ -120,11 +120,7 @@ object Utils {
     val filterNoneBlank: String => Boolean = s => StringUtils.isNoneBlank(s)
     val trim: String => String = s => s.trim
     val trans: Path => java.util.stream.Stream[String] = path => Files.readAllLines(path).stream()
-    Files
-      .list(dir)
-      .flatMap(trans.asJava)
-      .map[String](trim.asJava)
-      .filter(filterNoneBlank.asJava)
+    Files.list(dir).flatMap(trans.asJava).map[String](trim.asJava).filter(filterNoneBlank.asJava)
   }
 
   def randomBytes(size: Int): Array[Byte] = {
@@ -181,12 +177,8 @@ object Utils {
   def option[V](v: V): Option[V] = Option(v)
 
   def propertiesToMap(props: Properties): Map[String, String] = {
-    import scala.collection.JavaConverters._
-    props
-      .stringPropertyNames()
-      .asScala
-      .map(name => name -> props.getProperty(name))
-      .toMap
+    import scala.jdk.CollectionConverters._
+    props.stringPropertyNames().asScala.map(name => name -> props.getProperty(name)).toMap
   }
 
   def closeQuiet(io: AutoCloseable): Unit = {
@@ -211,5 +203,4 @@ object Utils {
       case _       => println("None")
     }
   }
-
 }

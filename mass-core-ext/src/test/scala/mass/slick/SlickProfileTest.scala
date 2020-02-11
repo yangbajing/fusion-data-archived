@@ -2,15 +2,16 @@ package mass.slick
 
 import java.util.concurrent.TimeUnit
 
-import org.scalatest.{BeforeAndAfterAll, WordSpec}
-import SlickProfile.api._
+import fusion.jdbc.util.JdbcUtils
 import helloscala.common.Configuration
 import mass.core.Constants
-import mass.core.jdbc.JdbcUtils
+import mass.slick.SlickProfile.api._
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.wordspec.AnyWordSpec
 import slick.sql.SqlStreamingAction
 
-class SlickProfileTest extends WordSpec with BeforeAndAfterAll {
-  val configuration = Configuration()
+class SlickProfileTest extends AnyWordSpec with BeforeAndAfterAll {
+  val configuration = Configuration.load()
   private val postgresProps = configuration.getConfiguration(s"${Constants.BASE_CONF}.core.persistence.postgres")
   val ds = JdbcUtils.createHikariDataSource(postgresProps)
   val db = createDatabase(ds, postgresProps)

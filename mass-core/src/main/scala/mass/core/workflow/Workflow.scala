@@ -8,19 +8,16 @@ import scala.concurrent.Future
  * 工作流
  */
 trait Workflow[Result] {
-
   /**
    * 运行工作流
    */
   def run(): WorkflowExecution[Result]
-
 }
 
 /**
  * 工作流执行对象
  */
 trait WorkflowExecution[Result] extends AutoCloseable {
-
   def future: Future[Result]
 
   /**
@@ -28,5 +25,4 @@ trait WorkflowExecution[Result] extends AutoCloseable {
    * @return
    */
   def terminate(): Future[Done]
-
 }

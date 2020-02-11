@@ -1,26 +1,26 @@
 package mass.http
 
 import java.nio.file.Paths
-import java.security.{KeyStore, SecureRandom}
+import java.security.{ KeyStore, SecureRandom }
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http.ServerBinding
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.{ HttpRequest, HttpResponse }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.settings.ServerSettings
-import akka.http.scaladsl.{ConnectionContext, Http, HttpsConnectionContext}
+import akka.http.scaladsl.{ ConnectionContext, Http, HttpsConnectionContext }
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import com.typesafe.scalalogging.StrictLogging
 import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import helloscala.common.Configuration
-import helloscala.common.util.{PidFile, StringUtils, Utils}
-import javax.net.ssl.{KeyManagerFactory, SSLContext, TrustManagerFactory}
+import helloscala.common.util.{ PidFile, StringUtils, Utils }
+import javax.net.ssl.{ KeyManagerFactory, SSLContext, TrustManagerFactory }
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContextExecutor, Future}
+import scala.concurrent.{ Await, ExecutionContextExecutor, Future }
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 /**
  * Created by yangbajing(yangbajing@gmail.com) on 2017-03-08.
@@ -143,8 +143,7 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
     startServer(
       configuration.getString(s"${prefix}server.host"),
       configuration.getInt(s"${prefix}server.port"),
-      configuration.get[Option[Int]](s"${prefix}server.https-port")
-    )
+      configuration.get[Option[Int]](s"${prefix}server.https-port"))
 
   /**
    * 根据设置的host:绑定主机名和port:绑定网络端口 启动Akka HTTP服务
@@ -165,7 +164,7 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
 
     val flow: Flow[HttpRequest, HttpResponse, Any] =
       (handleRejections(rejectionHandler) &
-        handleExceptions(exceptionHandler)) {
+      handleExceptions(exceptionHandler)) {
         routes.route
       }
     val handler = flow.map(handleMapResponse)
@@ -183,11 +182,12 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
     }
 
     httpsBindingFuture = httpsPort.map { portSsl =>
-      val f = Http().bindAndHandle(handler,
-                                   interface = host,
-                                   port = portSsl,
-                                   connectionContext = generateHttps(),
-                                   settings = ServerSettings(actorSystem))
+      val f = Http().bindAndHandle(
+        handler,
+        interface = host,
+        port = portSsl,
+        connectionContext = generateHttps(),
+        settings = ServerSettings(actorSystem))
       f.onComplete {
         case Success(binding) =>
           //setting the server binding for possible future uses in the client
@@ -208,13 +208,11 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
   }
 
   private def writePidfile(): Unit = {
-    val pidfilePath = Option(System.getProperty("pidfile.path"))
-      .orElse(configuration.get[Option[String]]("pidfile.path"))
-      .orNull
+    val pidfilePath =
+      Option(System.getProperty("pidfile.path")).orElse(configuration.get[Option[String]]("pidfile.path")).orNull
     try {
       if (StringUtils.isNoneBlank(pidfilePath)) {
-        PidFile(Utils.getPid)
-          .create(Paths.get(pidfilePath), deleteOnExit = true)
+        PidFile(Utils.getPid).create(Paths.get(pidfilePath), deleteOnExit = true)
       } else {
         logger.warn("-Dpidfile.path 未设置，将不写入 .pid 文件。")
       }
@@ -224,5 +222,4 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
         System.exit(-1)
     }
   }
-
 }

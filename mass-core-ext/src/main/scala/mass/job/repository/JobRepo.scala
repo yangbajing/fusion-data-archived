@@ -2,24 +2,21 @@ package mass.job.repository
 
 import java.time.OffsetDateTime
 
-import helloscala.common.exception.{HSBadRequestException, HSNotFoundException}
+import helloscala.common.exception.{ HSBadRequestException, HSNotFoundException }
 import helloscala.common.types.ObjectId
 import helloscala.common.util.StringUtils
 import mass.job.util.JobZip
 import mass.message.job._
-import mass.model.job._
+import mass.data.job._
 import mass.slick.SlickProfile.api._
-import slick.sql.{FixedSqlAction, FixedSqlStreamingAction, SqlAction}
+import slick.sql.{ FixedSqlAction, FixedSqlStreamingAction, SqlAction }
 
 import scala.concurrent.ExecutionContext
 
 object JobRepo {
-
   def listJob(req: JobListReq): FixedSqlStreamingAction[Seq[JobSchedule], JobSchedule, Effect.Read] = {
     tJobSchedule
-      .filter(
-        t => dynamicFilterOr(Seq(StringUtils.option(req.key).map(key => t.key ilike s"$key%")))
-      )
+      .filter(t => dynamicFilterOr(Seq(StringUtils.option(req.key).map(key => t.key ilike s"$key%"))))
       .sortBy(_.createdAt.desc)
       .result
   }
@@ -30,20 +27,19 @@ object JobRepo {
     tJobSchedule.returning(tJobSchedule) += payload
   }
 
-  def save(
-      jobZip: JobZip,
-      creator: String = ""
-  )(implicit ec: ExecutionContext): DBIOAction[Vector[JobSchedule], NoStream, Effect.Write] = {
+  def save(jobZip: JobZip, creator: String = "")(
+      implicit ec: ExecutionContext): DBIOAction[Vector[JobSchedule], NoStream, Effect.Write] = {
     val now = OffsetDateTime.now()
     val actions = jobZip.configs.map { config =>
       val jobItem = config.item.getOrElse(throw HSBadRequestException("item不能为空"))
       val trigger = config.trigger.getOrElse(throw HSBadRequestException("trigger不能为空"))
-      val schedule = JobSchedule(config.key.getOrElse(ObjectId.getString()),
-                                 Some(jobItem),
-                                 Some(trigger),
-                                 s"triggerType: ${trigger.triggerType}",
-                                 RunStatus.JOB_NORMAL,
-                                 createdAt = now)
+      val schedule = JobSchedule(
+        config.key.getOrElse(ObjectId.getString()),
+        Some(jobItem),
+        Some(trigger),
+        s"triggerType: ${trigger.triggerType}",
+        RunStatus.JOB_NORMAL,
+        createdAt = now)
       tJobSchedule.returning(tJobSchedule) += schedule
     }
     DBIO.sequence(actions)
@@ -58,11 +54,7 @@ object JobRepo {
   }
 
   def filterWhere(req: JobPageReq) = {
-    tJobSchedule.filter(
-      t =>
-        dynamicFilter(
-          StringUtils.option(req.key).map(key => t.key ilike s"$key%"),
-      ))
+    tJobSchedule.filter(t => dynamicFilter(StringUtils.option(req.key).map(key => t.key ilike s"$key%")))
   }
 
   def findJob(key: String): DBIOAction[Option[JobSchedule], NoStream, Effect.Read with Effect.Read] =
@@ -80,8 +72,7 @@ object JobRepo {
           item = req.item.orElse(schedule.item),
           trigger = req.trigger.orElse(schedule.trigger),
           description = req.description.getOrElse(schedule.description),
-          status = if (req.status.isUnrecognized) schedule.status else req.status
-        )
+          status = if (req.status.isUnrecognized) schedule.status else req.status)
         q.update(payload).map(_ => payload)
       case None => DBIO.failed(HSNotFoundException(s"Job：${req.key} Not Found."))
     }
@@ -117,15 +108,12 @@ object JobRepo {
       id: String,
       completionTime: OffsetDateTime,
       completionStatus: RunStatus,
-      completionValue: String
-  ): DBIOAction[Unit, NoStream, Effect.Write] = {
+      completionValue: String): DBIOAction[Unit, NoStream, Effect.Write] = {
     DBIO.seq(
       tJobLog
         .filter(_.id === id)
         .map(r => (r.completionTime, r.completionStatus, r.completionValue))
         .update((Some(completionTime), completionStatus, Some(completionValue))),
-      updateJobRunStatusByLogId(id, completionStatus, completionTime)
-    )
+      updateJobRunStatusByLogId(id, completionStatus, completionTime))
   }
-
 }

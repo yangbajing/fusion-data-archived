@@ -1,6 +1,6 @@
 package mass.job
 
-import java.nio.file.{Path, Paths}
+import java.nio.file.{ Path, Paths }
 
 import mass.core.Constants
 import mass.server.MassSettings

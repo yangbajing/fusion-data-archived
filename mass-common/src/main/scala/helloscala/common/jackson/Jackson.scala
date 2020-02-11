@@ -17,12 +17,12 @@
 package helloscala.common.jackson
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.core.{JsonParser, JsonProcessingException, TreeNode}
+import com.fasterxml.jackson.core.{ JsonParser, JsonProcessingException, TreeNode }
 import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.databind.introspect.{Annotated, JacksonAnnotationIntrospector}
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
-import com.fasterxml.jackson.databind.ser.impl.{SimpleBeanPropertyFilter, SimpleFilterProvider}
-import com.fasterxml.jackson.databind.ser.{DefaultSerializerProvider, SerializerFactory}
+import com.fasterxml.jackson.databind.introspect.{ Annotated, JacksonAnnotationIntrospector }
+import com.fasterxml.jackson.databind.node.{ ArrayNode, ObjectNode }
+import com.fasterxml.jackson.databind.ser.impl.{ SimpleBeanPropertyFilter, SimpleFilterProvider }
+import com.fasterxml.jackson.databind.ser.{ DefaultSerializerProvider, SerializerFactory }
 import helloscala.common.exception.HSBadRequestException
 import helloscala.common.util.Utils
 import scalapb.GeneratedMessage
@@ -71,8 +71,8 @@ object Jackson {
       .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
       .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-//      .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-//      .disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS)
+      //      .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+      //      .disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS)
       .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
       .disable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS)
       .setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -98,5 +98,4 @@ object Jackson {
     override def createInstance(config: SerializationConfig, jsf: SerializerFactory) =
       new MassSerializerProvider(this, config, jsf)
   }
-
 }

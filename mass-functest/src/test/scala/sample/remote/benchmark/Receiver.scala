@@ -1,6 +1,6 @@
 package sample.remote.benchmark
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{ Actor, ActorSystem, Props }
 import com.typesafe.config.ConfigFactory
 
 class Receiver extends Actor {
@@ -14,7 +14,6 @@ class Receiver extends Actor {
     case _ =>
     // 接收到的实际消息数据被忽略掉
   }
-
 }
 
 object Receiver extends App {

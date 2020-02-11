@@ -2,9 +2,9 @@ package sample.cluster.transformation
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.{Actor, ActorSystem, Props, RootActorPath}
-import akka.cluster.ClusterEvent.{CurrentClusterState, MemberUp}
-import akka.cluster.{Cluster, Member, MemberStatus}
+import akka.actor.{ Actor, ActorSystem, Props, RootActorPath }
+import akka.cluster.ClusterEvent.{ CurrentClusterState, MemberUp }
+import akka.cluster.{ Cluster, Member, MemberStatus }
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.ExecutionContext.Implicits
@@ -13,7 +13,6 @@ import scala.util.Random
 
 //#backend
 class TransformationBackend extends Actor {
-
   val cluster = Cluster(context.system)
 
   // subscribe to cluster changes, MemberUp
@@ -32,12 +31,11 @@ class TransformationBackend extends Actor {
   def register(member: Member): Unit =
     if (member.hasRole("frontend"))
       context.actorSelection(RootActorPath(member.address) / "user" / "frontend") !
-        BackendRegistration
+      BackendRegistration
 }
 //#backend
 
 object TransformationBackend {
-
   def main(args: Array[String]): Unit = {
     // Override the configuration of the port when specified as program argument
     val port = if (args.isEmpty) "0" else args(0)

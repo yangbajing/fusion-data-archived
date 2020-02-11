@@ -1,7 +1,7 @@
 package example.akkastream.graph
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, ClosedShape, OverflowStrategy}
+import akka.stream.{ ActorMaterializer, ClosedShape, OverflowStrategy }
 import akka.stream.scaladsl.{
   Broadcast,
   Concat,

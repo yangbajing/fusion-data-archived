@@ -1,9 +1,9 @@
 package mass.slick
 
-import com.github.tminglei.slickpg.agg.{AggFuncRep, OrderedAggFuncRep}
+import com.github.tminglei.slickpg.agg.{ AggFuncRep, OrderedAggFuncRep }
 import slick.ast.Library.SqlFunction
-import slick.ast.{Library, LiteralNode, TypedType}
-import slick.jdbc.{JdbcType, JdbcTypesComponent, PostgresProfile}
+import slick.ast.{ Library, LiteralNode, TypedType }
+import slick.jdbc.{ JdbcType, JdbcTypesComponent, PostgresProfile }
 import slick.lifted.OptionMapperDSL
 
 trait AggFuncSupport extends JdbcTypesComponent { driver: PostgresProfile =>
@@ -96,7 +96,6 @@ trait AggFuncSupport extends JdbcTypesComponent { driver: PostgresProfile =>
   }
 
   trait StatisticsAggFunctions {
-
     def corr[P1, P2, R](c1: Rep[P1], c2: Rep[P2])(
         implicit tm: JdbcType[Double],
         om: OptionMapperDSL.arg[Double, P1]#arg[Double, P2]#to[Double, R]) =
@@ -192,7 +191,6 @@ trait AggFuncSupport extends JdbcTypesComponent { driver: PostgresProfile =>
   }
 
   trait HypotheticalSetAggFunctions {
-
     def rank[T](v: T)(implicit tm: JdbcType[T]) =
       OrderedAggFuncRep.withTypes[Any, Long](AggLibrary.Rank, Seq(LiteralNode(tm, v)))
 

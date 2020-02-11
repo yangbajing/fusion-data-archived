@@ -1,8 +1,8 @@
 package example.akkastream.graph
 
 import akka.actor.ActorSystem
-import akka.stream.scaladsl.{Balance, Broadcast, Flow, GraphDSL, Keep, Merge, RunnableGraph, Sink, Source}
-import akka.stream.{ActorMaterializer, FlowShape, SourceShape}
+import akka.stream.scaladsl.{ Balance, Broadcast, Flow, GraphDSL, Keep, Merge, RunnableGraph, Sink, Source }
+import akka.stream.{ ActorMaterializer, FlowShape, SourceShape }
 
 import scala.concurrent.Future
 import scala.io.StdIn
@@ -42,11 +42,7 @@ object PartialGraph extends App {
     SourceShape(merge.out)
   })
 
-  val sink: Sink[Int, Future[Int]] = Flow[Int]
-    .map(_ * 2)
-    .drop(10)
-    .named("nestedFlow")
-    .toMat(Sink.head)(Keep.right)
+  val sink: Sink[Int, Future[Int]] = Flow[Int].map(_ * 2).drop(10).named("nestedFlow").toMat(Sink.head)(Keep.right)
 
   val closed: RunnableGraph[Future[Int]] =
     source.via(flow.filter(_ > 1)).toMat(sink)(Keep.right)

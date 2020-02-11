@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import helloscala.common.jackson.Jackson
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.time.{ Millis, Seconds, Span }
 
 import scala.concurrent.Future
 
@@ -35,5 +35,4 @@ trait HelloscalaSpec extends WordSpecLike with MustMatchers with OptionValues wi
 
   def jsonString(obj: AnyRef): String =
     defaultObjectMapper.writeValueAsString(obj)
-
 }

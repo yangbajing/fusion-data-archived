@@ -41,8 +41,7 @@ case class ArtPart(
     context: String,
     sort: Int,
     createTime: OffsetDateTime,
-    createBy: Long = 1
-)
+    createBy: Long = 1)
 
 class RvArticle {
   var author: Long = 0L
@@ -82,8 +81,7 @@ case class ArtArticle(
     sort: Int,
     needVip: String,
     publishTime: OffsetDateTime,
-    draftStatus: String = "1"
-)
+    draftStatus: String = "1")
 
 class RvUser {
   var id: Long = _
@@ -122,8 +120,7 @@ case class TdUser(
     email: String,
     phone: String,
     coverId: Long,
-    id: Long
-)
+    id: Long)
 
 case class TdUserAuthor(
     userId: Long,
@@ -136,8 +133,7 @@ case class TdUserAuthor(
     worksNum: Int,
     wordsSize: Long,
     workDayNum: Int,
-    checkStatus: String
-)
+    checkStatus: String)
 
 case class RvBaseFile(
     originName: String,
@@ -145,5 +141,4 @@ case class RvBaseFile(
     createBy: Long,
     createTime: OffsetDateTime,
     status: String,
-    path: String
-)
+    path: String)

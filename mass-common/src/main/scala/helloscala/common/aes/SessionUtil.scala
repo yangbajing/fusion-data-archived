@@ -18,10 +18,10 @@ package helloscala.common.aes
 
 import java.math.BigInteger
 import java.util.concurrent.ThreadLocalRandom
-import javax.xml.bind.DatatypeConverter
+
+import helloscala.common.util.StringUtils
 
 object SessionUtil {
-
   def randomString(length: Int): String = {
     // http://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string
     val random = ThreadLocalRandom.current()
@@ -47,9 +47,7 @@ object SessionUtil {
       equal == 0
     }
 
-  def toHexString(array: Array[Byte]): String =
-    DatatypeConverter.printHexBinary(array)
+  def toHexString(array: Array[Byte]): String = StringUtils.hex2Str(array)
 
-  def hexStringToByte(hexString: String): Array[Byte] =
-    DatatypeConverter.parseHexBinary(hexString)
+  def hexStringToByte(hexString: String): Array[Byte] = StringUtils.str2Hex(hexString)
 }

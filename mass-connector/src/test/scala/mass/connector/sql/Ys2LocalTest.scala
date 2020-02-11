@@ -5,34 +5,34 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Flow, Keep}
+import akka.stream.scaladsl.{ Flow, Keep }
 import com.zaxxer.hikari.HikariDataSource
+import fusion.jdbc.util.JdbcUtils
 import helloscala.common.types.AsString
-import mass.core.jdbc.JdbcUtils
-import org.scalatest.{BeforeAndAfterAll, MustMatchers, WordSpec}
+import org.scalatest.{ BeforeAndAfterAll, MustMatchers, WordSpec }
 
 import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
-
   implicit val system = ActorSystem()
   implicit val mat = ActorMaterializer()
   val localDS = createPGDataSource()
   val ysDS = createYsPGDataSource()
 
   "migrate" in {
-    val columns = immutable.IndexedSeq("id",
-                                       "ban_id",
-                                       "banletter",
-                                       "banlettpiny",
-                                       "bantype",
-                                       "banexp",
-                                       "banform",
-                                       "banto",
-                                       "recper",
-                                       "recdate")
+    val columns = immutable.IndexedSeq(
+      "id",
+      "ban_id",
+      "banletter",
+      "banlettpiny",
+      "bantype",
+      "banexp",
+      "banform",
+      "banto",
+      "recper",
+      "recdate")
 
     // 从源读取
     val source = JdbcSource(s"SELECT ${columns.mkString(", ")} FROM haishu_ys.reg_name_baninfo;", Nil, 1500)(ysDS)
@@ -54,13 +54,9 @@ class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
         conn.prepareStatement(
           """INSERT INTO reg_name_baninfo (id, ban_id, banletter, banlettpiny, bantype, banexp, banform, banto, recper, recdate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""),
       (jrs, stmt) => columns.indices.foreach(i => stmt.setObject(i + 1, jrs.values(i))),
-      1000
-    )(localDS)
+      1000)(localDS)
 
-    val graph = source
-      .via(JdbcFlow.flowJdbcResultSet)
-      .via(transferFlow(1))
-      .toMat(sink)(Keep.right)
+    val graph = source.via(JdbcFlow.flowJdbcResultSet).via(transferFlow(1)).toMat(sink)(Keep.right)
 
     val begin = System.nanoTime()
     val f = graph.run()
@@ -101,7 +97,5 @@ class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
       ("dataSource.portNumber", "10032"),
       ("dataSource.databaseName", "postgres"),
       ("dataSource.user", "postgres"),
-      ("dataSource.password", "hl.Data2018")
-    )
-
+      ("dataSource.password", "hl.Data2018"))
 }

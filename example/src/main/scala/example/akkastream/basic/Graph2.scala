@@ -1,8 +1,8 @@
 package example.akkastream.basic
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, ClosedShape}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Source}
+import akka.stream.{ ActorMaterializer, ClosedShape }
+import akka.stream.scaladsl.{ Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Source }
 
 import scala.io.StdIn
 

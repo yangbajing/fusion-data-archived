@@ -18,13 +18,12 @@ package com.fasterxml.jackson.module.helloscala
 
 import java.util.concurrent.TimeUnit
 
-import com.fasterxml.jackson.core.{JsonGenerator, JsonParser, Version}
+import com.fasterxml.jackson.core.{ JsonGenerator, JsonParser, Version }
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.databind.deser.Deserializers
 import com.fasterxml.jackson.databind.ser.Serializers
-import helloscala.common.jackson.{ObjectIdDeserializer, ObjectIdSerializer}
+import helloscala.common.jackson.{ ObjectIdDeserializer, ObjectIdSerializer }
 import helloscala.common.types.ObjectId
-import helloscala.common.util.StringUtils
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -59,13 +58,11 @@ class HelloscalaSerializers extends Serializers.Base {
 }
 
 class HelloscalaDeserializers extends Deserializers.Base {
-
   @throws[JsonMappingException]
   override def findBeanDeserializer(
       `type`: JavaType,
       config: DeserializationConfig,
-      beanDesc: BeanDescription
-  ): JsonDeserializer[_] = {
+      beanDesc: BeanDescription): JsonDeserializer[_] = {
     val rawClass = `type`.getRawClass
     if (classOf[ObjectId].isAssignableFrom(rawClass)) new ObjectIdDeserializer
     else if (classOf[FiniteDuration].isAssignableFrom(rawClass)) new FiniteDurationDeserializer
