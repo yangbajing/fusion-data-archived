@@ -1,11 +1,9 @@
 package mass.job
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-import helloscala.common.test.HelloscalaSpec
-import org.scalatest.BeforeAndAfterAll
+import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class JobSystemTest extends TestKit(ActorSystem("mass")) with HelloscalaSpec with BeforeAndAfterAll {
+class JobSystemTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   var jobSystem: JobSystem = _
 
   override protected def beforeAll(): Unit = {

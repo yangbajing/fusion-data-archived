@@ -11,7 +11,7 @@ object MultiNodeSampleConfig extends MultiNodeConfig {
   val node2: RoleName = role("node2")
 }
 
-object MultiNodeSample {
+object MultiNodeSampleSpec {
 
   class Ponger extends Actor {
     def receive: Receive = {
@@ -21,15 +21,15 @@ object MultiNodeSample {
 
 }
 
-class MultiNodeSample extends MultiNodeSpec(MultiNodeSampleConfig) with STMultiNodeSpec with ImplicitSender {
+class MultiNodeSampleSpec extends MultiNodeSpec(MultiNodeSampleConfig) with STMultiNodeSpec with ImplicitSender {
 
-  import MultiNodeSample._
+  import MultiNodeSampleSpec._
   import MultiNodeSampleConfig._
 
   // 设置参与者数量，之后的Barrier（enterBarrier）需要满足此数量后才运行之后的代码。
   def initialParticipants: Int = roles.size
 
-  "A MultiNodeSample" must {
+  "A MultiNodeSampleSpec" must {
 
     "wait for all nodes to enter a barrier" in {
       enterBarrier("startup")
@@ -56,5 +56,5 @@ class MultiNodeSample extends MultiNodeSpec(MultiNodeSampleConfig) with STMultiN
   }
 }
 
-class MultiNodeSampleSpecMultiJvmNode1 extends MultiNodeSample
-class MultiNodeSampleSpecMultiJvmNode2 extends MultiNodeSample
+class MultiNodeSampleSpecMultiJvmNode1 extends MultiNodeSampleSpec
+class MultiNodeSampleSpecMultiJvmNode2 extends MultiNodeSampleSpec

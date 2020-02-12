@@ -2,13 +2,13 @@ package mass.job.repository
 
 import java.time.OffsetDateTime
 
-import mass.data.CommonStatus
-import mass.data.job._
+import mass.model.CommonStatus
+import mass.model.job._
 import mass.slick.SlickProfile.api._
 
 class JobScheduleTable(tag: Tag) extends Table[JobSchedule](tag, "job_schedule") {
   def key = column[String]("key")
-  def job = column[JobItem]("job")
+  def item = column[JobItem]("item")
   def trigger = column[JobTrigger]("trigger")
   def description = column[String]("description")
   def runStatus = column[RunStatus]("run_status")
@@ -22,8 +22,8 @@ class JobScheduleTable(tag: Tag) extends Table[JobSchedule](tag, "job_schedule")
   def * =
     (
       key,
-      job.?,
-      trigger.?,
+      item,
+      trigger,
       description,
       runStatus,
       status,
@@ -31,7 +31,7 @@ class JobScheduleTable(tag: Tag) extends Table[JobSchedule](tag, "job_schedule")
       createdAt,
       scheduleCount,
       lastScheduleStart,
-      lastScheduledAt) <> ((JobSchedule.apply _).tupled, JobSchedule.unapply)
+      lastScheduledAt).mapTo[JobSchedule]
 }
 
 class JobLogTable(tag: Tag) extends Table[JobLog](tag, "job_log") {

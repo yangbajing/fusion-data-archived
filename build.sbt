@@ -70,7 +70,9 @@ lazy val massDocs = _project("mass-docs")
 
 lazy val example = _project("example")
   .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Seq(_fusionCluster))
+  .enablePlugins(MultiJvmPlugin)
+  .configs(MultiJvm)
+  .settings(libraryDependencies ++= Seq(_fusionCluster, _akkaMultiNodeTestkit % Test))
 
 lazy val massFunctest = _project("mass-functest")
   .dependsOn(massConsole, massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
@@ -178,6 +180,7 @@ lazy val massCore =
         _h2,
         _fusionJdbc,
         _fusionProtobufV3,
+        _fusionJson,
         _postgresql % Test,
         _quartz % Provided) ++ _akkaHttps)
 

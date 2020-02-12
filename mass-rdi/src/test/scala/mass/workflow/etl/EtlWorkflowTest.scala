@@ -1,16 +1,14 @@
 package mass.workflow.etl
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-import helloscala.common.test.HelloscalaSpec
+import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import mass.rdp.RdpSystem
 import mass.rdp.etl.EtlWorkflow
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class EtlWorkflowTest extends TestKit(ActorSystem("etl-test")) with HelloscalaSpec with BeforeAndAfterAll {
+class EtlWorkflowTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   var rdpSystem: RdpSystem = _
   var etlWorkflow: EtlWorkflow = _
 
@@ -27,7 +25,7 @@ class EtlWorkflowTest extends TestKit(ActorSystem("etl-test")) with HelloscalaSp
 
   "EtlWorkflow" should {
     "show" in {
-      etlWorkflow.connectors must not be empty
+      etlWorkflow.connectors should not be empty
       etlWorkflow.connectors.foreach(c => println(s"connector: $c"))
       println(etlWorkflow.graph)
 

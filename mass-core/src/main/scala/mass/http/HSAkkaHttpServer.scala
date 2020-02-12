@@ -28,7 +28,7 @@ import scala.util.{ Failure, Success }
 trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with StrictLogging {
   def actorSystem: ActorSystem
 
-  def actorMaterializer: ActorMaterializer
+//  def actorMaterializer: ActorMaterializer
 
   val hlServerValue: String
 
@@ -153,9 +153,7 @@ trait HSAkkaHttpServer extends BaseExceptionPF with BaseRejectionBuilder with St
       port: Int,
       httpsPort: Option[Int]): (Future[ServerBinding], Option[Future[ServerBinding]]) = {
     implicit val system: ActorSystem = actorSystem
-    implicit val mat: ActorMaterializer = actorMaterializer
-    implicit val executionContext: ExecutionContextExecutor =
-      actorSystem.dispatcher
+    implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
 
     serverHost = host
     serverPort = port

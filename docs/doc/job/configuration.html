@@ -321,38 +321,38 @@ Version 1.0.0-SNAPSHOT
 <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/scripts/software/postgres/init.sql#L35-L69" target="_blank" title="Go to snippet source"></a><code class="language-sql">drop table if exists public.job_schedule;
 create table public.job_schedule
 (
-  key                 varchar(128) not null,
-  job            jsonb not null,
-  trigger        jsonb not null,
-  description        text         not null,
-  run_status             int          not null default 1,
-  status             int          not null default 1,
-  creator varchar(24) not null,
-  created_at         timestamptz  not null,
-  schedule_count      bigint      not null default 0,
-  last_schedule_start timestamptz,
-  last_scheduled_at   timestamptz,
-  constraint job_schedule_pk primary key (key)
+    key                 varchar(128) not null,
+    item                jsonb        not null,
+    trigger             jsonb        not null,
+    description         text         not null,
+    run_status          int          not null default 1,
+    status              int          not null default 1,
+    creator             varchar(24)  not null,
+    created_at          timestamptz  not null,
+    schedule_count      bigint       not null default 0,
+    last_schedule_start timestamptz,
+    last_scheduled_at   timestamptz,
+    constraint job_schedule_pk primary key (key)
 );
 comment on table public.job_schedule
-  is &#39;作业，job_item与job_trigger关联后实际执行&#39;;
+    is &#39;作业，job_item与job_trigger关联后实际执行&#39;;
 comment on column public.job_schedule.status
-  is &#39;作业状态：0 未启用，1 启用&#39;;
+    is &#39;作业状态：0 未启用，1 启用&#39;;
 
 drop table if exists public.job_log;
 create table public.job_log
 (
-  id                char(24)     not null,
-  job_key           varchar(128), -- FK job_item.key
-  start_time        timestamptz  not null,
-  completion_time   timestamptz,
-  completion_status int,
-  completion_value  text,
-  created_at   timestamptz,
-  constraint job_log_pk primary key (id)
+    id                char(24)    not null,
+    job_key           varchar(128), -- FK job_item.key
+    start_time        timestamptz not null,
+    completion_time   timestamptz,
+    completion_status int,
+    completion_value  text,
+    created_at        timestamptz,
+    constraint job_log_pk primary key (id)
 );
 create index job_log_job_key_idx
-  on job_log (job_key);</code></pre>
+    on job_log (job_key);</code></pre>
 </div>
 </article>
 <div class="row">

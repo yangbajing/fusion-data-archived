@@ -3,7 +3,7 @@ package mass.job.component
 import helloscala.common.Configuration
 import helloscala.common.jackson.Jackson
 import helloscala.common.test.HelloscalaSpec
-import mass.data.job.{ JobItem, Program }
+import mass.model.job.{ JobItem, Program }
 import mass.job.JobSettings
 import mass.server.MassSettings
 
@@ -17,7 +17,7 @@ class JobRunTest extends HelloscalaSpec {
       val result = JobRun.run(detail, "test-java", schedulerConfig)
       println(Jackson.prettyStringify(result))
       result.exitValue mustBe 0
-      result.start must be < result.end
+      result.start must be < result.end.value
     }
 
     "run scala" in {
@@ -25,7 +25,7 @@ class JobRunTest extends HelloscalaSpec {
       val result = JobRun.run(detail, "test-scala", schedulerConfig)
       println(Jackson.prettyStringify(result))
       result.exitValue mustBe 0
-      result.start must be < result.end
+      result.start must be < result.end.value
     }
 
     "run bash -c" in {
@@ -33,7 +33,7 @@ class JobRunTest extends HelloscalaSpec {
       val result = JobRun.run(detail, "test-bash", schedulerConfig)
       println(Jackson.prettyStringify(result))
       result.exitValue mustBe 0
-      result.start must be < result.end
+      result.start must be < result.end.value
     }
 
     "run python -c" in {
@@ -41,7 +41,7 @@ class JobRunTest extends HelloscalaSpec {
       val result = JobRun.run(detail, "test-python", schedulerConfig)
       println(Jackson.prettyStringify(result))
       result.exitValue mustBe 0
-      result.start must be < result.end
+      result.start must be < result.end.value
     }
   }
 }

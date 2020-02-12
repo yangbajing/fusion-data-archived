@@ -1,6 +1,6 @@
 package mass.job.util
 
-import mass.data.job.Program
+import mass.model.job.Program
 
 sealed trait ProgramVersion {
   val NAME: Program

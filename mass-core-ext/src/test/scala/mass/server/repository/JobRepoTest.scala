@@ -2,18 +2,16 @@ package mass.server.repository
 
 import java.time.{ LocalDateTime, OffsetDateTime }
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
+import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import helloscala.common.jackson.Jackson
-import helloscala.common.test.HelloscalaSpec
 import helloscala.common.util.TimeUtils
 import mass.extension.MassSystem
 import mass.job.repository._
 import mass.message.job.JobPageReq
 import mass.slick.SlickProfile.api._
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class JobRepoTest extends TestKit(ActorSystem("test")) with HelloscalaSpec with BeforeAndAfterAll {
+class JobRepoTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   private val massSystem: MassSystem = MassSystem(system)
 
   "JobRepositoryTest" should {

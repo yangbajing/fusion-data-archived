@@ -4,17 +4,14 @@ import java.nio.file.{ Files, Paths, StandardCopyOption }
 import java.time.OffsetDateTime
 
 import com.typesafe.scalalogging.StrictLogging
+import helloscala.common.data.{ IntValueName, StringValueName }
 import helloscala.common.util.DigestUtils
-import mass.core.protobuf.ProtoUtils
 import mass.job.JobSystem
 import mass.job.component.DefaultSchedulerJob
-import mass.job.model.{ JobUploadFilesReq, JobUploadJobReq }
 import mass.job.repository.JobRepo
 import mass.job.util.{ JobUtils, ProgramVersion }
-import mass.message.job.JobGetAllOptionResp.ProgramVersionItem
 import mass.message.job._
-import mass.data.job._
-import mass.data.{ IdValue, TitleValue }
+import mass.model.job._
 import mass.slick.SqlManager
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -25,7 +22,7 @@ trait JobService extends StrictLogging {
   protected val JOB_CLASS_NAME: String = classOf[DefaultSchedulerJob].getName
   protected lazy val db: SqlManager = jobSystem.massSystem.sqlManager
 
-  def executionJob(event: JobExecuteEvent)(implicit ec: ExecutionContext): Unit = {
+  def executionJob(event: JobExecutionEvent)(implicit ec: ExecutionContext): Unit = {
     db.run(JobRepo.findJob(event.key)).foreach {
       case Some(schedule) => jobSystem.triggerJob(schedule.key)
       case None           => logger.error(s"作业未找到，jobKey: ${event.key}")
@@ -38,8 +35,8 @@ trait JobService extends StrictLogging {
 
   def handlePage(req: JobPageReq)(implicit ec: ExecutionContext): Future[JobPageResp] = db.run(JobRepo.page(req))
 
-  def handleFind(req: JobFindReq)(implicit ec: ExecutionContext): Future[JobFindResp] = {
-    db.run(JobRepo.findJob(req.key)).map(maybe => JobFindResp(maybe))
+  def handleFind(req: JobFindReq)(implicit ec: ExecutionContext): Future[JobSchedulerResp] = {
+    db.run(JobRepo.findJob(req.key)).map(maybe => JobSchedulerResp(maybe))
   }
 
   def handleUploadJob(req: JobUploadJobReq)(implicit ec: ExecutionContext): Future[JobUploadJobResp] =
@@ -52,16 +49,16 @@ trait JobService extends StrictLogging {
       }
 
   def handleGetAllOption(req: JobGetAllOptionReq)(implicit ec: ExecutionContext): Future[JobGetAllOptionResp] = Future {
-    val programs = ProtoUtils.enumToTitleIdValues(Program.values.filterNot(_.isUnkown))
-    val triggerType = ProtoUtils.enumToTitleIdValues(TriggerType.values.filterNot(_.isTriggerUnknown))
+    val programs = Program.values().toList.map(_.toValueName)
+    val triggerType = TriggerType.values().toList.map(_.toValueName)
     val programVersion = ProgramVersion.values
       .groupBy(_.NAME)
       .map {
         case (program, versions) =>
-          ProgramVersionItem(program.value, versions.map(p => TitleValue(p.VERSION, p.VERSION)))
+          ProgramVersionItem(program.getValue, versions.map(p => StringValueName(p.VERSION, p.VERSION)))
       }
       .toList
-    val jobStatus = ProtoUtils.enumToTitleIdValues(RunStatus)
+    val jobStatus = RunStatus.values().toList.map(_.toValueName)
     JobGetAllOptionResp(programs, triggerType, programVersion, jobStatus)
   }
 
@@ -71,10 +68,10 @@ trait JobService extends StrictLogging {
     }
   }
 
-  def handleUpdate(req: JobUpdateReq)(implicit ec: ExecutionContext): Future[JobFindResp] = {
+  def handleUpdate(req: JobUpdateReq)(implicit ec: ExecutionContext): Future[JobSchedulerResp] = {
     db.runTransaction(JobRepo.updateJobSchedule(req)).map { schedule =>
       schedulerJob(schedule)
-      JobFindResp(Option(schedule))
+      JobSchedulerResp(Option(schedule))
     }
   }
 
@@ -86,12 +83,12 @@ trait JobService extends StrictLogging {
         val relativePath = Paths.get(sha256.take(2), sha256, fileInfo.fileName)
         val dist = jobSettings.jobSavedDir.resolve(relativePath)
         Files.move(file.toPath, dist, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
-        IdValue(idx, relativePath.toString)
+        IntValueName(idx, relativePath.toString)
     }
     JobUploadFilesResp(resources)
   }
 
   private def schedulerJob(schedule: JobSchedule): OffsetDateTime = {
-    jobSystem.scheduleJob(schedule.key, schedule.item.get, schedule.trigger.get, JOB_CLASS_NAME, None)
+    jobSystem.scheduleJob(schedule.key, schedule.item, schedule.trigger, JOB_CLASS_NAME, None)
   }
 }

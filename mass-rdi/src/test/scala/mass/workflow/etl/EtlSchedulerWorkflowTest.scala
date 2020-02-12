@@ -1,13 +1,11 @@
 package mass.workflow.etl
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-import helloscala.common.test.HelloscalaSpec
+import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import mass.job.JobSystem
 import mass.rdp.RdpSystem
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class EtlSchedulerWorkflowTest extends TestKit(ActorSystem("etl-test")) with HelloscalaSpec with BeforeAndAfterAll {
+class EtlSchedulerWorkflowTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   var rdpSystem: RdpSystem = _
   var jobSystem: JobSystem = _
   //  var etlWorkflow: EtlWorkflow = _

@@ -8,7 +8,7 @@ import com.github.tminglei.slickpg.utils.SimpleArrayUtils
 import helloscala.common.types.ObjectId
 import slick.jdbc._
 
-import scala.language.{ higherKinds, implicitConversions }
+import scala.language.implicitConversions
 import scala.reflect.classTag
 import scala.reflect.runtime.{ universe => u }
 

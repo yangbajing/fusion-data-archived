@@ -8,6 +8,7 @@ object Dependencies {
   val _scalaXml = "org.scala-lang.modules" %% "scala-xml" % "1.2.0"
 
   val _fusionProtobufV3 = "com.akka-fusion" %% "fusion-protobuf-v3" % BuildInfo.version
+  val _fusionJson = "com.akka-fusion" %% "fusion-json" % BuildInfo.version
   val _fusionJdbc = "com.akka-fusion" %% "fusion-jdbc" % BuildInfo.version
   val _fusionCluster = "com.akka-fusion" %% "fusion-cluster" % BuildInfo.version
   val _fusionCore = "com.akka-fusion" %% "fusion-core" % BuildInfo.version

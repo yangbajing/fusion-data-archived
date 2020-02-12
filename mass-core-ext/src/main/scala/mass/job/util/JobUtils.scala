@@ -10,10 +10,9 @@ import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.Configuration
 import helloscala.common.exception.HSBadRequestException
 import helloscala.common.util.{ DigestUtils, FileUtils, Utils }
-import mass.job.model.JobUploadJobReq
 import mass.job.{ JobConstants, JobSettings }
 import mass.message.job._
-import mass.data.job.{ JobItem, JobTrigger, Program, TriggerType }
+import mass.model.job.{ JobItem, JobTrigger, Program, TriggerType }
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ ExecutionContext, Future }
@@ -83,7 +82,7 @@ object JobUtils extends StrictLogging {
     val item = conf.getConfiguration("item")
     val trigger = conf.getConfiguration("trigger")
 
-    val program = Program.fromName(item.getString("program").toUpperCase()).getOrElse(Program.UNKOWN)
+    val program = Program.optionalFromName(item.getString("program").toUpperCase()).orElse(Program.UNKOWN)
     val programMain = item.getString("program-main")
     val _version = item.getOrElse[String]("program-version", "")
     val programVersion =
@@ -96,7 +95,7 @@ object JobUtils extends StrictLogging {
       programVersion.VERSION)
 
     val triggerType =
-      TriggerType.fromName(trigger.getString("trigger-type").toUpperCase()).getOrElse(TriggerType.TRIGGER_UNKNOWN)
+      TriggerType.optionalFromName(trigger.getString("trigger-type").toUpperCase()).orElse(TriggerType.TRIGGER_UNKNOWN)
     val jobTrigger = JobTrigger(
       triggerType,
       trigger.getOrElse[String]("trigger-event", ""),
@@ -105,12 +104,12 @@ object JobUtils extends StrictLogging {
       trigger.getOrElse[Int]("repeat", 0),
       trigger.getOrElse[FiniteDuration]("duration", scala.concurrent.duration.Duration.Zero),
       trigger.getOrElse[String]("cron-express", ""),
-      trigger.getOrElse[String]("description", ""),
+      trigger.get[Option[String]]("description"),
       trigger.getOrElse[Int]("failed-retries", 0),
       trigger.getOrElse[FiniteDuration]("timeout", scala.concurrent.duration.Duration.Zero),
       trigger.getOrElse[Seq[String]]("alarm-emails", Nil))
 
-    JobCreateReq(conf.get[Option[String]]("key"), Some(jobItem), Some(jobTrigger))
+    JobCreateReq(conf.get[Option[String]]("key"), jobItem, jobTrigger, None)
   }
 }
 

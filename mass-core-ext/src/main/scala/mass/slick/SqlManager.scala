@@ -1,10 +1,9 @@
 package mass.slick
 
+import akka.actor.typed.ActorSystem
 import com.typesafe.scalalogging.StrictLogging
 import com.zaxxer.hikari.HikariDataSource
-import fusion.jdbc.JdbcTemplate
-import fusion.jdbc.util.JdbcUtils
-import helloscala.common.Configuration
+import fusion.jdbc.{ FusionJdbc, JdbcTemplate }
 import mass.core.Constants
 import slick.basic.DatabasePublisher
 
@@ -13,15 +12,14 @@ import scala.util.Failure
 
 /**
  * Mass系统SQL数据访问管理器
- * @param config 配置
  */
-class SqlManager private (config: Configuration) extends StrictLogging {
+class SqlManager private (system: ActorSystem[_]) extends StrictLogging {
   import SlickProfile.api._
 
   val profile: SlickProfile.type = SlickProfile
-  val dataSource: HikariDataSource = JdbcUtils.createHikariDataSource(config)
-  val slickDatabase: SlickProfile.backend.DatabaseDef = createDatabase(dataSource, config)
-  val jdbcTemplate: JdbcTemplate = JdbcTemplate(dataSource, config)
+  val dataSource: HikariDataSource = FusionJdbc(system).component
+  val slickDatabase: SlickProfile.backend.DatabaseDef = databaseForDataSource(dataSource)
+  val jdbcTemplate: JdbcTemplate = JdbcTemplate(dataSource)
 
   implicit final def executionContext: ExecutionContext = slickDatabase.ioExecutionContext
 
@@ -49,6 +47,6 @@ class SqlManager private (config: Configuration) extends StrictLogging {
 object SqlManager {
   val DEFAULT_PATH = s"${Constants.BASE_CONF}.core.persistence.postgres"
 
-  def apply(configuration: Configuration, path: String = DEFAULT_PATH): SqlManager =
-    new SqlManager(configuration.getConfiguration(path))
+  def apply(system: ActorSystem[_]): SqlManager =
+    new SqlManager(system)
 }

@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-package mass.data
-import com.typesafe.scalalogging.Logger
-import helloscala.common.jackson.Jackson
+package mass.model;
 
-import scala.util.control.NonFatal
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-object Provinces {
-  private val logger = Logger(getClass.getName.dropRight(1))
+/**
+ * Created by yangbajing(yangbajing@gmail.com) on 2017-03-30.
+ */
+public interface IApiResult<T> {
+    Integer getErrCode();
 
-  lazy val provinces: ProvinceData = getProvinces()
+    String getErrMsg();
 
-//
-  def getProvinces(): ProvinceData = {
-    val in =
-      Thread.currentThread().getContextClassLoader.getResource("province.json")
-    try {
-      Jackson.defaultObjectMapper.readValue(in, classOf[ProvinceData])
-    } catch {
-      case NonFatal(e) =>
-        logger.error("获取省份名名称数据错误", e)
-        throw e
+    T getData();
+
+    @JsonIgnore
+    default boolean isSuccess() {
+        Integer errCode = getErrCode();
+        return errCode == null || errCode == 0;
     }
-  }
+
 }

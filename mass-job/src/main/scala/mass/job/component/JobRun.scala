@@ -2,16 +2,17 @@ package mass.job.component
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{ Files, Path }
+import java.time.OffsetDateTime
 import java.util.stream.Collectors
 
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.exception.HSBadRequestException
 import helloscala.common.util.FileUtils
 import mass.core.Constants
-import mass.job.{ JobConstants, JobSettings }
 import mass.job.util.{ JobUtils, ProgramVersion }
+import mass.job.{ JobConstants, JobSettings }
 import mass.message.job.SchedulerJobResult
-import mass.data.job.{ JobItem, Program }
+import mass.model.job.{ JobItem, Program }
 
 /**
  * 阻塞API
@@ -66,8 +67,8 @@ object JobRun extends StrictLogging {
     val p = FileUtils.processBuilder(commands, dist, extraEnvs, outPath, errPath)
     try {
       val exitValue = p.exitValue()
-      val end = System.currentTimeMillis()
-      SchedulerJobResult(p.start.toInstant.toEpochMilli, end, exitValue, p.outPath.toString, p.errPath.toString)
+      val end = OffsetDateTime.now()
+      SchedulerJobResult(p.start, Some(end), exitValue, p.outPath.toString, p.errPath.toString)
     } finally {
       p.destroy()
     }

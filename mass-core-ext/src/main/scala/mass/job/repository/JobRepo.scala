@@ -7,7 +7,8 @@ import helloscala.common.types.ObjectId
 import helloscala.common.util.StringUtils
 import mass.job.util.JobZip
 import mass.message.job._
-import mass.data.job._
+import mass.model.CommonStatus
+import mass.model.job._
 import mass.slick.SlickProfile.api._
 import slick.sql.{ FixedSqlAction, FixedSqlStreamingAction, SqlAction }
 
@@ -23,7 +24,15 @@ object JobRepo {
 
   def save(req: JobCreateReq): DBIOAction[JobSchedule, NoStream, Effect.Write] = {
     val key = req.key.getOrElse(ObjectId.getString())
-    val payload = JobSchedule(key, req.item, req.trigger, req.description)
+    val payload = JobSchedule(
+      key,
+      req.item,
+      req.trigger,
+      req.description.getOrElse(""),
+      RunStatus.JOB_NORMAL,
+      CommonStatus.ENABLE,
+      creator = "",
+      OffsetDateTime.now())
     tJobSchedule.returning(tJobSchedule) += payload
   }
 
@@ -31,14 +40,16 @@ object JobRepo {
       implicit ec: ExecutionContext): DBIOAction[Vector[JobSchedule], NoStream, Effect.Write] = {
     val now = OffsetDateTime.now()
     val actions = jobZip.configs.map { config =>
-      val jobItem = config.item.getOrElse(throw HSBadRequestException("item不能为空"))
-      val trigger = config.trigger.getOrElse(throw HSBadRequestException("trigger不能为空"))
+      val jobItem = config.item
+      val trigger = config.trigger
       val schedule = JobSchedule(
         config.key.getOrElse(ObjectId.getString()),
-        Some(jobItem),
-        Some(trigger),
+        jobItem,
+        trigger,
         s"triggerType: ${trigger.triggerType}",
         RunStatus.JOB_NORMAL,
+        CommonStatus.ENABLE,
+        creator = "",
         createdAt = now)
       tJobSchedule.returning(tJobSchedule) += schedule
     }
@@ -69,10 +80,10 @@ object JobRepo {
     q.result.headOption.flatMap {
       case Some(schedule) =>
         val payload = schedule.copy(
-          item = req.item.orElse(schedule.item),
-          trigger = req.trigger.orElse(schedule.trigger),
+          item = req.item.getOrElse(schedule.item),
+          trigger = req.trigger.getOrElse(schedule.trigger),
           description = req.description.getOrElse(schedule.description),
-          status = if (req.status.isUnrecognized) schedule.status else req.status)
+          status = req.status.getOrElse(schedule.status))
         q.update(payload).map(_ => payload)
       case None => DBIO.failed(HSNotFoundException(s"Job：${req.key} Not Found."))
     }

@@ -1,16 +1,14 @@
 package mass.server
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-import helloscala.common.test.HelloscalaSpec
+import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import mass.extension.MassSystem
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class MassSystemExtensionTest extends TestKit(ActorSystem("mass")) with HelloscalaSpec with BeforeAndAfterAll {
+class MassSystemExtensionTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   "MassSystemExtension" should {
     "as[MassSystemExtension]" in {
       val massSystem = MassSystem(system)
-      massSystem must not be null
+      massSystem should not be null
       println(massSystem)
     }
   }

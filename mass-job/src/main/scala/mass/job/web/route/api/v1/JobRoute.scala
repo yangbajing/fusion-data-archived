@@ -8,7 +8,7 @@ import mass.job.service.Services
 import mass.message.job._
 
 class JobRoute(services: Services) extends AbstractRoute with StrictLogging {
-  private val pagePDM = ('page.as[Int].?(Page.DEFAULT_PAGE), 'size.as[Int].?(Page.DEFAULT_SIZE), 'key.?(""))
+  private val pagePDM = ('page.as[Int].?(Page.DEFAULT_PAGE), 'size.as[Int].?(Page.DEFAULT_SIZE), 'key.?)
 
   override def route: Route = pathPrefix("job") {
     pathEndOrSingleSlash {

@@ -4,30 +4,36 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
-import akka.actor.{ ActorRef, Props }
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.AskPattern._
 import akka.http.scaladsl.server.directives.FileInfo
-import akka.pattern._
 import akka.util.Timeout
 import mass.job.JobSystem
-import mass.job.model.{ JobUploadFilesReq, JobUploadJobReq }
-import mass.job.service.job.JobActor
+import mass.job.service.job.JobBehavior
+import mass.job.service.job.JobBehavior.CommandReply
 import mass.message.job._
 
 import scala.collection.immutable
 import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
 
-class Services(val jobSystem: JobSystem, propsList: Iterable[(Props, Symbol)]) {
+class Services(val jobSystem: JobSystem) {
   implicit val timeout: Timeout = Timeout(10.seconds)
-  val aggregate: ActorRef = jobSystem.system.actorOf(JobAggregate.props(propsList), JobAggregate.name.name)
+  implicit val system = jobSystem.system
 
-  def listOption(): Future[JobGetAllOptionResp] =
-    (aggregate ? JobActor.message(JobGetAllOptionReq())).mapTo[JobGetAllOptionResp]
+  val jobBehavior: ActorRef[JobBehavior.Command] = null
+
+  def listOption(): Future[JobGetAllOptionResp] = {
+    jobBehavior.ask[JobResponse](replyTo => CommandReply(JobGetAllOptionReq(), replyTo)).mapTo[JobGetAllOptionResp]
+  }
 
   def uploadFiles(list: immutable.Seq[(FileInfo, File)])(implicit ec: ExecutionContext): Future[JobUploadFilesResp] = {
-    (aggregate ? JobActor.message(JobUploadFilesReq(list))).mapTo[JobUploadFilesResp].andThen {
-      case _ => list.foreach { case (_, file) => Files.deleteIfExists(file.toPath) }
-    }
+    jobBehavior
+      .ask[JobResponse](replyTo => CommandReply(JobUploadFilesReq(list), replyTo))
+      .mapTo[JobUploadFilesResp]
+      .andThen {
+        case _ => list.foreach { case (_, file) => Files.deleteIfExists(file.toPath) }
+      }
   }
 
   def uploadJobOnZip(fileInfo: FileInfo, file: File)(implicit ec: ExecutionContext): Future[JobUploadJobResp] = {
@@ -35,19 +41,29 @@ class Services(val jobSystem: JobSystem, propsList: Iterable[(Props, Symbol)]) {
       file,
       fileInfo.fileName,
       fileInfo.contentType.charsetOption.map(_.nioCharset()).getOrElse(StandardCharsets.UTF_8))
-    (aggregate ? JobActor.message(msg)).mapTo[JobUploadJobResp].andThen { case _ => Files.deleteIfExists(file.toPath) }
+
+    jobBehavior.ask[JobResponse](replyTo => CommandReply(msg, replyTo)).mapTo[JobUploadJobResp].andThen {
+      case _ => Files.deleteIfExists(file.toPath)
+    }
   }
 
-  def updateTrigger(req: JobUpdateReq): Future[JobFindResp] =
-    (aggregate ? JobActor.message(req)).mapTo[JobFindResp]
+  def updateTrigger(req: JobUpdateReq): Future[JobSchedulerResp] = {
+    jobBehavior.ask[JobResponse](replyTo => CommandReply(req, replyTo)).mapTo[JobSchedulerResp]
+  }
 
-  def page(req: JobPageReq): Future[JobPageResp] = (aggregate ? JobActor.message(req)).mapTo[JobPageResp]
+  def page(req: JobPageReq): Future[JobPageResp] = {
+    jobBehavior.ask[JobResponse](replyTo => CommandReply(req, replyTo)).mapTo[JobPageResp]
+  }
 
-  def findItemByKey(key: String): Future[JobFindResp] =
-    (aggregate ? JobActor.message(JobFindReq(key = key))).mapTo[JobFindResp]
+  def findItemByKey(key: String): Future[JobSchedulerResp] = {
+    jobBehavior.ask[JobResponse](replyTo => CommandReply(JobFindReq(key = key), replyTo)).mapTo[JobSchedulerResp]
+  }
 
-  def createJob(req: JobCreateReq): Future[JobCreateResp] =
-    (aggregate ? JobActor.message(req)).mapTo[JobCreateResp]
+  def createJob(req: JobCreateReq): Future[JobCreateResp] = {
+    jobBehavior.ask[JobResponse](replyTo => CommandReply(req, replyTo)).mapTo[JobCreateResp]
+  }
 
-  def updateJob(req: JobUpdateReq): Future[JobFindResp] = (aggregate ? JobActor.message(req)).mapTo[JobFindResp]
+  def updateJob(req: JobUpdateReq): Future[JobSchedulerResp] = {
+    jobBehavior.ask[JobResponse](replyTo => CommandReply(req, replyTo)).mapTo[JobSchedulerResp]
+  }
 }

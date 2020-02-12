@@ -4,21 +4,20 @@ import akka.http.scaladsl.model.StatusCodes
 import helloscala.common.jackson.Jackson
 import mass.job.SchedulerSpec
 import mass.job.service.Services
-import mass.job.service.job.JobActor
 import mass.message.job.{ JobCreateReq, JobPageResp }
 
 class JobRouteTest extends SchedulerSpec {
-  private lazy val services = new Services(jobSystem, List(JobActor.props))
+  private lazy val services = new Services(jobSystem)
   private lazy val route = new JobRoute(services).route
 
   "JobRoute" should {
     "page" in {
       import mass.http.JacksonSupport._
       Get("/job/page") ~> route ~> check {
-        status mustBe StatusCodes.OK
+        status shouldBe StatusCodes.OK
         val resp = responseAs[JobPageResp]
         println(resp)
-        resp must not be null
+        resp should not be null
       }
     }
   }

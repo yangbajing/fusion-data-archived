@@ -7,7 +7,7 @@ import com.typesafe.config.ConfigFactory
 import helloscala.common.Configuration
 import helloscala.common.test.HelloscalaSpec
 import mass.job.JobSettings
-import mass.job.model.JobUploadJobReq
+import mass.message.job.JobUploadJobReq
 import mass.server.MassSettings
 
 class JobUtilsTest extends HelloscalaSpec {

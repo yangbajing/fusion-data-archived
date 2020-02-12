@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mass.data;
+package mass.model;
 
 import java.util.Objects;
 

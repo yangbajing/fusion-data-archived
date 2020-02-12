@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mass.data
+package mass.model
 
 import java.sql.Timestamp
 import java.time._

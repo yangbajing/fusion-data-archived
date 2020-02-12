@@ -19,7 +19,7 @@ import helloscala.common.jackson.Jackson
 import helloscala.common.page.{ Page, PageInput }
 import helloscala.common.types.{ AsInt, ObjectId }
 import helloscala.common.util.TimeUtils
-import mass.data.ApiResult
+import mass.model.ApiResult
 
 import scala.annotation.tailrec
 import scala.collection.immutable

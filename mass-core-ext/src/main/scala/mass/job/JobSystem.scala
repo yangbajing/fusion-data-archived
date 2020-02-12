@@ -4,27 +4,29 @@ import java.nio.file.Files
 import java.time.OffsetDateTime
 import java.util.Properties
 
-import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
+import akka.Done
+import akka.actor.typed.ActorSystem
 import com.typesafe.scalalogging.LazyLogging
+import fusion.common.extension.{ FusionExtension, FusionExtensionId }
+import fusion.core.extension.FusionCore
 import helloscala.common.Configuration
 import helloscala.common.exception.HSBadRequestException
 import helloscala.common.util.TimeUtils
 import mass.core.Constants
 import mass.core.job.{ SchedulerJob, SchedulerSystemRef }
 import mass.extension.MassSystem
-import mass.data.job.{ JobItem, JobTrigger, TriggerType }
+import mass.model.job.{ JobItem, JobTrigger, TriggerType }
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ ExecutionContext, Future }
 
-object JobSystem extends ExtensionId[JobSystem] with ExtensionIdProvider {
-  override def createExtension(system: ExtendedActorSystem): JobSystem = new JobSystem(system, true)
-  override def lookup(): ExtensionId[_ <: Extension] = JobSystem
+object JobSystem extends FusionExtensionId[JobSystem] {
+  override def createExtension(system: ActorSystem[_]): JobSystem = new JobSystem(system, true)
 }
 
-final class JobSystem private (val system: ExtendedActorSystem, val waitForJobsToComplete: Boolean)
+final class JobSystem private (val system: ActorSystem[_], val waitForJobsToComplete: Boolean)
     extends SchedulerSystemRef
-    with Extension
+    with FusionExtension
     with LazyLogging {
   import org.quartz._
   import org.quartz.impl.StdSchedulerFactory
@@ -49,17 +51,18 @@ final class JobSystem private (val system: ExtendedActorSystem, val waitForJobsT
     }
 
     scheduler.start()
-    system.registerOnTermination {
-      scheduler.shutdown(waitForJobsToComplete)
+    FusionCore(system).shutdowns.serviceStop("QuartzScheduler") { () =>
+      Future {
+        scheduler.shutdown(waitForJobsToComplete)
+        Done
+      }(system.executionContext)
     }
   }
 
   def name: String = system.name
 
-  def configuration: Configuration = massSystem.connection
-
   // TODO 定义 SchedulerSystem 自有的线程执行器
-  implicit override def executionContext: ExecutionContext = system.dispatcher
+  implicit override def executionContext: ExecutionContext = system.executionContext
 
   /**
    * 直接执行作业

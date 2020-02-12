@@ -2,18 +2,19 @@ package mass.extension
 
 import java.nio.file.Path
 
-import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
+import akka.actor.typed.ActorSystem
+import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import helloscala.common.Configuration
 import mass.server.MassSettings
 import mass.slick.SqlManager
 
-final class MassSystem private (val system: ExtendedActorSystem) extends Extension {
+final class MassSystem private (val system: ActorSystem[_]) extends FusionExtension {
   val core: MassCore = MassCore(system)
 
   val settings = MassSettings(core.configuration)
 
   val sqlManager: SqlManager = {
-    val v = SqlManager(core.configuration)
+    val v = SqlManager(system)
     sys.addShutdownHook(v.slickDatabase.close())
     v
   }
@@ -25,7 +26,6 @@ final class MassSystem private (val system: ExtendedActorSystem) extends Extensi
   override def toString = s"MassSystem($system)"
 }
 
-object MassSystem extends ExtensionId[MassSystem] with ExtensionIdProvider {
-  override def createExtension(system: ExtendedActorSystem): MassSystem = new MassSystem(system)
-  override def lookup(): ExtensionId[_ <: Extension] = MassSystem
+object MassSystem extends FusionExtensionId[MassSystem] {
+  override def createExtension(system: ActorSystem[_]): MassSystem = new MassSystem(system)
 }

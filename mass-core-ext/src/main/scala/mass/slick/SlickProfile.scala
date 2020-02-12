@@ -6,13 +6,14 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.github.tminglei.slickpg._
 import com.github.tminglei.slickpg.agg.PgAggFuncSupport
 import com.github.tminglei.slickpg.str.PgStringSupport
+import com.zaxxer.hikari.HikariDataSource
 import helloscala.common.Configuration
+import helloscala.common.data.NameValue
 import helloscala.common.jackson.Jackson
 import helloscala.common.types.ObjectId
-import mass.data.NameValue
 import javax.sql.DataSource
-import mass.data.CommonStatus
-import mass.data.job._
+import mass.model.CommonStatus
+import mass.model.job._
 import slick.ast.TypedType
 import slick.basic.Capability
 import slick.jdbc.{ GetResult, JdbcCapabilities, JdbcType, SetParameter }
@@ -45,20 +46,21 @@ trait SlickProfile
     implicit val getCommonStatus: GetResult[CommonStatus] = mkGetResult(pr => CommonStatus.fromValue(pr.nextInt()))
     implicit val getCommonStatusOption: GetResult[Option[CommonStatus]] = mkGetResult(
       _.nextIntOption().map(CommonStatus.fromValue))
-    implicit val setCommonStatus: SetParameter[CommonStatus] = (v, rp) => rp.setInt(v.value)
-    implicit val setCommonStatusOption: SetParameter[Option[CommonStatus]] = (v, rp) => rp.setIntOption(v.map(_.value))
+    implicit val setCommonStatus: SetParameter[CommonStatus] = (v, rp) => rp.setInt(v.getValue)
+    implicit val setCommonStatusOption: SetParameter[Option[CommonStatus]] = (v, rp) =>
+      rp.setIntOption(v.map(_.getValue))
 
     implicit val getRunStatus: GetResult[RunStatus] = mkGetResult(pr => RunStatus.fromValue(pr.nextInt()))
     implicit val getRunStatusOption: GetResult[Option[RunStatus]] = mkGetResult(
       _.nextIntOption().map(RunStatus.fromValue))
-    implicit val setRunStatus: SetParameter[RunStatus] = (v, rp) => rp.setInt(v.value)
-    implicit val setRunStatusOption: SetParameter[Option[RunStatus]] = (v, rp) => rp.setIntOption(v.map(_.value))
+    implicit val setRunStatus: SetParameter[RunStatus] = (v, rp) => rp.setInt(v.getValue)
+    implicit val setRunStatusOption: SetParameter[Option[RunStatus]] = (v, rp) => rp.setIntOption(v.map(_.getValue))
 
     implicit val getTriggerType: GetResult[TriggerType] = mkGetResult(pr => TriggerType.fromValue(pr.nextInt()))
     implicit val getTriggerTypeOption: GetResult[Option[TriggerType]] = mkGetResult(
       pr => pr.nextIntOption().map(TriggerType.fromValue))
-    implicit val setTriggerType: SetParameter[TriggerType] = (v, rp) => rp.setInt(v.value)
-    implicit val setTriggerTypeOption: SetParameter[Option[TriggerType]] = (v, rp) => rp.setIntOption(v.map(_.value))
+    implicit val setTriggerType: SetParameter[TriggerType] = (v, rp) => rp.setInt(v.getValue)
+    implicit val setTriggerTypeOption: SetParameter[Option[TriggerType]] = (v, rp) => rp.setIntOption(v.map(_.getValue))
 
     implicit val getFiniteDuration: GetResult[FiniteDuration] =
       mkGetResult(pr => FiniteDuration(pr.nextLong(), TimeUnit.MILLISECONDS))
@@ -101,15 +103,16 @@ trait SlickProfile
     def coalesce[R: TypedType]: Seq[Rep[_]] => Rep[R] = SimpleFunction("coalesce")
 
     /// #proto-jdbc-type
-    implicit val programColumnType: JdbcType[Program] = MappedColumnType.base[Program, Int](_.value, Program.fromValue)
+    implicit val programColumnType: JdbcType[Program] =
+      MappedColumnType.base[Program, Int](_.getValue, Program.fromValue)
     implicit val commonStatusColumnType: JdbcType[CommonStatus] =
-      MappedColumnType.base[CommonStatus, Int](_.value, CommonStatus.fromValue)
+      MappedColumnType.base[CommonStatus, Int](_.getValue, CommonStatus.fromValue)
     implicit val durationColumnType: JdbcType[FiniteDuration] =
       MappedColumnType.base[FiniteDuration, Long](_.toMillis, millis => FiniteDuration(millis, TimeUnit.MILLISECONDS))
     implicit val triggerTypeColumnType: JdbcType[TriggerType] =
-      MappedColumnType.base[TriggerType, Int](_.value, TriggerType.fromValue)
+      MappedColumnType.base[TriggerType, Int](_.getValue, TriggerType.fromValue)
     implicit val jobStatusColumnType: JdbcType[RunStatus] =
-      MappedColumnType.base[RunStatus, Int](_.value, RunStatus.fromValue)
+      MappedColumnType.base[RunStatus, Int](_.getValue, RunStatus.fromValue)
 
     implicit val jobItemColumnType: JdbcType[JobItem] =
       MappedColumnType.base[JobItem, JsonNode](Jackson.valueToTree, Jackson.treeToValue[JobItem])
@@ -147,17 +150,29 @@ trait SlickProfile
         .reduceLeftOption(_ || _)
         .getOrElse(Some(true): Rep[Option[Boolean]])
 
-    def createDatabase(ds: DataSource, conf: Configuration): backend.DatabaseDef = {
-      val numThreads = conf.getOrElse[Int]("numThreads", 20)
-      val maximumPoolSize = conf.getOrElse[Int]("maximumPoolSize", numThreads)
-      val executor = AsyncExecutor(
-        conf.getOrElse[String]("poolName", "default"),
-        numThreads,
-        numThreads,
-        conf.getOrElse[Int]("queueSize", 1000),
-        maximumPoolSize,
-        registerMbeans = conf.getOrElse[Boolean]("registerMbeans", false))
-      Database.forDataSource(ds, Some(maximumPoolSize), executor)
+//    def createDatabase(ds: DataSource, conf: Configuration): backend.DatabaseDef = {
+//      val numThreads = conf.getOrElse[Int]("numThreads", 20)
+//      val maximumPoolSize = conf.getOrElse[Int]("maximumPoolSize", numThreads)
+//      val executor = AsyncExecutor(
+//        conf.getOrElse[String]("poolName", "default"),
+//        numThreads,
+//        numThreads,
+//        conf.getOrElse[Int]("queueSize", 1000),
+//        maximumPoolSize,
+//        registerMbeans = conf.getOrElse[Boolean]("registerMbeans", false))
+//      Database.forDataSource(ds, Some(maximumPoolSize), executor)
+//    }
+
+    def databaseForDataSource(dataSource: HikariDataSource): backend.DatabaseDef = {
+      Database.forDataSource(
+        dataSource,
+        None,
+        AsyncExecutor(
+          dataSource.getPoolName,
+          dataSource.getMaximumPoolSize,
+          dataSource.getMaximumPoolSize,
+          dataSource.getMaximumPoolSize * 2,
+          dataSource.getMaximumPoolSize))
     }
   }
 

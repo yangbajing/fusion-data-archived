@@ -1,14 +1,16 @@
 package mass.rdp
 
-import akka.actor.{ ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
-import akka.stream.ActorMaterializer
+import akka.actor.typed.ActorSystem
+import akka.stream.{ Materializer, SystemMaterializer }
 import com.typesafe.scalalogging.StrictLogging
-import helloscala.common.Configuration
+import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import mass.connector.ConnectorSystem
 import mass.core.Constants
 import mass.extension.MassCore
 import mass.rdp.etl.graph.{ EtlGraphParserFactory, EtlStreamFactory }
 import mass.rdp.module.RdpModule
+
+import scala.util.{ Failure, Success }
 
 trait RdpRefFactory {
   def settings: MassCore
@@ -16,17 +18,17 @@ trait RdpRefFactory {
   def connectorSystem: ConnectorSystem
 }
 
-private[rdp] class RdpSetup(val system: ActorSystem) extends StrictLogging {
-  val settings = MassCore(system)
+private[rdp] class RdpSetup(val system: ActorSystem[_]) extends StrictLogging {
+  val massCore = MassCore(system)
 
   val extensions: Vector[RdpModule] =
-    settings.configuration
+    massCore.configuration
       .get[Seq[String]](s"${Constants.BASE_CONF}.rdp.extensions")
       .flatMap { className =>
-        Class.forName(className).newInstance() match {
-          case v: RdpModule => Some(v)
-          case unknown =>
-            logger.warn(s"初始化找到未知RdpExtension: $unknown")
+        system.dynamicAccess.createInstanceFor[RdpModule](className, Nil) match {
+          case Success(v) => Some(v)
+          case Failure(e) =>
+            logger.warn(s"初始化找到未知RdpExtension", e)
             None
         }
       }
@@ -34,11 +36,11 @@ private[rdp] class RdpSetup(val system: ActorSystem) extends StrictLogging {
 
   def initialStreamFactories(): Map[String, EtlStreamFactory] = {
     val list = extensions.flatMap(_.etlStreamBuilders) ++
-      settings.configuration.get[Seq[String]](s"${Constants.BASE_CONF}.rdp.stream-builders").flatMap { className =>
-        Class.forName(className).newInstance() match {
-          case v: EtlStreamFactory => Some(v)
-          case unknown =>
-            logger.warn(s"初始化找到未知EtlStreamBuilder: $unknown")
+      massCore.configuration.get[Seq[String]](s"${Constants.BASE_CONF}.rdp.stream-builders").flatMap { className =>
+        system.dynamicAccess.createInstanceFor[EtlStreamFactory](className, Nil) match {
+          case Success(v) => Some(v)
+          case Failure(e) =>
+            logger.warn(s"初始化找到未知EtlStreamBuilder", e)
             None
         }
       }
@@ -52,13 +54,14 @@ private[rdp] class RdpSetup(val system: ActorSystem) extends StrictLogging {
 /**
  * RDP 系统，保存RDP运行所全局需要的各配置、资源
  */
-final class RdpSystem private (val system: ActorSystem, setup: RdpSetup)
+final class RdpSystem private (val system: ActorSystem[_])
     extends RdpRefFactory
-    with Extension
+    with FusionExtension
     with StrictLogging {
-  override val connectorSystem = ConnectorSystem(system)
+  override val connectorSystem: ConnectorSystem = ConnectorSystem(system)
+  implicit val materializer: Materializer = SystemMaterializer(system).materializer
 
-  implicit val materializer: ActorMaterializer = ActorMaterializer()(system)
+  private val setup = new RdpSetup(system)
 
   protected var _streamFactories: Map[String, EtlStreamFactory] = setup.initialStreamFactories()
 
@@ -78,12 +81,10 @@ final class RdpSystem private (val system: ActorSystem, setup: RdpSetup)
     logger.info(s"注册EtlGraphParserFactor: $b")
     _graphParerFactories = _graphParerFactories.updated(b.`type`, b)
   }
-  override def settings: MassCore = setup.settings
+  override def settings: MassCore = setup.massCore
   def name: String = system.name
-  def configuration: Configuration = settings.configuration
 }
 
-object RdpSystem extends ExtensionId[RdpSystem] with ExtensionIdProvider {
-  override def createExtension(system: ExtendedActorSystem): RdpSystem = new RdpSystem(system, new RdpSetup(system))
-  override def lookup(): ExtensionId[_ <: Extension] = RdpSystem
+object RdpSystem extends FusionExtensionId[RdpSystem] {
+  override def createExtension(system: ActorSystem[_]): RdpSystem = new RdpSystem(system)
 }

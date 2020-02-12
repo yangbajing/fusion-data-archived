@@ -2,19 +2,17 @@ package mass.extension
 
 import java.nio.file.{ Files, Path, Paths }
 
-import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
+import akka.actor.typed.ActorSystem
 import com.typesafe.scalalogging.StrictLogging
-import helloscala.common.Configuration
+import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import mass.core.Constants
 
 /**
  * MassCore将作为Akka的库扩展自动加载
- * library-extensions += "mass.extension.MassCore"
+ * akka.typed.library-extensions += "mass.extension.MassCore"
  */
-final class MassCore private (val system: ExtendedActorSystem) extends Extension with StrictLogging {
+final class MassCore private (val system: ActorSystem[_]) extends FusionExtension with StrictLogging {
   private var _tempDirectory: Path = _
-
-  val configuration = Configuration(system.settings.config)
 
   logger.info(configuration.getConfig(Constants.BASE_CONF).toString)
 
@@ -32,7 +30,6 @@ final class MassCore private (val system: ExtendedActorSystem) extends Extension
   override def toString = s"MassCore($system)"
 }
 
-object MassCore extends ExtensionId[MassCore] with ExtensionIdProvider {
-  override def createExtension(system: ExtendedActorSystem): MassCore = new MassCore(system)
-  override def lookup(): ExtensionId[_ <: Extension] = MassCore
+object MassCore extends FusionExtensionId[MassCore] {
+  override def createExtension(system: ActorSystem[_]): MassCore = new MassCore(system)
 }

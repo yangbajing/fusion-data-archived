@@ -7,7 +7,7 @@ import helloscala.common.exception.HSNotFoundException
 import helloscala.common.types.ObjectId
 import helloscala.common.util.StringUtils
 import mass.core.job.{ SchedulerContext, SchedulerJob }
-import mass.data.job.{ JobLog, RunStatus }
+import mass.model.job.{ JobLog, RunStatus }
 import mass.job.repository.JobRepo
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -30,10 +30,10 @@ object JobRunner extends StrictLogging {
       db.run(JobRepo.findJob(key))
         .flatMap {
           case Some(schedule) =>
-            val jobItem = schedule.item.get
+            val jobItem = schedule.item
             val data = jobItem.data ++ extData
             val ctx = SchedulerContext(key, jobItem, data, jobSystem.system)
-            val job = clz.newInstance().asInstanceOf[SchedulerJob]
+            val job = jobSystem.system.dynamicAccess.createInstanceFor[SchedulerJob](clz, Nil).get
             // TODO 超时控制、失败重试、失败告警
             job.run(ctx)
           case _ =>
