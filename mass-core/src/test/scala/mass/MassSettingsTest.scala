@@ -1,6 +1,6 @@
 package mass
 
-import mass.core.MassActorTestKit
+import mass.testkit.MassActorTestKit
 import org.scalatest.wordspec.AnyWordSpecLike
 
 class MassSettingsTest extends MassActorTestKit with AnyWordSpecLike {

@@ -8,7 +8,7 @@ import akka.stream.alpakka.csv.scaladsl.{ CsvFormatting, CsvParsing }
 import akka.stream.scaladsl.{ FileIO, Sink }
 import akka.util.ByteString
 import fusion.jdbc.util.JdbcUtils
-import mass.core.MassActorTestKit
+import mass.testkit.MassActorTestKit
 import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._

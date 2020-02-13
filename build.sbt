@@ -25,7 +25,7 @@ ThisBuild / scalafmtOnCompile := true
 
 ThisBuild / resolvers ++= Seq(Resolver.bintrayRepo("akka-fusion", "maven"), Resolver.jcenterRepo)
 
-lazy val root = Project(id = "mass-data-root", base = file("."))
+lazy val root = Project(id = "fusion-data-root", base = file("."))
   .aggregate(
     example,
     massDocs,
@@ -55,7 +55,7 @@ lazy val massDocs = _project("mass-docs")
     massApiService,
     massConsole,
     massAuth,
-    massCoreExt % "compile->compile;test->test",
+    massCoreExt,
     massCore % "compile->compile;test->test",
     massCommon)
   .enablePlugins(AkkaParadoxPlugin)
@@ -69,13 +69,13 @@ lazy val massDocs = _project("mass-docs")
         "akka.version" -> BuildInfo.versionAkka))
 
 lazy val example = _project("example")
-  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt, massCore % "compile->compile;test->test")
   .enablePlugins(MultiJvmPlugin)
   .configs(MultiJvm)
   .settings(libraryDependencies ++= Seq(_fusionCluster, _akkaMultiNodeTestkit % Test))
 
 lazy val massFunctest = _project("mass-functest")
-  .dependsOn(massConsole, massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(massConsole, massCoreExt, massCore % "compile->compile;test->test")
   .enablePlugins(MultiJvmPlugin)
   .configs(MultiJvm)
   .settings(
@@ -84,46 +84,45 @@ lazy val massFunctest = _project("mass-functest")
 
 // API Service
 lazy val massApiService = _project("mass-api-service")
-  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt, massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(mainClass in Compile := Some("mass.apiservice.boot.ApiServiceMain"), libraryDependencies ++= Seq())
 
 // 数据治理
 lazy val massGovernance = _project("mass-governance")
-  .dependsOn(massConnector, massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(massConnector, massCoreExt, massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(mainClass in Compile := Some("mass.governance.boot.GovernanceMain"), libraryDependencies ++= Seq())
 
 // 监查、控制、管理
 lazy val massConsole = _project("mass-console")
-  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt, massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(mainClass in Compile := Some("mass.console.boot.ConsoleMain"), libraryDependencies ++= Seq())
 
 // Reactive Data Integration Console
 lazy val massRdiConsole = _project("mass-rdi-console")
-  .dependsOn(massRdiCore, massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(massRdiCore, massCoreExt, massCore % "compile->compile;test->test")
   .settings(
     mainClass in Compile := Some("mass.rdi.console.boot.RdiConsoleMain"),
-    libraryDependencies ++= Seq(_quartz) ++ _pois)
+    libraryDependencies ++= Seq() ++ _pois)
 
 // Reactive Data Integration 反应式数据处理流工具
 lazy val massRdi = _project("mass-rdi")
   .dependsOn(
-    massCoreExt,
     massRdiCore,
-    massCoreExt % "compile->compile;test->test",
+    massCoreExt,
     massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
-  .settings(mainClass in Compile := Some("mass.rdi.boot.RdiMain"), libraryDependencies ++= Seq(_quartz) ++ _pois)
+  .settings(mainClass in Compile := Some("mass.rdi.boot.RdiMain"), libraryDependencies ++= Seq() ++ _pois)
 
 // Reactive Data Integration Cli
 lazy val massRdiCli = _project("mass-rdi-cli")
-  .dependsOn(massRdiCore, massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(massRdiCore,massCoreExt, massCore % "compile->compile;test->test")
   .settings(
     //    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
     assemblyJarName in assembly := "rdi.jar",
@@ -139,11 +138,11 @@ lazy val massRdiCli = _project("mass-rdi-cli")
 
 lazy val massRdiCore = _project("mass-rdi-core")
   .dependsOn(massConnector, massCore % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Seq(_commonsVfs, _quartz % Provided))
+  .settings(libraryDependencies ++= Seq(_commonsVfs))
 
 // mass调度任务程序.
 lazy val massJob = _project("mass-job")
-  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt, massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging, JavaAgent, MultiJvmPlugin)
   .configs(MultiJvm)
   .settings(Packaging.settings: _*)
@@ -151,7 +150,7 @@ lazy val massJob = _project("mass-job")
 
 // 统一用户，OAuth 2服务
 lazy val massAuth = _project("mass-auth")
-  .dependsOn(massCoreExt % "compile->compile;test->test", massCore % "compile->compile;test->test")
+  .dependsOn(massCoreExt, massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(mainClass in Compile := Some("mass.auth.boot.AuthMain"), libraryDependencies ++= Seq())
@@ -168,20 +167,23 @@ lazy val massCoreExt = _project("mass-core-ext")
   .settings(Publishing.publishing: _*)
   .dependsOn(massCore % "compile->compile;test->test")
   .settings(
-    libraryDependencies ++= Seq(_quartz, _jsch, _fusionHttp, _fusionCluster, _akkaMultiNodeTestkit % Test) ++ _slicks)
+    libraryDependencies ++= Seq(
+        _jsch,
+        _osLib,
+        _fusionHttp,
+        _fusionJob,
+        _fusionCluster,
+        _akkaPersistenceJdbc,
+        _akkaPersistenceTyped,
+        _akkaPersistenceQuery,
+        _akkaMultiNodeTestkit % Test) ++ _slicks)
 
 lazy val massCore =
   _project("mass-core")
     .dependsOn(massCommon % "compile->compile;test->test")
     .settings(Publishing.publishing: _*)
     .settings(
-      libraryDependencies ++= Seq(
-          _scalaXml,
-          _h2,
-          _fusionJdbc,
-          _fusionJsonJackson,
-          _postgresql % Test,
-          _quartz % Provided) ++ _akkaHttps)
+      libraryDependencies ++= Seq(_scalaXml, _h2, _fusionJdbc, _fusionJsonJackson) ++ _akkaHttps)
 
 lazy val massCommon = _project("mass-common")
   .settings(Publishing.publishing: _*)

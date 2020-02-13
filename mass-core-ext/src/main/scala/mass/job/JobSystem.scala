@@ -2,41 +2,32 @@ package mass.job
 
 import java.nio.file.Files
 import java.time.OffsetDateTime
-import java.util.Properties
 
-import akka.Done
 import akka.actor.typed.ActorSystem
-import com.typesafe.scalalogging.LazyLogging
+import com.typesafe.scalalogging.StrictLogging
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
-import fusion.core.extension.FusionCore
-import helloscala.common.Configuration
+import fusion.job.{ FusionJob, FusionScheduler }
 import helloscala.common.exception.HSBadRequestException
 import helloscala.common.util.TimeUtils
-import mass.core.Constants
-import mass.core.job.{ SchedulerJob, SchedulerSystemRef }
+import mass.core.job.{ JobConstants, SchedulerJob }
 import mass.extension.MassSystem
 import mass.model.job.{ JobItem, JobTrigger, TriggerType }
 
 import scala.collection.mutable
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.ExecutionContext
 
 object JobSystem extends FusionExtensionId[JobSystem] {
-  override def createExtension(system: ActorSystem[_]): JobSystem = new JobSystem(system, true)
+  override def createExtension(system: ActorSystem[_]): JobSystem = new JobSystem(system)
 }
 
-final class JobSystem private (val system: ActorSystem[_], val waitForJobsToComplete: Boolean)
-    extends SchedulerSystemRef
-    with FusionExtension
-    with LazyLogging {
+final class JobSystem private (val system: ActorSystem[_]) extends FusionExtension with StrictLogging {
   import org.quartz._
-  import org.quartz.impl.StdSchedulerFactory
 
   val massSystem: MassSystem = MassSystem(system)
 
-  val jobSettings = JobSettings(massSystem.settings)
+  val jobSettings: JobSettings = JobSettings(massSystem.settings)
 
-  private val scheduler: org.quartz.Scheduler =
-    new StdSchedulerFactory(configuration.get[Properties](s"${Constants.BASE_CONF}.job.scheduler.properties")).getScheduler
+  private val scheduler: FusionScheduler = FusionJob(system).component
 
   /**
    * 事件触发待执行Job队列。当事件发生时，执行任务
@@ -49,20 +40,12 @@ final class JobSystem private (val system: ActorSystem[_], val waitForJobsToComp
     if (!Files.isDirectory(jobSettings.jobSavedDir)) {
       Files.createDirectories(jobSettings.jobSavedDir)
     }
-
-    scheduler.start()
-    FusionCore(system).shutdowns.serviceStop("QuartzScheduler") { () =>
-      Future {
-        scheduler.shutdown(waitForJobsToComplete)
-        Done
-      }(system.executionContext)
-    }
   }
 
   def name: String = system.name
 
   // TODO 定义 SchedulerSystem 自有的线程执行器
-  implicit override def executionContext: ExecutionContext = system.executionContext
+  implicit def executionContext: ExecutionContext = system.executionContext
 
   /**
    * 直接执行作业
@@ -74,7 +57,7 @@ final class JobSystem private (val system: ActorSystem[_], val waitForJobsToComp
   def executionJob(key: String, jobItem: JobItem, className: String): OffsetDateTime = {
     val detail = buildJobDetail(key, jobItem, className, None)
     val trigger = TriggerBuilder.newTrigger().startNow().build()
-    scheduler.scheduleJob(detail, trigger).toInstant.atOffset(TimeUtils.ZONE_CHINA_OFFSET)
+    scheduler.scheduleJob(detail, trigger).atOffset(TimeUtils.DEFAULT_OFFSET)
   }
 
   def triggerJob(key: String): OffsetDateTime = {
@@ -118,26 +101,8 @@ final class JobSystem private (val system: ActorSystem[_], val waitForJobsToComp
    * @return 作业加入调度队列时间
    */
   def schedulerJob(jobDetail: JobDetail, trigger: Trigger, replace: Boolean): OffsetDateTime = {
-    scheduler.scheduleJob(jobDetail, java.util.Collections.singleton(trigger), replace)
+    scheduler.scheduleJob(jobDetail, Set(trigger), replace)
     logger.info(s"启动作业：${jobDetail.getKey}:${trigger.getKey}, $replace")
-    OffsetDateTime.now()
-  }
-
-  /**
-   *
-   * @param key
-   * @param jobTrigger
-   * @param jobItems
-   * @param className
-   * @return 作业被重置调度队列时间
-   */
-  def rescheduleJob(key: String, jobTrigger: JobTrigger, jobItems: Seq[JobItem], className: String): OffsetDateTime = {
-    import scala.collection.JavaConverters._
-    scheduler.deleteJobs(jobItems.map(item => JobKey.jobKey(key)).asJava)
-    for (item <- jobItems) {
-      val trigger = buildTrigger(key, jobTrigger, jobKey = Some(key))
-      scheduler.scheduleJob(buildJobDetail(key, item, className, Some(item.data)), trigger)
-    }
     OffsetDateTime.now()
   }
 
@@ -161,7 +126,7 @@ final class JobSystem private (val system: ActorSystem[_], val waitForJobsToComp
 
     val schedule = conf.triggerType match {
       case TriggerType.SIMPLE =>
-        val ssb = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(conf.duration.toMillis)
+        val ssb = SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(conf.interval.toMillis)
         if (conf.repeat > 0) ssb.withRepeatCount(conf.repeat) else ssb.repeatForever()
       case TriggerType.CRON  => CronScheduleBuilder.cronSchedule(conf.cronExpress)
       case TriggerType.EVENT => throw HSBadRequestException("事件触发不需要构建Trigger")
@@ -186,5 +151,5 @@ final class JobSystem private (val system: ActorSystem[_], val waitForJobsToComp
     JobBuilder.newJob(classOf[JobClassJob]).withIdentity(JobKey.jobKey(key)).setJobData(dataMap).build()
   }
 
-  override def toString: String = s"JobSystem($name, $system, $waitForJobsToComplete)"
+  override def toString: String = s"JobSystem($name, $system)"
 }

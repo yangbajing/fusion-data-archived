@@ -23,7 +23,7 @@ class JobRouteTest extends SchedulerSpec {
   }
 
   val jsonCreateJob =
-    """{"item":{"programVersion":"2.12","key":"ddd","program":1,"programOptions":[],"programMain":"test.Main","programArgs":[]},"trigger":{"triggerType":2,"key":"ddd","startTime":null,"endTime":null,"duration":"1.day"}}"""
+    """{"item":{"programVersion":"2.12","key":"ddd","program":1,"programOptions":[],"programMain":"test.Main","programArgs":[]},"trigger":{"triggerType":2,"key":"ddd","startTime":null,"endTime":null,"interval":"1.day"}}"""
 
   "mock" should {
     "createJob" in {

@@ -7,10 +7,11 @@ import java.util.stream.Collectors
 
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.exception.HSBadRequestException
-import helloscala.common.util.FileUtils
-import mass.core.Constants
-import mass.job.util.{ JobUtils, ProgramVersion }
-import mass.job.{ JobConstants, JobSettings }
+import mass.common.util.FileUtils
+import mass.core.{ Constants, ProgramVersion }
+import mass.core.job.JobConstants
+import mass.job.util.JobUtils
+import mass.job.JobSettings
 import mass.message.job.SchedulerJobResult
 import mass.model.job.{ JobItem, Program }
 
@@ -74,53 +75,57 @@ object JobRun extends StrictLogging {
     }
   }
 
+  /**
+   *
+   * @return (commands, environments)
+   */
   private def parseCommands(
-      detail: JobItem,
+      item: JobItem,
       schedulerConfig: JobSettings,
       dist: Path): (Seq[String], Seq[(String, String)]) =
-    detail.program match {
+    item.program match {
       case Program.SCALA =>
         val options =
-          if (detail.programOptions.exists(item => item == "-cp" || item == "-classpath")) {
-            detail.programOptions ++ Seq("-cp", schedulerConfig.schedulerRunJar)
+          if (item.programOptions.exists(item => item == "-cp" || item == "-classpath")) {
+            item.programOptions ++ Seq("-cp", schedulerConfig.schedulerRunJar)
           } else {
             val classpath = Files
               .walk(dist, MAX_DEPTH)
               .filter(_.endsWith(".jar"))
               .map[String](_.toString)
               .collect(Collectors.joining(":", "", s":./:${schedulerConfig.schedulerRunJar}"))
-            Seq("-classpath", classpath) ++ detail.programOptions
+            Seq("-classpath", classpath) ++ item.programOptions
           }
-        val version = ProgramVersion.get(detail.program, detail.programVersion).getOrElse(ProgramVersion.Scala212)
+        val version = ProgramVersion.get(item.program, item.programVersion).getOrElse(ProgramVersion.Scala212)
         val cmd = version match {
-          case ProgramVersion.Scala211 => schedulerConfig.massSettings.compiles.scala212Home + "/bin/" + version.CLI
-          case _                       => schedulerConfig.massSettings.compiles.scala212Home + "/bin/" + version.CLI
+          case ProgramVersion.Scala211 => schedulerConfig.massSettings.compiles.scala212Home + "/bin/" + version.cli
+          case _                       => schedulerConfig.massSettings.compiles.scala212Home + "/bin/" + version.cli
         }
         (Seq(cmd) ++ options, Nil)
       case Program.JAVA =>
         val options =
-          if (detail.programOptions.exists(item => item == "-cp" || item == "-classpath")) {
-            detail.programOptions ++ Seq("-cp", schedulerConfig.schedulerRunJar)
+          if (item.programOptions.exists(item => item == "-cp" || item == "-classpath")) {
+            item.programOptions ++ Seq("-cp", schedulerConfig.schedulerRunJar)
           } else {
             val classpath = Files
               .walk(dist, MAX_DEPTH)
               .filter(_.endsWith(".jar"))
               .map[String](_.toString)
               .collect(Collectors.joining(":", "", s":./:${schedulerConfig.schedulerRunJar}"))
-            Seq("-classpath", classpath) ++ detail.programOptions
+            Seq("-classpath", classpath) ++ item.programOptions
           }
         (Seq("java") ++ options, Nil)
       case Program.PYTHON =>
-        val cmd = ProgramVersion.getStringOrElse(detail.program, detail.programVersion, "python")
-        (Seq(cmd) ++ detail.programOptions, Seq("PYTHONPATH" -> "./"))
+        val cmd = ProgramVersion.getCliOrElse(item.program, item.programVersion, "python")
+        (Seq(cmd) ++ item.programOptions, Seq("PYTHONPATH" -> "./"))
       case Program.SH =>
-        val cmd = ProgramVersion.getStringOrElse(detail.program, detail.programVersion, "bash")
-        (Seq(cmd) ++ detail.programOptions, Nil)
+        val cmd = ProgramVersion.getCliOrElse(item.program, item.programVersion, "bash")
+        (Seq(cmd) ++ item.programOptions, Nil)
       case Program.SQL =>
         val cmd = ProgramVersion
-          .getString(detail.program, detail.programVersion)
-          .getOrElse(throw HSBadRequestException(s"SQL执行程序不存在。${detail.program}${detail.programVersion}"))
-        (Seq(cmd) ++ detail.programOptions, Seq(("PATH", System.getProperty("user.dir") + "/bin")))
+          .getCli(item.program, item.programVersion)
+          .getOrElse(throw HSBadRequestException(s"SQL执行程序不存在。${item.program}${item.programVersion}"))
+        (Seq(cmd) ++ item.programOptions, Seq(("PATH", System.getProperty("user.dir") + "/bin")))
       case _ =>
         (Nil, Nil)
     }

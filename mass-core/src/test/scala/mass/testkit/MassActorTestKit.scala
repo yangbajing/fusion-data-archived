@@ -1,9 +1,10 @@
-package mass.core
+package mass.testkit
 
 import akka.actor.testkit.typed.scaladsl.{ ActorTestKit, ScalaTestWithActorTestKit }
 import com.typesafe.config.{ Config, ConfigFactory }
 import fusion.common.config.FusionConfigFactory
 import mass.Global
+import mass.core.Constants
 import org.scalatest.{ EitherValues, OptionValues }
 
 abstract class MassActorTestKit(testKit: ActorTestKit)

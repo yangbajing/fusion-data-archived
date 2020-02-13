@@ -1,4 +1,4 @@
-package mass.slick
+package mass.db.slick
 
 import java.util.concurrent.TimeUnit
 

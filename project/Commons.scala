@@ -1,14 +1,14 @@
 import bintray.BintrayKeys._
 import com.typesafe.sbt.SbtNativePackager.autoImport.maintainer
-import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{HeaderLicense, headerLicense}
+import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.{ HeaderLicense, headerLicense }
 import sbt.Keys._
 import sbt._
 import sbtassembly.MergeStrategy
 
 object Commons {
-  import Environment.{BuildEnv, buildEnv}
-  import sbtassembly.AssemblyKeys.{assembly, assemblyMergeStrategy}
-  import sbtassembly.{MergeStrategy, PathList}
+  import Environment.{ BuildEnv, buildEnv }
+  import sbtassembly.AssemblyKeys.{ assembly, assemblyMergeStrategy }
+  import sbtassembly.{ MergeStrategy, PathList }
 
   def basicSettings =
     Seq(
@@ -100,7 +100,7 @@ object Environment {
 
 object Packaging {
   // Good example https://github.com/typesafehub/activator/blob/master/project/Packaging.scala
-  import Environment.{BuildEnv, buildEnv}
+  import Environment.{ BuildEnv, buildEnv }
   import com.typesafe.sbt.SbtNativePackager._
   import com.typesafe.sbt.packager.Keys._
 

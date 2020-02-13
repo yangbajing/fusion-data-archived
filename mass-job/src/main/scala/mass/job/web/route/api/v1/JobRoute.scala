@@ -3,7 +3,7 @@ package mass.job.web.route.api.v1
 import akka.http.scaladsl.server.Route
 import com.typesafe.scalalogging.StrictLogging
 import fusion.http.server.{ AbstractRoute, JacksonDirectives }
-import helloscala.common.page.Page
+import mass.common.page.Page
 import mass.job.service.Services
 import mass.message.job._
 
@@ -48,7 +48,7 @@ class JobRoute(services: Services) extends AbstractRoute with JacksonDirectives 
     extractExecutionContext { implicit ec =>
       storeUploadedFile("job", createTempFileFunc(services.jobSystem.massSystem.tempDirectory)) {
         case (fileInfo, file) =>
-          futureComplete(services.uploadJobOnZip(fileInfo, file))
+          futureComplete(services.uploadJobOnZip(fileInfo, file.toPath))
       }
     }
   }

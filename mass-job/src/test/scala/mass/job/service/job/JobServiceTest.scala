@@ -3,11 +3,11 @@ package mass.job.service.job
 import java.util.concurrent.TimeUnit
 
 import fusion.json.jackson.Jackson
-import mass.core.MassActorTestKit
+import mass.core.ProgramVersion
 import mass.job.JobSystem
-import mass.job.util.ProgramVersion
 import mass.message.job._
 import mass.model.job.{ JobItem, JobTrigger, Program, TriggerType }
+import mass.testkit.MassActorTestKit
 import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
@@ -24,9 +24,9 @@ class JobServiceTest extends MassActorTestKit with AnyWordSpecLike {
       Program.SCALA,
       Nil,
       programMain = "test.Main",
-      programVersion = ProgramVersion.Scala212.VERSION,
+      programVersion = ProgramVersion.Scala212.version,
       description = Some("测试描述"))
-    val trigger = JobTrigger(TriggerType.SIMPLE, repeat = 5, duration = 10.seconds)
+    val trigger = JobTrigger(TriggerType.SIMPLE, repeat = 5, interval = 10.seconds)
 
     "handleJobPage be empty" in {
       val resp = jobService.handlePage(JobPageReq()).futureValue

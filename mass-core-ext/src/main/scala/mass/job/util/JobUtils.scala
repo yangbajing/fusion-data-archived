@@ -3,18 +3,17 @@ package mass.job.util
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.{ Files, Path, StandardCopyOption }
-import java.time.OffsetDateTime
 import java.util.zip.ZipFile
 
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.Configuration
-import helloscala.common.exception.HSBadRequestException
-import helloscala.common.util.{ DigestUtils, FileUtils, Utils }
-import mass.job.{ JobConstants, JobSettings }
+import helloscala.common.util.{ DigestUtils, Utils }
+import mass.common.util.FileUtils
+import mass.core.job.JobConstants
+import mass.job.JobSettings
 import mass.message.job._
-import mass.model.job.{ JobItem, JobTrigger, Program, TriggerType }
+import mass.model.job.{ JobItem, JobTrigger }
 
-import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
@@ -26,7 +25,7 @@ object JobUtils extends StrictLogging {
 
   def uploadJob(jobSettings: JobSettings, req: JobUploadJobReq)(implicit ec: ExecutionContext): Future[JobZip] =
     Future {
-      val sha256 = DigestUtils.sha256HexFromPath(req.file.toPath)
+      val sha256 = DigestUtils.sha256HexFromPath(req.file)
       val dest = jobSettings.jobSavedDir.resolve(sha256.take(2)).resolve(sha256)
 
       val jobZipInternal = parseJobZip(req.file, req.charset, dest.resolve(JobConstants.DIST)) match {
@@ -35,7 +34,7 @@ object JobUtils extends StrictLogging {
       }
 
       val zipPath = dest.resolve(req.fileName)
-      Files.move(req.file.toPath, zipPath, StandardCopyOption.REPLACE_EXISTING)
+      Files.move(req.file, zipPath, StandardCopyOption.REPLACE_EXISTING)
       JobZip(zipPath, jobZipInternal.configs, jobZipInternal.entries)
     }
 
@@ -43,7 +42,7 @@ object JobUtils extends StrictLogging {
     parseJobZip(file.toFile, charset, dest)
 
   def parseJobZip(file: File, charset: Charset, dest: Path): Either[Throwable, JobZipInternal] = Utils.either {
-    import scala.collection.JavaConverters._
+    import scala.jdk.CollectionConverters._
     import scala.language.existentials
 
     val zip = new ZipFile(file, charset)
@@ -79,36 +78,8 @@ object JobUtils extends StrictLogging {
 
   def parseJobConf(content: String): Either[Throwable, JobCreateReq] = Utils.either {
     val conf = Configuration.parseString(content)
-    val item = conf.getConfiguration("item")
-    val trigger = conf.getConfiguration("trigger")
-
-    val program = Program.optionalFromName(item.getString("program").toUpperCase()).orElse(Program.UNKOWN)
-    val programMain = item.getString("program-main")
-    val _version = item.getOrElse[String]("program-version", "")
-    val programVersion =
-      ProgramVersion.get(program, _version).getOrElse(throw HSBadRequestException(s"program-version: ${_version} 无效"))
-    val jobItem = JobItem(
-      program,
-      item.getOrElse[Seq[String]]("program-options", Nil),
-      programMain,
-      item.getOrElse[Seq[String]]("program-args", Nil),
-      programVersion.VERSION)
-
-    val triggerType =
-      TriggerType.optionalFromName(trigger.getString("trigger-type").toUpperCase()).orElse(TriggerType.TRIGGER_UNKNOWN)
-    val jobTrigger = JobTrigger(
-      triggerType,
-      trigger.getOrElse[String]("trigger-event", ""),
-      trigger.get[Option[OffsetDateTime]]("start-time"),
-      trigger.get[Option[OffsetDateTime]]("end-time"),
-      trigger.getOrElse[Int]("repeat", 0),
-      trigger.getOrElse[FiniteDuration]("duration", scala.concurrent.duration.Duration.Zero),
-      trigger.getOrElse[String]("cron-express", ""),
-      trigger.get[Option[String]]("description"),
-      trigger.getOrElse[Int]("failed-retries", 0),
-      trigger.getOrElse[FiniteDuration]("timeout", scala.concurrent.duration.Duration.Zero),
-      trigger.getOrElse[Seq[String]]("alarm-emails", Nil))
-
+    val jobItem = JobItem(conf.getConfiguration("item"))
+    val jobTrigger = JobTrigger(conf.getConfiguration("trigger"))
     JobCreateReq(conf.get[Option[String]]("key"), jobItem, jobTrigger, None)
   }
 }

@@ -341,7 +341,7 @@ Version 1.0.0-SNAPSHOT
   def run(context: SchedulerContext): Future[JobResult]
 }</code></pre>
 <p><em>Job配置（JobItem）属性：</em></p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/mass-core/src/main/scala/mass/model/job/JobItem.scala#L6-L16" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class JobItem(
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/mass-core/src/main/scala/mass/model/job/JobItem.scala#L9-L20" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class JobItem(
     program: Program,
     programOptions: Seq[String],
     programMain: String,
@@ -350,7 +350,8 @@ Version 1.0.0-SNAPSHOT
     resources: Map[String, String] = Map(),
     data: Map[String, String] = Map(),
     description: Option[String] = None,
-    dependentJobKeys: Seq[String] = Nil)
+    dependentJobKeys: Seq[String] = Nil,
+    name: Option[String] = None)
     extends CborSerializable</code></pre>
 <h2><a href="#调度类型" name="调度类型" class="anchor"><span class="anchor-link"></span></a>调度类型</h2>
 <p>MassData提供完善的Job调度功能，支持简单调度（时间间隔）、日历调度和事件触发三种。同时，调度Job提供 <code>beforeStart</code>、<code>afterStart</code>、<code>beforeStart</code>和<code>afterStop</code>回调函数， 用户可据此实现对Job启动、退出时做更自定义操作，如：实现Job依赖等。</p>
@@ -361,17 +362,19 @@ Version 1.0.0-SNAPSHOT
 </ul>
 <p>同时，每个Job在执行成功完成后还可以触发多个依赖Job运行，只需要在Job配置时指定需要依赖运行的Job ID即可。</p>
 <p><em>触发配置（JobTrigger）属性：</em></p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/mass-core/src/main/scala/mass/model/job/JobTrigger.scala#L10-L22" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class JobTrigger(
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/mass-core/src/main/scala/mass/model/job/JobTrigger.scala#L12-L26" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class JobTrigger(
     triggerType: TriggerType,
     triggerEvent: String = &quot;&quot;,
     startTime: Option[OffsetDateTime] = None,
     endTime: Option[OffsetDateTime] = None,
-    repeat: Int = 1,
-    duration: FiniteDuration = 1.hour,
+    // 重复次数
+    repeat: Int = JobConstants.TRIGGER_REPEAT,
+    // 每次重复间隔
+    interval: FiniteDuration = JobConstants.TRIGGER_INTERVAL,
     cronExpress: String = &quot;&quot;,
     description: Option[String] = None,
     failedRetries: Int = 0,
-    timeout: FiniteDuration = 2.hours,
+    timeout: FiniteDuration = JobConstants.RUN_TIMEOUT,
     alarmEmails: Seq[String] = Nil)
     extends CborSerializable</code></pre>
 <h2><a href="#创建job" name="创建job" class="anchor"><span class="anchor-link"></span></a>创建Job</h2>
@@ -383,20 +386,37 @@ Version 1.0.0-SNAPSHOT
 </ol>
 <p><strong><em>Zip包</em></strong></p>
 <p>Zip包里面需要包含配置文件和可执行程序，配置文件使用 <a href="https://github.com/lightbend/config">HOCON</a> 格式。每个配置文件代表一个Job。</p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/mass-job/src/universal/examples/sample-job/sample.conf" target="_blank" title="Go to snippet source"></a><code class="language-conf">#key=sample
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/mass-job/src/universal/examples/sample-job/sample.conf" target="_blank" title="Go to snippet source"></a><code class="language-conf"># 作业唯一key，不设置由服务端生成。若设置，则客户端需要保证全局唯一。
+//key=sample
+
 item {
-  key = &quot;Job名字&quot;
-  program = &quot;java&quot; # Job程序类型，当前支持Java，sh（bash），python
-  program-main = &quot;com.gtan.repox.Main&quot; # 可执行Java主类名字，[需要将程序打成Jar包。job-program为java时有效
-  program-version = &quot;python2.7&quot; # Python程序。可选，默认使用python2.7。job-program为python时有效
+  # 显示名字，可选
+  name = &quot;Hello world!&quot;
+
+  # Job程序类型，当前支持java，sh（bash），python
+  program = &quot;java&quot;
+
+  # 可执行Java主类名字。
+  program-main = &quot;hello.Hello&quot;
 }
 trigger {
-  trigger-type = &quot;cron&quot; # Job类型，当前支持：simple、cron、event三种
-  start-time = &quot;yyyy-MM-dd HH:mm:ss&quot; # Job开始执行时间（可选）
-  end-time = &quot;yyyy-MM-dd HH:mm:ss&quot; # Job结束时间（可选）
-  repeat = 4 # Job重复次数，job-type为simple时有效
-  duration = 120.seconds # 两次Job之间的时间间隔，job-type为simple时有效
-  cron-express = &quot;1 0 0 * * ?&quot; # 基于CRON的日历调度配置，job-type为cron时有效
+  # Job类型，当前支持：simple、cron、event三种
+  trigger-type = &quot;cron&quot;
+
+  # Job开始执行时间（可选），不设置则为立即开始。yyyy-MM-ddTHH:mm:ss+08
+  start-time = &quot;2020-03-03T10:10:10+08&quot;
+
+  # Job结束时间（可选）。yyyy-MM-ddTHH:mm:ss+08
+  end-time = &quot;2020-03-13T10:10:10+08&quot;
+
+  # Job重复次数，job-type为simple时有效
+  repeat = 4
+
+  # 两次Job之间的时间间隔，job-type为simple时有效
+  interval = 120.seconds
+
+  # 基于CRON的日历调度配置，job-type为cron时有效
+  cron-express = &quot;1 0 0 * * ?&quot;
 }</code></pre>
 <h2><a href="#其它" name="其它" class="anchor"><span class="anchor-link"></span></a>其它</h2>
 <h3><a href="#远程调度" name="远程调度" class="anchor"><span class="anchor-link"></span></a>远程调度</h3>

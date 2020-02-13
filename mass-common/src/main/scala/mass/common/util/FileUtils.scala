@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package helloscala.common.util
+package mass.common.util
 
 import java.io.{ IOException, InputStream, OutputStream }
 import java.nio.charset.Charset
@@ -22,6 +22,7 @@ import java.nio.file.{ Files, Path, StandardOpenOption }
 import java.time.OffsetDateTime
 
 import com.typesafe.scalalogging.StrictLogging
+import helloscala.common.util.{ StringUtils, TimeUtils }
 
 import scala.sys.process.{ Process, ProcessLogger }
 

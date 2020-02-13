@@ -7,7 +7,7 @@ import akka.stream.scaladsl.{ Flow, Keep }
 import com.zaxxer.hikari.HikariDataSource
 import fusion.jdbc.util.JdbcUtils
 import helloscala.common.util.AsString
-import mass.core.MassActorTestKit
+import mass.testkit.MassActorTestKit
 import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.collection.immutable

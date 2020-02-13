@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import mass.model.CommonStatus
 import mass.model.job._
-import mass.slick.SlickProfile.api._
+import mass.db.slick.SlickProfile.api._
 
 class JobScheduleTable(tag: Tag) extends Table[JobSchedule](tag, "job_schedule") {
   def key = column[String]("key")

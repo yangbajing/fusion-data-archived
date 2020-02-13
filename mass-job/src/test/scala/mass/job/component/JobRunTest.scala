@@ -1,45 +1,43 @@
 package mass.job.component
 
 import fusion.json.jackson.Jackson
-import helloscala.common.Configuration
 import mass.MassSettings
-import mass.core.MassActorTestKit
 import mass.job.JobSettings
 import mass.model.job.{ JobItem, Program }
+import mass.testkit.MassActorTestKit
 import org.scalatest.wordspec.AnyWordSpecLike
 
 class JobRunTest extends MassActorTestKit with AnyWordSpecLike {
-  val configuration = Configuration.load()
-  val schedulerConfig = JobSettings(MassSettings(configuration))
+  private val jobSettings = JobSettings(MassSettings(system))
 
   "JobRunTest" should {
     "run java" in {
-      val detail = JobItem(Program.JAVA, Seq(), "test.JavaMain")
-      val result = JobRun.run(detail, "test-java", schedulerConfig)
+      val item = JobItem(Program.JAVA, Seq(), "test.JavaMain")
+      val result = JobRun.run(item, "test-java", jobSettings)
       println(Jackson.prettyStringify(result))
       result.exitValue shouldBe 0
       result.start should be < result.end.value
     }
 
     "run scala" in {
-      val detail = JobItem(Program.SCALA, Seq(), "test.ScalaMain")
-      val result = JobRun.run(detail, "test-scala", schedulerConfig)
+      val item = JobItem(Program.SCALA, Seq(), "test.ScalaMain")
+      val result = JobRun.run(item, "test-scala", jobSettings)
       println(Jackson.prettyStringify(result))
       result.exitValue shouldBe 0
       result.start should be < result.end.value
     }
 
     "run bash -c" in {
-      val detail = JobItem(Program.SH, Seq("-c"), "echo '哈哈哈'")
-      val result = JobRun.run(detail, "test-bash", schedulerConfig)
+      val item = JobItem(Program.SH, Seq("-c"), "echo '哈哈哈'")
+      val result = JobRun.run(item, "test-bash", jobSettings)
       println(Jackson.prettyStringify(result))
       result.exitValue shouldBe 0
       result.start should be < result.end.value
     }
 
     "run python -c" in {
-      val detail = JobItem(Program.PYTHON, Seq("-c"), "print('哈哈哈')")
-      val result = JobRun.run(detail, "test-python", schedulerConfig)
+      val item = JobItem(Program.PYTHON, Seq("-c"), "print('哈哈哈')")
+      val result = JobRun.run(item, "test-python", jobSettings)
       println(Jackson.prettyStringify(result))
       result.exitValue shouldBe 0
       result.start should be < result.end.value

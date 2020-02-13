@@ -1,4 +1,4 @@
-package mass.slick
+package mass.db.slick
 
 import com.github.tminglei.slickpg.agg.{ AggFuncRep, OrderedAggFuncRep }
 import slick.ast.Library.SqlFunction

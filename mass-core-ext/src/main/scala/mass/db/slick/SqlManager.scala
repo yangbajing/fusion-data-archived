@@ -1,4 +1,4 @@
-package mass.slick
+package mass.db.slick
 
 import akka.actor.typed.ActorSystem
 import com.typesafe.scalalogging.StrictLogging

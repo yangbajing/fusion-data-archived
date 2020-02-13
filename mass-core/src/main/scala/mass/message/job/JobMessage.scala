@@ -2,12 +2,13 @@ package mass.message.job
 
 import java.io.File
 import java.nio.charset.Charset
+import java.nio.file.Path
 import java.time.OffsetDateTime
 
 import akka.http.scaladsl.server.directives.FileInfo
 import fusion.json.CborSerializable
 import helloscala.common.data.{ IntValueName, StringValueName }
-import helloscala.common.page.{ Page, PageResult }
+import mass.common.page.{ Page, PageResult }
 import mass.core.job.JobResult
 import mass.model.CommonStatus
 import mass.model.job.{ JobItem, JobSchedule, JobTrigger }
@@ -55,7 +56,7 @@ case class SchedulerJobResult(
     errPath: String)
     extends JobResult
 
-case class JobUploadJobReq(file: File, fileName: String, charset: Charset) extends JobMessage
+case class JobUploadJobReq(file: Path, fileName: String, charset: Charset) extends JobMessage
 case class JobUploadJobResp(resps: Seq[JobCreateResp]) extends JobResponse
 
 case class JobUploadFilesReq(items: Seq[(FileInfo, File)]) extends JobMessage

@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import com.typesafe.scalalogging.StrictLogging
 import mass.core.job._
-import mass.job.{ JobConstants, JobSystem }
+import mass.job.JobSystem
 import mass.message.job.SchedulerJobResult
 
 import scala.concurrent.Future

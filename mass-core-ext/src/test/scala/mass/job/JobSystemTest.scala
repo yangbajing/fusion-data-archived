@@ -1,20 +1,12 @@
 package mass.job
 
-import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
+import mass.testkit.MassActorTestKit
 import org.scalatest.wordspec.AnyWordSpecLike
 
-class JobSystemTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
-  var jobSystem: JobSystem = _
+class JobSystemTest extends MassActorTestKit with AnyWordSpecLike {
+  private val jobSystem: JobSystem = JobSystem(system)
 
-  override protected def beforeAll(): Unit = {
-    super.beforeAll()
-    jobSystem = JobSystem(system)
-  }
-
-  override protected def afterAll(): Unit =
-    super.afterAll()
-
-  "SchedulerSystem" should {
+  "JobSystem" should {
     "toString" in {
       println(jobSystem)
     }

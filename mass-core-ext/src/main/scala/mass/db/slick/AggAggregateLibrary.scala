@@ -1,4 +1,4 @@
-package mass.slick
+package mass.db.slick
 
 import slick.ast.Library.SqlAggregateFunction
 

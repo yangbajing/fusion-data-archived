@@ -6,13 +6,14 @@ import java.time.OffsetDateTime
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.data.{ IntValueName, StringValueName }
 import helloscala.common.util.DigestUtils
+import mass.core.ProgramVersion
 import mass.job.JobSystem
 import mass.job.component.DefaultSchedulerJob
 import mass.job.repository.JobRepo
-import mass.job.util.{ JobUtils, ProgramVersion }
+import mass.job.util.JobUtils
 import mass.message.job._
 import mass.model.job._
-import mass.slick.SqlManager
+import mass.db.slick.SqlManager
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -52,10 +53,10 @@ trait JobService extends StrictLogging {
     val programs = Program.values().toList.map(_.toValueName)
     val triggerType = TriggerType.values().toList.map(_.toValueName)
     val programVersion = ProgramVersion.values
-      .groupBy(_.NAME)
+      .groupBy(_.program)
       .map {
         case (program, versions) =>
-          ProgramVersionItem(program.getValue, versions.map(p => StringValueName(p.VERSION, p.VERSION)))
+          ProgramVersionItem(program.getValue, versions.map(p => StringValueName(p.version, p.version)))
       }
       .toList
     val jobStatus = RunStatus.values().toList.map(_.toValueName)

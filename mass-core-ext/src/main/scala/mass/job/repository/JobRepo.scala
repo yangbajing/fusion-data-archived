@@ -9,7 +9,7 @@ import mass.job.util.JobZip
 import mass.message.job._
 import mass.model.CommonStatus
 import mass.model.job._
-import mass.slick.SlickProfile.api._
+import mass.db.slick.SlickProfile.api._
 import slick.sql.{ FixedSqlAction, FixedSqlStreamingAction, SqlAction }
 
 import scala.concurrent.ExecutionContext
@@ -93,7 +93,7 @@ object JobRepo {
       key: String,
       status: RunStatus,
       lastScheduleStart: OffsetDateTime): SqlAction[Int, NoStream, Effect] = {
-    import mass.slick.SlickProfile.plainApi._
+    import mass.db.slick.SlickProfile.plainApi._
     sqlu"""update job_schedule set schedule_count = schedule_count + 1, status = $status where key = $key and last_schedule_start = $lastScheduleStart"""
   }
 

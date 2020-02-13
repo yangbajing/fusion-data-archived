@@ -17,20 +17,20 @@ class ScriptManagerTest extends FusionWordSpecLike {
       println(s"result: ${result.getClass.getSimpleName} = $result")
     }
 
-    "scriptScala" in {
-      new ScriptEngineManager().getEngineFactories.forEach(println)
-
-      val engine = ScriptManager.scriptScala
-      println(s"engine: $engine")
-      val event = SqlDataEvent("哈哈哈")
-      val bindings = new SimpleBindings()
-      bindings.put("event", event)
-      val result = engine.eval("event.data", bindings)
-      println(s"result = $result")
-    }
+//    "scriptScala" in {
+//      new ScriptEngineManager().getEngineFactories.forEach(println)
+//
+//      val engine = ScriptManager.scriptScala
+//      println(s"engine: $engine")
+//      val event = SqlDataEvent("哈哈哈")
+//      val bindings = new SimpleBindings()
+//      bindings.put("event", event)
+//      val result = engine.eval("event.data", bindings)
+//      println(s"result = $result")
+//    }
 
     "set same" in {
-      println(Set(1, 2, 3, 4) sameElements Set(2, 3, 1, 4))
+      println(Set(1, 2, 3, 4).iterator.sameElements(Set(2, 3, 1, 4)))
       println(Set(1, 2, 3, 4) == Set(2, 3, 1, 4))
     }
   }

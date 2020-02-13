@@ -7,9 +7,9 @@ object Dependencies {
 
   val _scalaXml = "org.scala-lang.modules" %% "scala-xml" % "1.2.0"
 
-  val _fusionProtobufV3 = "com.akka-fusion" %% "fusion-protobuf-v3" % BuildInfo.version
   val _fusionJsonJackson = "com.akka-fusion" %% "fusion-json-jackson" % BuildInfo.version
   val _fusionJdbc = "com.akka-fusion" %% "fusion-jdbc" % BuildInfo.version
+  val _fusionJob = "com.akka-fusion" %% "fusion-job" % BuildInfo.version
   val _fusionHttp = "com.akka-fusion" %% "fusion-http" % BuildInfo.version
   val _fusionCluster = "com.akka-fusion" %% "fusion-cluster" % BuildInfo.version
   val _fusionCore = "com.akka-fusion" %% "fusion-core" % BuildInfo.version
@@ -111,35 +111,39 @@ object Dependencies {
     //                           _alpakksHdfs,
     _alpakkaElasticsearch)
 
-  private val versionAkkaPersistenceCassandra = "0.89"
-
   val _akkaPersistenceCassandras = Seq(
-    "com.typesafe.akka" %% "akka-persistence-cassandra" % versionAkkaPersistenceCassandra,
-    "com.typesafe.akka" %% "akka-persistence-cassandra-launcher" % versionAkkaPersistenceCassandra % Test)
+    "com.typesafe.akka" %% "akka-persistence-cassandra" % BuildInfo.versionAkkaPersistenceCassandra,
+    "com.typesafe.akka" %% "akka-persistence-cassandra-launcher" % BuildInfo.versionAkkaPersistenceCassandra % Test)
 
-  val _akkaStreamKafka = ("com.typesafe.akka" %% "akka-stream-kafka" % "2.0.1")
+  val _akkaPersistenceJdbc =
+    ("com.github.dnvriend" %% "akka-persistence-jdbc" % BuildInfo.versionAkkaPersistenceJdbc)
+      .excludeAll(ExclusionRule("com.typesafe.akka"))
+      .cross(CrossVersion.binary)
+
+  val _akkaStreamKafka = ("com.typesafe.akka" %% "akka-stream-kafka" % BuildInfo.versionAlpakkaKafka)
     .exclude("com.typesafe.akka", "akka-slf4j")
     .cross(CrossVersion.binary)
+
+  val _osLib = "com.lihaoyi" %% "os-lib" % BuildInfo.versionOsLib
 
   val _hanlp = "com.hankcs" % "hanlp" % "portable-1.7.1"
 
   val _scopt = "com.github.scopt" %% "scopt" % "3.7.1"
 
   val _slicks = Seq(
+    "com.github.tminglei" %% "slick-pg" % BuildInfo.versionSlickPg,
     "com.typesafe.slick" %% "slick" % BuildInfo.versionSlick,
-    "com.github.tminglei" %% "slick-pg" % "0.18.1",
     "com.typesafe.slick" %% "slick-testkit" % BuildInfo.versionSlick % Test)
 
-  private val versionPoi = "4.1.1"
-  val _pois = Seq("org.apache.poi" % "poi-scratchpad" % versionPoi, "org.apache.poi" % "poi-ooxml" % versionPoi)
+  val _pois = Seq(
+    "org.apache.poi" % "poi-scratchpad" % BuildInfo.versionPoi,
+    "org.apache.poi" % "poi-ooxml" % BuildInfo.versionPoi)
 
   val _h2 = "com.h2database" % "h2" % "1.4.200"
 
-  val _quartz = ("org.quartz-scheduler" % "quartz" % BuildInfo.versionQuartz).exclude("com.zaxxer", "HikariCP-java7")
+  val _postgresql = "org.postgresql" % "postgresql" % BuildInfo.versionPostgres
 
-  val _postgresql = "org.postgresql" % "postgresql" % "42.2.10"
-
-  val _mysql = "mysql" % "mysql-connector-java" % "8.0.19"
+  val _mysql = "mysql" % "mysql-connector-java" % BuildInfo.versionMySQL
 
   val _mssql = "com.microsoft.sqlserver" % "mssql-jdbc" % "8.2.0.jre11"
 

@@ -3,9 +3,10 @@ package mass.job
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.util.StringUtils
 import mass.Global
+import mass.core.job.JobConstants
 import org.quartz.{ Job, JobExecutionContext }
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 private[job] class JobClassJob extends Job with StrictLogging {
   override def execute(context: JobExecutionContext): Unit =

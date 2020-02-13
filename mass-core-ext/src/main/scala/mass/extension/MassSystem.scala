@@ -6,7 +6,7 @@ import akka.actor.typed.ActorSystem
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import helloscala.common.Configuration
 import mass.MassSettings
-import mass.slick.SqlManager
+import mass.db.slick.SqlManager
 
 final class MassSystem private (val system: ActorSystem[_]) extends FusionExtension {
   val core: MassCore = MassCore(system)

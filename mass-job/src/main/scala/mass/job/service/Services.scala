@@ -2,7 +2,7 @@ package mass.job.service
 
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
+import java.nio.file.{ Files, Path }
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern._
@@ -36,14 +36,14 @@ class Services(val jobSystem: JobSystem) {
       }
   }
 
-  def uploadJobOnZip(fileInfo: FileInfo, file: File)(implicit ec: ExecutionContext): Future[JobUploadJobResp] = {
+  def uploadJobOnZip(fileInfo: FileInfo, file: Path)(implicit ec: ExecutionContext): Future[JobUploadJobResp] = {
     val msg = JobUploadJobReq(
       file,
       fileInfo.fileName,
       fileInfo.contentType.charsetOption.map(_.nioCharset()).getOrElse(StandardCharsets.UTF_8))
 
     jobBehavior.ask[JobResponse](replyTo => CommandReply(msg, replyTo)).mapTo[JobUploadJobResp].andThen {
-      case _ => Files.deleteIfExists(file.toPath)
+      case _ => Files.deleteIfExists(file)
     }
   }
 
