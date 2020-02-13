@@ -1,7 +1,7 @@
 package mass.job.web.route.api.v1
 
 import akka.http.scaladsl.model.StatusCodes
-import helloscala.common.jackson.Jackson
+import fusion.json.jackson.Jackson
 import mass.job.SchedulerSpec
 import mass.job.service.Services
 import mass.message.job.{ JobCreateReq, JobPageResp }
@@ -12,7 +12,7 @@ class JobRouteTest extends SchedulerSpec {
 
   "JobRoute" should {
     "page" in {
-      import mass.http.JacksonSupport._
+      import fusion.json.jackson.http.JacksonSupport._
       Get("/job/page") ~> route ~> check {
         status shouldBe StatusCodes.OK
         val resp = responseAs[JobPageResp]

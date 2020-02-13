@@ -2,23 +2,20 @@ package mass.job.service.job
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
-import helloscala.common.jackson.Jackson
-import mass.Global
+import fusion.json.jackson.Jackson
+import mass.core.MassActorTestKit
 import mass.job.JobSystem
 import mass.job.util.ProgramVersion
 import mass.message.job._
 import mass.model.job.{ JobItem, JobTrigger, Program, TriggerType }
-import org.scalatest.OptionValues
 import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
 
 class JobServiceMock(val jobSystem: JobSystem) extends JobService
 
-class JobServiceTest extends ScalaTestWithActorTestKit with AnyWordSpecLike with OptionValues {
+class JobServiceTest extends MassActorTestKit with AnyWordSpecLike {
   private implicit val ec = system.executionContext
-  Global.registerActorSystem(system)
   val jobSystem = JobSystem(system)
   val jobService = new JobServiceMock(jobSystem)
 

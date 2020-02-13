@@ -1,7 +1,7 @@
 package mass.job.web.route.api
 
 import akka.http.scaladsl.server.Route
-import mass.http.AbstractRoute
+import fusion.http.server.AbstractRoute
 import mass.job.service.Services
 import mass.job.web.route.api.v1.JobRoute
 

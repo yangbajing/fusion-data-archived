@@ -8,8 +8,8 @@ import akka.stream.alpakka.csv.scaladsl.{ CsvFormatting, CsvParsing }
 import akka.stream.scaladsl.{ FileIO, Sink }
 import akka.util.ByteString
 import fusion.jdbc.util.JdbcUtils
-import helloscala.common.test.HelloscalaSpec
-import mass.core.test.AkkaSpec
+import mass.core.MassActorTestKit
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
 import scala.concurrent.{ Await, Future }
@@ -41,7 +41,7 @@ import scala.concurrent.{ Await, Future }
  *   created_at  datetime
  * );
  */
-class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
+class PostgresMySQLTest extends MassActorTestKit with AnyWordSpecLike {
   "Database" should {
     "Postgres foreach" in {
       val sql =
@@ -111,8 +111,7 @@ class PostgresMySQLTest extends HelloscalaSpec with AkkaSpec {
           conn.prepareStatement(
             "insert into t_book(id, isbn, title, description, publish_at, created_at) values (?, ?, ?, ?, ?, ?);"),
         (values, pstmt) => {
-          val id :: isbn :: title :: description :: publishAt :: createdAt :: Nil =
-            values
+          val id :: isbn :: title :: description :: publishAt :: createdAt :: Nil = values
           println(values)
           JdbcUtils.setStatementParameters(
             pstmt,

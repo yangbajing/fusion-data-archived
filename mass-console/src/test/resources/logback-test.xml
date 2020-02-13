@@ -4,7 +4,7 @@
 <!-- The default logback configuration that Play uses if no other configuration is provided -->
 <configuration>
 
-    <conversionRule conversionWord="coloredLevel" converterClass="helloscala.common.logback.ColoredLevel"/>
+    <conversionRule conversionWord="coloredLevel" converterClass="fusion.common.logback.ColoredLevel"/>
     <!-- 按照每天生成日志文件 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">

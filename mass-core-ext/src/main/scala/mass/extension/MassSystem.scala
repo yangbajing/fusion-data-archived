@@ -5,7 +5,7 @@ import java.nio.file.Path
 import akka.actor.typed.ActorSystem
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import helloscala.common.Configuration
-import mass.server.MassSettings
+import mass.MassSettings
 import mass.slick.SqlManager
 
 final class MassSystem private (val system: ActorSystem[_]) extends FusionExtension {

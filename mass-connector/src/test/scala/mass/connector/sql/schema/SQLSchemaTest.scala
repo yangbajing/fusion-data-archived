@@ -1,12 +1,12 @@
 package mass.connector.sql.schema
 
-import helloscala.common.test.HelloscalaSpec
+import fusion.test.FusionWordSpecLike
 import mass.connector.sql.TestSchema
 import org.scalatest.BeforeAndAfterAll
 
 import scala.collection.immutable
 
-class SQLSchemaTest extends HelloscalaSpec with BeforeAndAfterAll {
+class SQLSchemaTest extends FusionWordSpecLike with BeforeAndAfterAll {
   override protected def afterAll(): Unit = {
     TestSchema.postgres.close()
     super.afterAll()
@@ -18,16 +18,16 @@ class SQLSchemaTest extends HelloscalaSpec with BeforeAndAfterAll {
 
     "listTable" in {
       tables = schema.listTable("public")
-      tables must not be empty
+      tables should not be empty
       val table = tables.head
-      table.schemaName mustBe "public"
+      table.schemaName shouldBe "public"
       tables.foreach(println)
     }
 
     "listColumn" in {
       val columns =
         schema.listColumn(tables.head.tableName, tables.head.schemaName)
-      columns must not be empty
+      columns should not be empty
       columns.foreach(println)
     }
   }

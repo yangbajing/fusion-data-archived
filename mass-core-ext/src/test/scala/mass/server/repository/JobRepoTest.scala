@@ -3,7 +3,7 @@ package mass.server.repository
 import java.time.{ LocalDateTime, OffsetDateTime }
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
-import helloscala.common.jackson.Jackson
+import fusion.json.jackson.Jackson
 import helloscala.common.util.TimeUtils
 import mass.extension.MassSystem
 import mass.job.repository._

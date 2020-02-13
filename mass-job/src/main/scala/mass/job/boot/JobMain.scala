@@ -1,13 +1,12 @@
 package mass.job.boot
 
 import com.typesafe.config.ConfigFactory
-import mass.Global
+import mass.Mass
 import mass.job.JobSystem
 
 object JobMain {
   def main(args: Array[String]): Unit = {
-    val system = Global.registerActorSystem(ConfigFactory.load())
-    val jobSystem = JobSystem(system)
-    new JobServer(jobSystem).startServerAwait()
+    val jobSystem = JobSystem(Mass.fromConfig(ConfigFactory.load()).system)
+    new JobServer(jobSystem).startServer()
   }
 }

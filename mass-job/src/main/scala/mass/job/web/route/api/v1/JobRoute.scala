@@ -2,12 +2,12 @@ package mass.job.web.route.api.v1
 
 import akka.http.scaladsl.server.Route
 import com.typesafe.scalalogging.StrictLogging
+import fusion.http.server.{ AbstractRoute, JacksonDirectives }
 import helloscala.common.page.Page
-import mass.http.AbstractRoute
 import mass.job.service.Services
 import mass.message.job._
 
-class JobRoute(services: Services) extends AbstractRoute with StrictLogging {
+class JobRoute(services: Services) extends AbstractRoute with JacksonDirectives with StrictLogging {
   private val pagePDM = ('page.as[Int].?(Page.DEFAULT_PAGE), 'size.as[Int].?(Page.DEFAULT_SIZE), 'key.?)
 
   override def route: Route = pathPrefix("job") {

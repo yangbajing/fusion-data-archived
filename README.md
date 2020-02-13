@@ -24,9 +24,9 @@ google-chrome mass-docs/target/paradox/site/main/index.html
 
 ## 项目结构
 
-- [mass-docs](mass-docs)：使用 [Lightbend Paradox](https://developer.lightbend.com/docs/paradox/latest/) 编写的文档。在线访问地址：[http://www.yangbajing.me/mass-data/doc/](http://www.yangbajing.me/mass-data/doc/)
+- [mass-docs](mass-docs)：使用 [Lightbend Paradox](https://developer.lightbend.com/docs/paradox/latest/) 编写的文档。在线访问地址：[http://www.yangbajing.me/fusion-data/doc/](http://www.yangbajing.me/mass-data/doc/)
 - [mass-functest](mass-functest)：功能测试项目，支持 multi-jvm 测试（单机上启动多个JVM实例模拟集群）
-- [mass-console](mass-console)：mass 管理控制台、监控、业务流程编排
+- [mass-console](mass-console)：mass 主管理控制台、监控、业务流程编排
 - [mass-governance](mass-governance)：mass 数据治理
 - [mass-rdi](mass-rdi)：mass 数据集成，ETL
 - [mass-connector](mass-connector): 基于Akka Stream的数据连接器

@@ -167,30 +167,29 @@ lazy val massConnector = _project("mass-connector")
 lazy val massCoreExt = _project("mass-core-ext")
   .settings(Publishing.publishing: _*)
   .dependsOn(massCore % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Seq(_quartz, _jsch, _fusionCluster, _akkaMultiNodeTestkit % Test) ++ _slicks)
+  .settings(
+    libraryDependencies ++= Seq(_quartz, _jsch, _fusionHttp, _fusionCluster, _akkaMultiNodeTestkit % Test) ++ _slicks)
 
 lazy val massCore =
   _project("mass-core")
     .dependsOn(massCommon % "compile->compile;test->test")
-    .enablePlugins(AkkaGrpcPlugin)
     .settings(Publishing.publishing: _*)
-    .settings(libraryDependencies ++= Seq(
-        "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
-        _scalaXml,
-        _h2,
-        _fusionJdbc,
-        _fusionProtobufV3,
-        _fusionJson,
-        _postgresql % Test,
-        _quartz % Provided) ++ _akkaHttps)
+    .settings(
+      libraryDependencies ++= Seq(
+          _scalaXml,
+          _h2,
+          _fusionJdbc,
+          _fusionJsonJackson,
+          _postgresql % Test,
+          _quartz % Provided) ++ _akkaHttps)
 
 lazy val massCommon = _project("mass-common")
   .settings(Publishing.publishing: _*)
-  .settings(libraryDependencies ++= Seq(
-      "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "provided",
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      _akkaSerializationJackson,
-      _fusionCore))
+  .settings(
+    libraryDependencies ++= Seq(
+        "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+        _akkaSerializationJackson,
+        _fusionCore))
 
 def _project(name: String, _base: String = null) =
   Project(id = name, base = file(if (_base eq null) name else _base))

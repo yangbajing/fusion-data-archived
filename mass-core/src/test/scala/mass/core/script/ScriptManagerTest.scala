@@ -1,10 +1,10 @@
 package mass.core.script
 
-import helloscala.common.test.HelloscalaSpec
+import fusion.test.FusionWordSpecLike
 import javax.script.{ ScriptEngineManager, SimpleBindings }
 import mass.core.event.EventData
 
-class ScriptManagerTest extends HelloscalaSpec {
+class ScriptManagerTest extends FusionWordSpecLike {
   case class SqlDataEvent(data: String, `type`: String = "data-sql") extends EventData
 
   "ScriptManagerTest" should {

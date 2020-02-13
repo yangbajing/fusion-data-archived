@@ -8,6 +8,7 @@ package mass.core
 
 object Constants {
   val BASE_CONF = "mass"
+  val MASS = "mass"
 
   val SHA256_HEX_LENGTH = 64
 

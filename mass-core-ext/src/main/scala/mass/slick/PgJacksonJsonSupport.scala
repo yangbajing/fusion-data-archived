@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.node.NullNode
 import com.github.tminglei.slickpg.json.PgJsonExtensions
 import com.github.tminglei.slickpg.utils.{ PgCommonJdbcTypes, SimpleArrayUtils }
 import com.github.tminglei.slickpg.{ ArraySupport, ExPostgresProfile }
+import fusion.json.jackson.Jackson
 import helloscala.common.data.NameValue
-import helloscala.common.jackson.Jackson
 import mass.model.job.{ JobItem, JobTrigger }
 import slick.jdbc._
 

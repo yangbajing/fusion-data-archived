@@ -4,13 +4,13 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 
 import com.typesafe.config.ConfigFactory
+import fusion.test.{ FusionScalaFutures, FusionWordSpecLike }
 import helloscala.common.Configuration
-import helloscala.common.test.HelloscalaSpec
+import mass.MassSettings
 import mass.job.JobSettings
 import mass.message.job.JobUploadJobReq
-import mass.server.MassSettings
 
-class JobUtilsTest extends HelloscalaSpec {
+class JobUtilsTest extends FusionWordSpecLike with FusionScalaFutures {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   val configuration = Configuration.load()
@@ -43,7 +43,7 @@ class JobUtilsTest extends HelloscalaSpec {
     "parse" in {
       val conf = Configuration(ConfigFactory.parseString(str))
       println(conf)
-      conf.getString("name") mustBe "Job名字"
+      conf.getString("name") shouldBe "Job名字"
     }
   }
 }

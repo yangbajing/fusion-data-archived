@@ -31,7 +31,7 @@ object Consumer {
   private def run(consumer: KafkaConsumer[String, String]): Unit = {
     consumer.subscribe(Collections.singleton("customerCountries"))
     while (!isStop && !Thread.currentThread().isInterrupted) {
-      val records = consumer.poll(100)
+      val records = consumer.poll(java.time.Duration.ofMillis(100))
       records.forEach { record =>
         println(s"topic = ${record.topic()}, partition = ${record.partition()}, offset = ${record
           .offset()}, key: ${record.key()}, value = ${record.value()}")

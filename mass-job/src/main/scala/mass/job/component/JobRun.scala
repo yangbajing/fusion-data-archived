@@ -93,8 +93,8 @@ object JobRun extends StrictLogging {
           }
         val version = ProgramVersion.get(detail.program, detail.programVersion).getOrElse(ProgramVersion.Scala212)
         val cmd = version match {
-          case ProgramVersion.Scala211 => schedulerConfig.massSettings.scala211Home + "/bin/" + version.CLI
-          case _                       => schedulerConfig.massSettings.scala212Home + "/bin/" + version.CLI
+          case ProgramVersion.Scala211 => schedulerConfig.massSettings.compiles.scala212Home + "/bin/" + version.CLI
+          case _                       => schedulerConfig.massSettings.compiles.scala212Home + "/bin/" + version.CLI
         }
         (Seq(cmd) ++ options, Nil)
       case Program.JAVA =>

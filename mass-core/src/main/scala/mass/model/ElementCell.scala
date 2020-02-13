@@ -20,7 +20,7 @@ import java.sql.Timestamp
 import java.time._
 import java.util.Date
 
-import helloscala.common.types._
+import helloscala.common.util._
 
 import scala.beans.BeanProperty
 

@@ -13,6 +13,7 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.Configuration
 import helloscala.common.util.Utils
+import mass.MassSettings
 import mass.core.Constants
 
 import scala.collection.immutable.TreeMap

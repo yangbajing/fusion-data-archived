@@ -40,7 +40,7 @@ class PidFile(val pid: Long) {
     val parent = path.getParent
     if (parent != null) {
       if (Files.exists(parent) && !Files.isDirectory(parent))
-        throw new IllegalArgumentException(parent + " exists but is not a directory")
+        throw new IllegalArgumentException(s"$parent exists but is not a directory")
 
       if (!Files.exists(parent)) {
         // only do this if it doesn't exists we get a better exception further down
@@ -52,7 +52,7 @@ class PidFile(val pid: Long) {
     }
 
     if (Files.exists(path) && !Files.isRegularFile(path))
-      throw new IllegalArgumentException(path + " exists but is not a regular file")
+      throw new IllegalArgumentException(s"$path exists but is not a regular file")
 
     val stream = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
     try {

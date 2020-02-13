@@ -1,8 +1,8 @@
 package mass.job.web.route.api
 
 import akka.http.scaladsl.server.Route
-import helloscala.common.jackson.Jackson
-import mass.http.AbstractRoute
+import fusion.http.server.AbstractRoute
+import fusion.json.jackson.Jackson
 
 class MockRoute extends AbstractRoute {
   override def route: Route = pathPrefix("api") {

@@ -2,8 +2,8 @@ package mass.job
 
 import java.nio.file.{ Path, Paths }
 
+import mass.MassSettings
 import mass.core.Constants
-import mass.server.MassSettings
 
 case class JobSettings(massSettings: MassSettings) {
   private val configuration = massSettings.configuration

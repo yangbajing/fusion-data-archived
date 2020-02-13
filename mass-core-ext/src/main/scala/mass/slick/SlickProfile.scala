@@ -7,11 +7,9 @@ import com.github.tminglei.slickpg._
 import com.github.tminglei.slickpg.agg.PgAggFuncSupport
 import com.github.tminglei.slickpg.str.PgStringSupport
 import com.zaxxer.hikari.HikariDataSource
-import helloscala.common.Configuration
+import fusion.json.jackson.Jackson
 import helloscala.common.data.NameValue
-import helloscala.common.jackson.Jackson
 import helloscala.common.types.ObjectId
-import javax.sql.DataSource
 import mass.model.CommonStatus
 import mass.model.job._
 import slick.ast.TypedType
