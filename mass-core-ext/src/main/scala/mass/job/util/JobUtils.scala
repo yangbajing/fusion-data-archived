@@ -80,7 +80,7 @@ object JobUtils extends StrictLogging {
     val conf = Configuration.parseString(content)
     val jobItem = JobItem(conf.getConfiguration("item"))
     val jobTrigger = JobTrigger(conf.getConfiguration("trigger"))
-    JobCreateReq(conf.get[Option[String]]("key"), jobItem, jobTrigger, None)
+    JobCreateReq(conf.get[Option[String]]("key"), jobItem, jobTrigger)
   }
 }
 

@@ -13,7 +13,7 @@ class JobRepoTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   private val massSystem: MassSystem = MassSystem(system)
 
   "JobRepoTest" should {
-    val db = massSystem.sqlManager.slickDatabase
+    val db = massSystem.sqlManager.slickDb
 
     "filterWhere" in {
       val req = JobPageReq(page = 1, size = 30)

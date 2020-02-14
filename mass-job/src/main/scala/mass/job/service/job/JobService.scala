@@ -1,19 +1,18 @@
 package mass.job.service.job
 
 import java.nio.file.{ Files, Paths, StandardCopyOption }
-import java.time.OffsetDateTime
 
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.data.{ IntValueName, StringValueName }
 import helloscala.common.util.DigestUtils
 import mass.core.ProgramVersion
+import mass.db.slick.SqlSystem
 import mass.job.JobSystem
 import mass.job.component.DefaultSchedulerJob
 import mass.job.repository.JobRepo
 import mass.job.util.JobUtils
 import mass.message.job._
 import mass.model.job._
-import mass.db.slick.SqlManager
 
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -21,12 +20,12 @@ trait JobService extends StrictLogging {
   val jobSystem: JobSystem
 
   protected val JOB_CLASS_NAME: String = classOf[DefaultSchedulerJob].getName
-  protected lazy val db: SqlManager = jobSystem.massSystem.sqlManager
+  def db: SqlSystem = jobSystem.massSystem.sqlManager
 
-  def executionJob(event: JobExecutionEvent)(implicit ec: ExecutionContext): Unit = {
+  def triggerJob(event: JobTriggerEvent)(implicit ec: ExecutionContext): Unit = {
     db.run(JobRepo.findJob(event.key)).foreach {
       case Some(schedule) => jobSystem.triggerJob(schedule.key)
-      case None           => logger.error(s"作业未找到，jobKey: ${event.key}")
+      case None           => logger.error(s"Job not found, job key is '${event.key}'.")
     }
   }
 
@@ -41,22 +40,20 @@ trait JobService extends StrictLogging {
   }
 
   def handleUploadJob(req: JobUploadJobReq)(implicit ec: ExecutionContext): Future[JobUploadJobResp] =
-    JobUtils
-      .uploadJob(jobSystem.jobSettings, req)
-      .flatMap(jobZip => db.runTransaction(JobRepo.save(jobZip)(db.executionContext)))
-      .map { list =>
+    JobUtils.uploadJob(jobSystem.jobSettings, req).flatMap(jobZip => db.runTransaction(JobRepo.save(jobZip))).map {
+      list =>
         val results = list.map(schedule => JobCreateResp(Option(schedule)))
         JobUploadJobResp(results)
-      }
+    }
 
   def handleGetAllOption(req: JobGetAllOptionReq)(implicit ec: ExecutionContext): Future[JobGetAllOptionResp] = Future {
-    val programs = Program.values().toList.map(_.toValueName)
-    val triggerType = TriggerType.values().toList.map(_.toValueName)
+    val programs = Program.values.map(_.toValueName)
+    val triggerType = TriggerType.values.toList.map(_.toValueName)
     val programVersion = ProgramVersion.values
       .groupBy(_.program)
       .map {
         case (program, versions) =>
-          ProgramVersionItem(program.getValue, versions.map(p => StringValueName(p.version, p.version)))
+          ProgramVersionItem(program.value, versions.map(p => StringValueName(p.version, p.version)))
       }
       .toList
     val jobStatus = RunStatus.values().toList.map(_.toValueName)
@@ -71,7 +68,6 @@ trait JobService extends StrictLogging {
 
   def handleUpdate(req: JobUpdateReq)(implicit ec: ExecutionContext): Future[JobSchedulerResp] = {
     db.runTransaction(JobRepo.updateJobSchedule(req)).map { schedule =>
-      schedulerJob(schedule)
       JobSchedulerResp(Option(schedule))
     }
   }
@@ -89,7 +85,14 @@ trait JobService extends StrictLogging {
     JobUploadFilesResp(resources)
   }
 
-  private def schedulerJob(schedule: JobSchedule): OffsetDateTime = {
-    jobSystem.scheduleJob(schedule.key, schedule.item, schedule.trigger, JOB_CLASS_NAME, None)
+  def handleScheduleJob(req: JobTriggerReq)(implicit ec: ExecutionContext): Future[JobSchedulerResp] = {
+    db.run(JobRepo.findJob(req.key)).map { maybe =>
+      maybe match {
+        case Some(schedule) =>
+          jobSystem.scheduleJob(schedule.key, schedule.toJobItem, schedule.toJobTrigger, JOB_CLASS_NAME, None)
+        case None => logger.error(s"Job not found, job key is '${req.key}'.")
+      }
+      JobSchedulerResp(maybe)
+    }
   }
 }

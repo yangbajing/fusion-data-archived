@@ -21,7 +21,7 @@ class Services(val jobSystem: JobSystem) {
   implicit val timeout: Timeout = Timeout(10.seconds)
   implicit val system = jobSystem.system
 
-  val jobBehavior: ActorRef[JobBehavior.Command] = null
+  val jobBehavior: ActorRef[JobBehavior.Command] = JobBehavior.init(system)
 
   def listOption(): Future[JobGetAllOptionResp] = {
     jobBehavior.ask[JobResponse](replyTo => CommandReply(JobGetAllOptionReq(), replyTo)).mapTo[JobGetAllOptionResp]

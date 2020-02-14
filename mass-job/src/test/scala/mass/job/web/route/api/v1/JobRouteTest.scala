@@ -1,10 +1,9 @@
 package mass.job.web.route.api.v1
 
 import akka.http.scaladsl.model.StatusCodes
-import fusion.json.jackson.Jackson
 import mass.job.SchedulerSpec
 import mass.job.service.Services
-import mass.message.job.{ JobCreateReq, JobPageResp }
+import mass.message.job.JobPageResp
 
 class JobRouteTest extends SchedulerSpec {
   private lazy val services = new Services(jobSystem)
@@ -19,31 +18,6 @@ class JobRouteTest extends SchedulerSpec {
         println(resp)
         resp should not be null
       }
-    }
-  }
-
-  val jsonCreateJob =
-    """{"item":{"programVersion":"2.12","key":"ddd","program":1,"programOptions":[],"programMain":"test.Main","programArgs":[]},"trigger":{"triggerType":2,"key":"ddd","startTime":null,"endTime":null,"interval":"1.day"}}"""
-
-  "mock" should {
-    "createJob" in {
-      val jsonNode = Jackson.readTree(jsonCreateJob)
-      println(jsonNode)
-      val req = Jackson.treeToValue[JobCreateReq](jsonNode)
-      println(req)
-      println(Jackson.prettyStringify(req))
-    }
-
-    "jackson" in {
-      import scala.compat.java8.DurationConverters._
-      val d = java.time.Duration.ofDays(3)
-      println(Jackson.valueToTree(d))
-      println(Jackson.stringify(d))
-
-      val node = Jackson.readTree("69")
-      val jd = Jackson.treeToValue[java.time.Duration](node)
-      println(jd)
-      println(jd.toScala)
     }
   }
 }

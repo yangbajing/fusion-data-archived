@@ -1,6 +1,7 @@
 package mass
 
 import akka.actor.typed.ActorSystem
+import fusion.json.jackson.Jackson
 
 object Global {
   private var _system: ActorSystem[_] = _
@@ -9,6 +10,7 @@ object Global {
     if (_system != null) {
       throw new ExceptionInInitializerError("ActorSystem[_] already set.")
     }
+//    Jackson.defaultObjectMapper.findAndRegisterModules()
     _system = system
     _system
   }

@@ -1,5 +1,6 @@
 package mass.db.slick
 
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 import com.fasterxml.jackson.databind.JsonNode
@@ -54,19 +55,21 @@ trait SlickProfile
     implicit val setRunStatus: SetParameter[RunStatus] = (v, rp) => rp.setInt(v.getValue)
     implicit val setRunStatusOption: SetParameter[Option[RunStatus]] = (v, rp) => rp.setIntOption(v.map(_.getValue))
 
-    implicit val getTriggerType: GetResult[TriggerType] = mkGetResult(pr => TriggerType.fromValue(pr.nextInt()))
+    implicit val getTriggerType: GetResult[TriggerType] = mkGetResult(pr => TriggerType.fromValue(pr.nextString()))
     implicit val getTriggerTypeOption: GetResult[Option[TriggerType]] = mkGetResult(
-      pr => pr.nextIntOption().map(TriggerType.fromValue))
-    implicit val setTriggerType: SetParameter[TriggerType] = (v, rp) => rp.setInt(v.getValue)
-    implicit val setTriggerTypeOption: SetParameter[Option[TriggerType]] = (v, rp) => rp.setIntOption(v.map(_.getValue))
+      pr => pr.nextStringOption().map(TriggerType.fromValue))
+    implicit val setTriggerType: SetParameter[TriggerType] = (v, rp) => rp.setString(v.value)
+    implicit val setTriggerTypeOption: SetParameter[Option[TriggerType]] = (v, rp) => rp.setStringOption(v.map(_.value))
 
     implicit val getFiniteDuration: GetResult[FiniteDuration] =
-      mkGetResult(pr => FiniteDuration(pr.nextLong(), TimeUnit.MILLISECONDS))
+      mkGetResult(pr => FiniteDuration(pr.nextDuration().toNanos, TimeUnit.NANOSECONDS).toCoarsest)
     implicit val getFiniteDurationOption: GetResult[Option[FiniteDuration]] =
-      mkGetResult(pr => pr.nextLongOption().map(FiniteDuration(_, TimeUnit.MILLISECONDS)))
-    implicit val setFiniteDuration: SetParameter[FiniteDuration] = (v, rp) => rp.setLong(v.toMillis)
+      mkGetResult(pr => pr.nextDurationOption().map(d => FiniteDuration(d.toNanos, TimeUnit.NANOSECONDS).toCoarsest))
+
+    implicit val setFiniteDuration: SetParameter[FiniteDuration] =
+      mkSetParameter[FiniteDuration]("interval", fd => Duration.ofNanos(fd.toNanos).toString)
     implicit val setFiniteDurationOption: SetParameter[Option[FiniteDuration]] =
-      (v, rp) => rp.setLongOption(v.map(_.toMillis))
+      mkOptionSetParameter[FiniteDuration]("interval", fd => Duration.ofNanos(fd.toNanos).toString)
 
     implicit val getObjectId: GetResult[ObjectId] = mkGetResult(pr => ObjectId(pr.nextString()))
     implicit val getObjectIdOption: GetResult[Option[ObjectId]] = mkGetResult(
@@ -100,35 +103,23 @@ trait SlickProfile
 
     def coalesce[R: TypedType]: Seq[Rep[_]] => Rep[R] = SimpleFunction("coalesce")
 
-    /// #proto-jdbc-type
     implicit val programColumnType: JdbcType[Program] =
-      MappedColumnType.base[Program, Int](_.getValue, Program.fromValue)
+      MappedColumnType.base[Program, String](_.value, Program.fromValue)
     implicit val commonStatusColumnType: JdbcType[CommonStatus] =
       MappedColumnType.base[CommonStatus, Int](_.getValue, CommonStatus.fromValue)
     implicit val durationColumnType: JdbcType[FiniteDuration] =
       MappedColumnType.base[FiniteDuration, Long](_.toMillis, millis => FiniteDuration(millis, TimeUnit.MILLISECONDS))
     implicit val triggerTypeColumnType: JdbcType[TriggerType] =
-      MappedColumnType.base[TriggerType, Int](_.getValue, TriggerType.fromValue)
+      MappedColumnType.base[TriggerType, String](_.value, TriggerType.fromValue)
     implicit val jobStatusColumnType: JdbcType[RunStatus] =
       MappedColumnType.base[RunStatus, Int](_.getValue, RunStatus.fromValue)
-
     implicit val jobItemColumnType: JdbcType[JobItem] =
       MappedColumnType.base[JobItem, JsonNode](Jackson.valueToTree, Jackson.treeToValue[JobItem])
     implicit val jobTriggerColumnType: JdbcType[JobTrigger] =
       MappedColumnType.base[JobTrigger, JsonNode](Jackson.valueToTree, Jackson.treeToValue[JobTrigger])
-    /// #proto-jdbc-type
-
-    /// #google-protobuf
-//    implicit val timestampColumnType: JdbcType[com.google.protobuf.Timestamp] =
-//      MappedColumnType.base[com.google.protobuf.Timestamp, java.sql.Timestamp](
-//        tmap => java.sql.Timestamp.from(Instant.ofEpochSecond(tmap.getSeconds, tmap.getNanos)),
-//        tcomap => {
-//        val inst = tcomap.toInstant
-//        com.google.protobuf.Timestamp.newBuilder.setSeconds(inst.getEpochSecond).setNanos(inst.getNano).build()
-//      })
-    /// #google-protobuf
-
-    implicit val objectIdTypeMapper: JdbcType[ObjectId] =
+    implicit val jobLogColumnType: JdbcType[TriggerLog] =
+      MappedColumnType.base[TriggerLog, JsonNode](Jackson.valueToTree, Jackson.treeToValue[TriggerLog])
+    implicit val objectIdColumnType: JdbcType[ObjectId] =
       MappedColumnType.base[ObjectId, String](_.toString(), ObjectId.apply)
 
     type FilterCriteriaType = Option[Rep[Option[Boolean]]]
@@ -147,19 +138,6 @@ trait SlickProfile
         .collect({ case Some(criteria) => criteria })
         .reduceLeftOption(_ || _)
         .getOrElse(Some(true): Rep[Option[Boolean]])
-
-//    def createDatabase(ds: DataSource, conf: Configuration): backend.DatabaseDef = {
-//      val numThreads = conf.getOrElse[Int]("numThreads", 20)
-//      val maximumPoolSize = conf.getOrElse[Int]("maximumPoolSize", numThreads)
-//      val executor = AsyncExecutor(
-//        conf.getOrElse[String]("poolName", "default"),
-//        numThreads,
-//        numThreads,
-//        conf.getOrElse[Int]("queueSize", 1000),
-//        maximumPoolSize,
-//        registerMbeans = conf.getOrElse[Boolean]("registerMbeans", false))
-//      Database.forDataSource(ds, Some(maximumPoolSize), executor)
-//    }
 
     def databaseForDataSource(dataSource: HikariDataSource): backend.DatabaseDef = {
       Database.forDataSource(

@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import fusion.json.CborSerializable
 
-case class JobLog(
+case class TriggerLog(
     id: String,
     jobKey: String,
     startTime: OffsetDateTime,

@@ -5,19 +5,11 @@ import java.nio.file.Path
 import akka.actor.typed.ActorSystem
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import helloscala.common.Configuration
-import mass.MassSettings
-import mass.db.slick.SqlManager
+import mass.db.slick.SqlSystem
 
 final class MassSystem private (val system: ActorSystem[_]) extends FusionExtension {
   val core: MassCore = MassCore(system)
-
-  val settings = MassSettings(core.configuration)
-
-  val sqlManager: SqlManager = {
-    val v = SqlManager(system)
-    sys.addShutdownHook(v.slickDatabase.close())
-    v
-  }
+  val sqlManager: SqlSystem = SqlSystem(system)
 
   def connection: Configuration = core.configuration
 

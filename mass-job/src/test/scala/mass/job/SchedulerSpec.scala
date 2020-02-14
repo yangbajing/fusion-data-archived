@@ -1,42 +1,43 @@
 package mass.job
 
-import akka.actor.typed.scaladsl.adapter._
+import akka.actor.{ ActorSystem, typed }
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import akka.mass.AkkaUtils
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.StrictLogging
+import fusion.common.FusionProtocol
 import helloscala.common.Configuration
-import mass.Global
+import mass.Mass
 import mass.extension.MassSystem
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.wordspec.AnyWordSpec
 
-import scala.concurrent.duration._
-
-trait SchedulerSpec
-    extends AnyWordSpecLike
+abstract class SchedulerSpec(val mass: Mass)
+    extends AnyWordSpec
     with Matchers
     with BeforeAndAfterAll
     with ScalatestRouteTest
     with StrictLogging {
-  private[this] var _massSystem: MassSystem = _
+  def this() = this(Mass.fromConfig(ConfigFactory.load("application-test.conf")))
+
+  override protected def createActorSystem(): ActorSystem = mass.classicSystem
+
   private[this] var _jobSystem: JobSystem = _
 
-  protected def massSystem: MassSystem = _massSystem
+  protected def typedSystem: typed.ActorSystem[FusionProtocol.Command] = mass.system
 
   protected def jobSystem: JobSystem = _jobSystem
+
+  protected def massSystem: MassSystem = jobSystem.massSystem
 
   protected def configuration: Configuration = _jobSystem.configuration
 
   override protected def beforeAll(): Unit = {
+    _jobSystem = JobSystem(mass.system)
     super.beforeAll()
-    Global.registerActorSystem(system.toTyped)
-    _massSystem = MassSystem(system.toTyped)
-    _jobSystem = JobSystem(system.toTyped)
   }
 
   override protected def afterAll(): Unit = {
-    AkkaUtils.shutdownActorSystem(system, 10.seconds)
     super.afterAll()
   }
 }

@@ -22,14 +22,14 @@ case class JobItem(
 
 object JobItem {
   def apply(item: Configuration): JobItem = {
-    val program = Program.optionalFromName(item.getString("program").toUpperCase()).orElse(Program.UNKOWN)
+    val program = Program.fromValue(item.getString("program"))
     val programMain = item.getString("program-main")
     val _version = item.getOrElse[String]("program-version", "")
     val programVersion =
       ProgramVersion
         .get(program, _version)
         .getOrElse(
-          throw HSBadRequestException(s"Configuration key program-version is invalid, current value is ${_version}."))
+          throw HSBadRequestException(s"Configuration key program-version is invalid, current name is ${_version}."))
     JobItem(
       program,
       item.getOrElse[Seq[String]]("program-options", Nil),

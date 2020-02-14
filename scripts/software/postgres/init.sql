@@ -35,17 +35,15 @@ $$
 drop table if exists public.job_schedule;
 create table public.job_schedule
 (
-    key                 varchar(128) not null,
-    item                jsonb        not null,
-    trigger             jsonb        not null,
-    description         text         not null,
-    run_status          int          not null default 1,
-    status              int          not null default 1,
-    creator             varchar(24)  not null,
-    created_at          timestamptz  not null,
-    schedule_count      bigint       not null default 0,
-    last_schedule_start timestamptz,
-    last_scheduled_at   timestamptz,
+    key            varchar(128) not null,
+    item           jsonb        not null,
+    trigger        jsonb        not null,
+    description    text         not null,
+    status         int          not null default 1,
+    creator        varchar(24)  not null,
+    created_at     timestamptz  not null,
+    schedule_count bigint       not null default 0,
+    trigger_log    jsonb,
     constraint job_schedule_pk primary key (key)
 );
 comment on table public.job_schedule
@@ -53,8 +51,8 @@ comment on table public.job_schedule
 comment on column public.job_schedule.status
     is '作业状态：0 未启用，1 启用';
 
-drop table if exists public.job_log;
-create table public.job_log
+drop table if exists public.job_trigger_log;
+create table public.job_trigger_log
 (
     id                char(24)    not null,
     job_key           varchar(128), -- FK job_item.key
@@ -63,10 +61,10 @@ create table public.job_log
     completion_status int,
     completion_value  text,
     created_at        timestamptz,
-    constraint job_log_pk primary key (id)
+    constraint job_trigger_log_pk primary key (id)
 );
-create index job_log_job_key_idx
-    on job_log (job_key);
+create index job_trigger_log_job_key_idx
+    on job_trigger_log (job_key);
 -- #ddl-job
 
 -- #ddl-workflow

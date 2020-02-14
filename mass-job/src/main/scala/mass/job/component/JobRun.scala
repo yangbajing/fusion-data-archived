@@ -79,39 +79,36 @@ object JobRun extends StrictLogging {
    *
    * @return (commands, environments)
    */
-  private def parseCommands(
-      item: JobItem,
-      schedulerConfig: JobSettings,
-      dist: Path): (Seq[String], Seq[(String, String)]) =
+  private def parseCommands(item: JobItem, jobSettings: JobSettings, dist: Path): (Seq[String], Seq[(String, String)]) =
     item.program match {
       case Program.SCALA =>
         val options =
           if (item.programOptions.exists(item => item == "-cp" || item == "-classpath")) {
-            item.programOptions ++ Seq("-cp", schedulerConfig.schedulerRunJar)
+            item.programOptions ++ Seq("-cp", jobSettings.schedulerRunJar)
           } else {
             val classpath = Files
               .walk(dist, MAX_DEPTH)
               .filter(_.endsWith(".jar"))
               .map[String](_.toString)
-              .collect(Collectors.joining(":", "", s":./:${schedulerConfig.schedulerRunJar}"))
+              .collect(Collectors.joining(":", "", s":./:${jobSettings.schedulerRunJar}"))
             Seq("-classpath", classpath) ++ item.programOptions
           }
         val version = ProgramVersion.get(item.program, item.programVersion).getOrElse(ProgramVersion.Scala212)
         val cmd = version match {
-          case ProgramVersion.Scala211 => schedulerConfig.massSettings.compiles.scala212Home + "/bin/" + version.cli
-          case _                       => schedulerConfig.massSettings.compiles.scala212Home + "/bin/" + version.cli
+          case ProgramVersion.Scala211 => jobSettings.settings.compiles.scala212Home + "/bin/" + version.cli
+          case _                       => jobSettings.settings.compiles.scala212Home + "/bin/" + version.cli
         }
         (Seq(cmd) ++ options, Nil)
       case Program.JAVA =>
         val options =
           if (item.programOptions.exists(item => item == "-cp" || item == "-classpath")) {
-            item.programOptions ++ Seq("-cp", schedulerConfig.schedulerRunJar)
+            item.programOptions ++ Seq("-cp", jobSettings.schedulerRunJar)
           } else {
             val classpath = Files
               .walk(dist, MAX_DEPTH)
               .filter(_.endsWith(".jar"))
               .map[String](_.toString)
-              .collect(Collectors.joining(":", "", s":./:${schedulerConfig.schedulerRunJar}"))
+              .collect(Collectors.joining(":", "", s":./:${jobSettings.schedulerRunJar}"))
             Seq("-classpath", classpath) ++ item.programOptions
           }
         (Seq("java") ++ options, Nil)

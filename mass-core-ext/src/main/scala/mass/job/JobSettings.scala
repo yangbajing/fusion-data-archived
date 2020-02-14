@@ -6,8 +6,8 @@ import mass.MassSettings
 import mass.core.job.JobConstants
 import mass.core.{ Constants, MassUtils }
 
-case class JobSettings(massSettings: MassSettings) {
-  private val configuration = massSettings.configuration
+final class JobSettings private (val settings: MassSettings) {
+  private val configuration = settings.configuration
 
   private val conf = configuration.getConfiguration(s"${Constants.BASE_CONF}.job")
 
@@ -26,4 +26,8 @@ case class JobSettings(massSettings: MassSettings) {
   def getJobRunDist(jobKey: String): Path = jobRunDir.resolve(jobKey).resolve(JobConstants.DIST)
 
   def schedulerRunJar: String = ""
+}
+
+object JobSettings {
+  def apply(massSettings: MassSettings): JobSettings = new JobSettings(massSettings)
 }

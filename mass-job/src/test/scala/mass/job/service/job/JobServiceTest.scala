@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 class JobServiceMock(val jobSystem: JobSystem) extends JobService
 
 class JobServiceTest extends MassActorTestKit with AnyWordSpecLike {
-  private implicit val ec = system.executionContext
+//  private implicit val ec = system.executionContext
   val jobSystem = JobSystem(system)
   val jobService = new JobServiceMock(jobSystem)
 
@@ -34,14 +34,14 @@ class JobServiceTest extends MassActorTestKit with AnyWordSpecLike {
     }
 
     "handleCreateJob" in {
-      val req = JobCreateReq(Some("测试"), item, trigger, item.description)
+      val req = JobCreateReq(Some("测试"), item, trigger)
       val resp = jobService.handleCreateJob(req).futureValue
       val schedule = resp.schedule.value
       println(schedule)
     }
 
     "handleJobPage not be empty" in {
-      val req = JobPageReq(page = 1, size = 30)
+      val req = JobPageReq(size = 30)
       val resp = jobService.handlePage(req).futureValue
       println(Jackson.prettyStringify(resp))
       resp.totalElements should be > 0L
@@ -49,12 +49,11 @@ class JobServiceTest extends MassActorTestKit with AnyWordSpecLike {
     }
 
     "handleUpdate" in {
-      val req =
-        JobUpdateReq("测试", Some(item.copy(data = Map("test" -> "test"))), Some(trigger.copy(timeout = 60.minutes)))
+      val req = JobUpdateReq("测试", data = Some(Map("test" -> "test")), timeout = Some(60.minutes))
       val resp = jobService.handleUpdate(req).futureValue
       val schedule = resp.schedule.value
-      val jobItem = schedule.item
-      val jobTrigger = schedule.trigger
+      val jobItem = schedule.toJobItem
+      val jobTrigger = schedule.toJobTrigger
       jobItem.data should contain key "test"
       jobTrigger.timeout shouldBe 60.minutes
     }
@@ -79,8 +78,8 @@ class JobServiceTest extends MassActorTestKit with AnyWordSpecLike {
     }
 
     "handleExecutionJob" in {
-      val event = JobExecutionEvent("测试")
-      jobService.executionJob(event)
+      val event = JobTriggerEvent("测试")
+      jobService.triggerJob(event)
       TimeUnit.SECONDS.sleep(30)
     }
   }
