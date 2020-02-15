@@ -69,7 +69,7 @@ object JobRun extends StrictLogging {
     try {
       val exitValue = p.exitValue()
       val end = OffsetDateTime.now()
-      SchedulerJobResult(p.start, Some(end), exitValue, p.outPath.toString, p.errPath.toString)
+      SchedulerJobResult(p.start, end, exitValue, p.outPath.toString, p.errPath.toString)
     } finally {
       p.destroy()
     }

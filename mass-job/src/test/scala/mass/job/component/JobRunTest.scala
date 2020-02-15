@@ -16,7 +16,7 @@ class JobRunTest extends MassActorTestKit with AnyWordSpecLike {
       val result = JobRun.run(item, "test-java", jobSettings)
       println(Jackson.prettyStringify(result))
       result.exitValue shouldBe 0
-      result.start should be < result.end.value
+      result.start should be < result.end
     }
 
     "run scala" in {
@@ -24,7 +24,7 @@ class JobRunTest extends MassActorTestKit with AnyWordSpecLike {
       val result = JobRun.run(item, "test-scala", jobSettings)
       println(Jackson.prettyStringify(result))
       result.exitValue shouldBe 0
-      result.start should be < result.end.value
+      result.start should be < result.end
     }
 
     "run bash -c" in {
@@ -32,7 +32,7 @@ class JobRunTest extends MassActorTestKit with AnyWordSpecLike {
       val result = JobRun.run(item, "test-bash", jobSettings)
       println(Jackson.prettyStringify(result))
       result.exitValue shouldBe 0
-      result.start should be < result.end.value
+      result.start should be < result.end
     }
 
     "run python -c" in {
@@ -40,7 +40,7 @@ class JobRunTest extends MassActorTestKit with AnyWordSpecLike {
       val result = JobRun.run(item, "test-python", jobSettings)
       println(Jackson.prettyStringify(result))
       result.exitValue shouldBe 0
-      result.start should be < result.end.value
+      result.start should be < result.end
     }
   }
 }

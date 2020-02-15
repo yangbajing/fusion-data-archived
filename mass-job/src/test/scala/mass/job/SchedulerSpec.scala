@@ -22,18 +22,18 @@ abstract class SchedulerSpec(val mass: Mass)
 
   override protected def createActorSystem(): ActorSystem = mass.classicSystem
 
-  private[this] var _jobSystem: JobSystem = _
+  private[this] var _jobSystem: JobScheduler = _
 
   protected def typedSystem: typed.ActorSystem[FusionProtocol.Command] = mass.system
 
-  protected def jobSystem: JobSystem = _jobSystem
+  protected def jobSystem: JobScheduler = _jobSystem
 
   protected def massSystem: MassSystem = jobSystem.massSystem
 
   protected def configuration: Configuration = _jobSystem.configuration
 
   override protected def beforeAll(): Unit = {
-    _jobSystem = JobSystem(mass.system)
+    _jobSystem = JobScheduler(mass.system)
     super.beforeAll()
   }
 

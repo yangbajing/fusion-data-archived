@@ -15,7 +15,7 @@ private[job] class JobClassJob extends Job with StrictLogging {
       require(StringUtils.isNoneBlank(jobClass), s"Key: ${JobConstants.JOB_CLASS} 不能为空。")
       val data =
         context.getJobDetail.getJobDataMap.asScala.filterNot(_._1 == JobConstants.JOB_CLASS).mapValues(_.toString).toMap
-      val jobSystem = JobSystem(Global.system)
+      val jobSystem = JobScheduler(Global.system)
       JobRunner.execute(jobSystem, context.getJobDetail.getKey.getName, data, jobClass)
     } catch {
       case e: Throwable =>

@@ -3,7 +3,6 @@ package mass.model.job
 import java.time.OffsetDateTime
 
 import fusion.json.CborSerializable
-import helloscala.common.exception.HSBadRequestException
 import mass.message.job.{ JobCreateReq, JobUpdateReq }
 import mass.model.CommonStatus
 
@@ -33,7 +32,7 @@ case class JobSchedule(
     failedRetries: Int,
     timeout: FiniteDuration,
     alarmEmails: Seq[String],
-    status: CommonStatus = CommonStatus.ENABLE,
+    status: CommonStatus = CommonStatus.DISABLE,
     creator: String = "",
     createdAt: OffsetDateTime = OffsetDateTime.now(),
     // 已执行次数
@@ -41,9 +40,9 @@ case class JobSchedule(
     // 最新执行日志
     triggerLog: Option[TriggerLog] = None)
     extends CborSerializable {
-  if (endTime.isDefined && endTime.get.isBefore(startTime)) {
-    throw HSBadRequestException(s"The endTime cannot be earlier than startTime, ($startTime, ${endTime.get}).")
-  }
+  require(
+    endTime.isDefined && endTime.get.isAfter(startTime),
+    s"The endTime cannot be earlier than startTime, ($startTime, ${endTime.get}).")
 
   def toJobTrigger: JobTrigger =
     JobTrigger(

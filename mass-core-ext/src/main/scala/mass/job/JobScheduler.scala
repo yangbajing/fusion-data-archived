@@ -7,19 +7,18 @@ import com.typesafe.scalalogging.StrictLogging
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import fusion.job.{ FusionJob, FusionScheduler }
 import helloscala.common.exception.HSBadRequestException
-import helloscala.common.util.TimeUtils
 import mass.core.job.{ JobConstants, SchedulerJob }
 import mass.extension.MassSystem
-import mass.model.job.{ JobItem, JobTrigger, TriggerType }
+import mass.model.job.{ JobItem, JobSchedule, JobTrigger, TriggerType }
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 
-object JobSystem extends FusionExtensionId[JobSystem] {
-  override def createExtension(system: ActorSystem[_]): JobSystem = new JobSystem(system)
+object JobScheduler extends FusionExtensionId[JobScheduler] {
+  override def createExtension(system: ActorSystem[_]): JobScheduler = new JobScheduler(system)
 }
 
-final class JobSystem private (val system: ActorSystem[_]) extends FusionExtension with StrictLogging {
+final class JobScheduler private (val system: ActorSystem[_]) extends FusionExtension with StrictLogging {
   import org.quartz._
 
   val massSystem: MassSystem = MassSystem(system)
@@ -36,7 +35,6 @@ final class JobSystem private (val system: ActorSystem[_]) extends FusionExtensi
 
   def name: String = system.name
 
-  // TODO 定义 SchedulerSystem 自有的线程执行器
   implicit def executionContext: ExecutionContext = system.executionContext
 
 //  /**
@@ -57,12 +55,16 @@ final class JobSystem private (val system: ActorSystem[_]) extends FusionExtensi
     OffsetDateTime.now()
   }
 
+  def scheduleJob(schedule: JobSchedule, jobClassName: String): OffsetDateTime = {
+    scheduleJob(schedule.key, schedule.toJobItem, schedule.toJobTrigger, jobClassName, None)
+  }
+
   /**
    * 将作业加入调度队列
    * @param key 作业KEY
    * @param jobItem 作业配置
    * @param jobTrigger 作业触发策略
-   * @param className 用于执行作业的Job类全限定名
+   * @param jobClassName 用于执行作业的Job类全限定名
    * @param data 附加的作业数据
    * @param replace 是否覆盖已存在的作业
    * @return 作业加入调度队列时间
@@ -71,7 +73,7 @@ final class JobSystem private (val system: ActorSystem[_]) extends FusionExtensi
       key: String,
       jobItem: JobItem,
       jobTrigger: JobTrigger,
-      className: String,
+      jobClassName: String,
       data: Option[Map[String, String]],
       replace: Boolean = true): OffsetDateTime =
     jobTrigger.triggerType match {
@@ -79,7 +81,7 @@ final class JobSystem private (val system: ActorSystem[_]) extends FusionExtensi
         handleTriggerEventJob(key, jobTrigger)
       case _ =>
         val jobDetail = Option(scheduler.getJobDetail(JobKey.jobKey(key))) getOrElse
-          buildJobDetail(key, jobItem, className, data)
+          buildJobDetail(key, jobItem, jobClassName, data)
         val trigger = Option(scheduler.getTrigger(TriggerKey.triggerKey(key))) getOrElse
           buildTrigger(key, jobTrigger)
         schedulerJob(jobDetail, trigger, replace)

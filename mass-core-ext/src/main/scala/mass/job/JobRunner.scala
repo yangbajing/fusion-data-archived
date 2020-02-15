@@ -14,7 +14,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 
 object JobRunner extends StrictLogging {
-  def execute(jobSystem: JobSystem, key: String, extData: Map[String, String], jobClass: String): Unit = {
+  def execute(jobSystem: JobScheduler, key: String, extData: Map[String, String], jobClass: String): Unit = {
     implicit val ec: ExecutionContext = jobSystem.executionContext
     val db = jobSystem.massSystem.sqlManager
     val logId = ObjectId.getString()

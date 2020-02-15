@@ -1,98 +1,52 @@
 package mass.job.service.job
 
-import java.nio.file.{ Files, Paths, StandardCopyOption }
+import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.{ Files, Path }
 
-import com.typesafe.scalalogging.StrictLogging
-import helloscala.common.data.{ IntValueName, StringValueName }
-import helloscala.common.util.DigestUtils
-import mass.core.ProgramVersion
-import mass.db.slick.SqlSystem
-import mass.job.JobSystem
-import mass.job.component.DefaultSchedulerJob
-import mass.job.repository.JobRepo
-import mass.job.util.JobUtils
+import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.typed.{ ActorRef, ActorSystem }
+import akka.http.scaladsl.server.directives.FileInfo
+import akka.util.Timeout
+import mass.job.service.job.JobActor.CommandReply
 import mass.message.job._
-import mass.model.job._
 
+import scala.collection.immutable
+import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.reflect.ClassTag
 
-trait JobService extends StrictLogging {
-  val jobSystem: JobSystem
+class JobService(system: ActorSystem[_]) {
+  implicit val st = system
+  implicit val timeout: Timeout = Timeout(10.seconds)
+  val jobActor: ActorRef[JobActor.Command] = JobActor.init(system)
 
-  protected val JOB_CLASS_NAME: String = classOf[DefaultSchedulerJob].getName
-  def db: SqlSystem = jobSystem.massSystem.sqlManager
+  def listOption(): Future[JobGetAllOptionResp] = askToJob[JobGetAllOptionResp](JobGetAllOptionReq())
 
-  def triggerJob(event: JobTriggerEvent)(implicit ec: ExecutionContext): Unit = {
-    db.run(JobRepo.findJob(event.key)).foreach {
-      case Some(schedule) => jobSystem.triggerJob(schedule.key)
-      case None           => logger.error(s"Job not found, job key is '${event.key}'.")
+  def uploadFiles(list: immutable.Seq[(FileInfo, File)])(implicit ec: ExecutionContext): Future[JobUploadFilesResp] = {
+    askToJob[JobUploadFilesResp](JobUploadFilesReq(list)).andThen {
+      case _ => list.foreach { case (_, file) => Files.deleteIfExists(file.toPath) }
     }
   }
 
-  def handleList(req: JobListReq)(implicit ec: ExecutionContext): Future[JobListResp] = {
-    db.run(JobRepo.listJob(req)).map(list => JobListResp(list))
+  def uploadJobOnZip(fileInfo: FileInfo, file: Path)(implicit ec: ExecutionContext): Future[JobUploadJobResp] = {
+    val req = JobUploadJobReq(
+      file,
+      fileInfo.fileName,
+      fileInfo.contentType.charsetOption.map(_.nioCharset()).getOrElse(StandardCharsets.UTF_8))
+    askToJob[JobUploadJobResp](req).andThen { case _ => Files.deleteIfExists(file) }
   }
 
-  def handlePage(req: JobPageReq)(implicit ec: ExecutionContext): Future[JobPageResp] = db.run(JobRepo.page(req))
+  def updateTrigger(req: JobUpdateReq): Future[JobSchedulerResp] = askToJob[JobSchedulerResp](req)
 
-  def handleFind(req: JobFindReq)(implicit ec: ExecutionContext): Future[JobSchedulerResp] = {
-    db.run(JobRepo.findJob(req.key)).map(maybe => JobSchedulerResp(maybe))
-  }
+  def page(req: JobPageReq): Future[JobPageResp] = askToJob[JobPageResp](req)
 
-  def handleUploadJob(req: JobUploadJobReq)(implicit ec: ExecutionContext): Future[JobUploadJobResp] =
-    JobUtils.uploadJob(jobSystem.jobSettings, req).flatMap(jobZip => db.runTransaction(JobRepo.save(jobZip))).map {
-      list =>
-        val results = list.map(schedule => JobCreateResp(Option(schedule)))
-        JobUploadJobResp(results)
-    }
+  def findItemByKey(key: String): Future[JobSchedulerResp] = askToJob[JobSchedulerResp](JobFindReq(key = key))
 
-  def handleGetAllOption(req: JobGetAllOptionReq)(implicit ec: ExecutionContext): Future[JobGetAllOptionResp] = Future {
-    val programs = Program.values.map(_.toValueName)
-    val triggerType = TriggerType.values.toList.map(_.toValueName)
-    val programVersion = ProgramVersion.values
-      .groupBy(_.program)
-      .map {
-        case (program, versions) =>
-          ProgramVersionItem(program.value, versions.map(p => StringValueName(p.version, p.version)))
-      }
-      .toList
-    val jobStatus = RunStatus.values().toList.map(_.toValueName)
-    JobGetAllOptionResp(programs, triggerType, programVersion, jobStatus)
-  }
+  def createJob(req: JobCreateReq): Future[JobCreateResp] = askToJob[JobCreateResp](req)
 
-  def handleCreateJob(req: JobCreateReq)(implicit ec: ExecutionContext): Future[JobCreateResp] = {
-    db.runTransaction(JobRepo.save(req)).map { schedule =>
-      JobCreateResp(Option(schedule))
-    }
-  }
+  def updateJob(req: JobUpdateReq): Future[JobSchedulerResp] = askToJob[JobSchedulerResp](req)
 
-  def handleUpdate(req: JobUpdateReq)(implicit ec: ExecutionContext): Future[JobSchedulerResp] = {
-    db.runTransaction(JobRepo.updateJobSchedule(req)).map { schedule =>
-      JobSchedulerResp(Option(schedule))
-    }
-  }
-
-  def handleUploadFiles(req: JobUploadFilesReq)(implicit ec: ExecutionContext): Future[JobUploadFilesResp] = Future {
-    val jobSettings = jobSystem.jobSettings
-    val resources = req.items.zipWithIndex.map {
-      case ((fileInfo, file), idx) =>
-        val sha256 = DigestUtils.sha256HexFromPath(file.toPath)
-        val relativePath = Paths.get(sha256.take(2), sha256, fileInfo.fileName)
-        val dist = jobSettings.jobSavedDir.resolve(relativePath)
-        Files.move(file.toPath, dist, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
-        IntValueName(idx, relativePath.toString)
-    }
-    JobUploadFilesResp(resources)
-  }
-
-  def handleScheduleJob(req: JobTriggerReq)(implicit ec: ExecutionContext): Future[JobSchedulerResp] = {
-    db.run(JobRepo.findJob(req.key)).map { maybe =>
-      maybe match {
-        case Some(schedule) =>
-          jobSystem.scheduleJob(schedule.key, schedule.toJobItem, schedule.toJobTrigger, JOB_CLASS_NAME, None)
-        case None => logger.error(s"Job not found, job key is '${req.key}'.")
-      }
-      JobSchedulerResp(maybe)
-    }
-  }
+  @inline private def askToJob[RESP](req: JobMessage)(implicit tag: ClassTag[RESP]): Future[RESP] =
+    jobActor.ask[JobResponse](replyTo => CommandReply(req, replyTo)).mapTo[RESP]
 }

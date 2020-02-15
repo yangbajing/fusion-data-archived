@@ -1,4 +1,4 @@
-package mass.job.web.route.api
+package mass.job.route.api
 
 import akka.http.scaladsl.server.Route
 import fusion.http.server.AbstractRoute

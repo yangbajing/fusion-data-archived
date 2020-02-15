@@ -97,7 +97,7 @@ class MassProcessBuilder(
     case (name, value) => name -> StringUtils.option(System.getenv(name)).map(v => s"$value:$v").getOrElse(value)
   }
 
-  println("PATH: " + System.getenv("PATH"))
+  logger.debug("PATH: " + System.getenv("PATH"))
 
   logger.info(s"$commands\t$dist\t$envs\t$start\t$outPath\t$errPath")
 

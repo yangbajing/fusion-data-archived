@@ -1,7 +1,5 @@
 package mass.extension
 
-import java.nio.file.Path
-
 import akka.actor.typed.ActorSystem
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import helloscala.common.Configuration
@@ -12,8 +10,6 @@ final class MassSystem private (val system: ActorSystem[_]) extends FusionExtens
   val sqlManager: SqlSystem = SqlSystem(system)
 
   def connection: Configuration = core.configuration
-
-  def tempDirectory: Path = core.tempDirectory
 
   override def toString = s"MassSystem($system)"
 }

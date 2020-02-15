@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import fusion.json.jackson.Jackson
 import mass.core.ProgramVersion
-import mass.job.JobSystem
+import mass.job.JobScheduler
 import mass.message.job._
 import mass.model.job.{ JobItem, JobTrigger, Program, TriggerType }
 import mass.testkit.MassActorTestKit
@@ -12,11 +12,11 @@ import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
 
-class JobServiceMock(val jobSystem: JobSystem) extends JobService
+class JobServiceMock(val jobScheduler: JobScheduler) extends JobServiceComponent
 
 class JobServiceTest extends MassActorTestKit with AnyWordSpecLike {
 //  private implicit val ec = system.executionContext
-  val jobSystem = JobSystem(system)
+  val jobSystem = JobScheduler(system)
   val jobService = new JobServiceMock(jobSystem)
 
   "JobServiceTest" should {
