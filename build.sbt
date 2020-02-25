@@ -112,17 +112,14 @@ lazy val massRdiConsole = _project("mass-rdi-console")
 
 // Reactive Data Integration 反应式数据处理流工具
 lazy val massRdi = _project("mass-rdi")
-  .dependsOn(
-    massRdiCore,
-    massCoreExt,
-    massCore % "compile->compile;test->test")
+  .dependsOn(massRdiCore, massCoreExt, massCore % "compile->compile;test->test")
   .enablePlugins(JavaAppPackaging)
   .settings(Packaging.settings: _*)
   .settings(mainClass in Compile := Some("mass.rdi.boot.RdiMain"), libraryDependencies ++= Seq() ++ _pois)
 
 // Reactive Data Integration Cli
 lazy val massRdiCli = _project("mass-rdi-cli")
-  .dependsOn(massRdiCore,massCoreExt, massCore % "compile->compile;test->test")
+  .dependsOn(massRdiCore, massCoreExt, massCore % "compile->compile;test->test")
   .settings(
     //    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
     assemblyJarName in assembly := "rdi.jar",
@@ -166,32 +163,27 @@ lazy val massConnector = _project("mass-connector")
 lazy val massCoreExt = _project("mass-core-ext")
   .settings(Publishing.publishing: _*)
   .dependsOn(massCore % "compile->compile;test->test")
-  .settings(
-    libraryDependencies ++= Seq(
-        _jsch,
-        _osLib,
-        _fusionHttp,
-        _fusionJob,
-        _fusionCluster,
-        _akkaPersistenceJdbc,
-        _akkaPersistenceTyped,
-        _akkaPersistenceQuery,
-        _akkaMultiNodeTestkit % Test) ++ _slicks)
+  .settings(libraryDependencies ++= Seq(
+      _fusionInjectGuice,
+      _jsch,
+      _osLib,
+      _fusionHttp,
+      _fusionJob,
+      _fusionCluster,
+      _akkaPersistenceJdbc,
+      _akkaPersistenceTyped,
+      _akkaPersistenceQuery,
+      _akkaMultiNodeTestkit % Test) ++ _slicks)
 
 lazy val massCore =
   _project("mass-core")
     .dependsOn(massCommon % "compile->compile;test->test")
     .settings(Publishing.publishing: _*)
-    .settings(
-      libraryDependencies ++= Seq(_scalaXml, _h2, _fusionJdbc, _fusionJsonJackson) ++ _akkaHttps)
+    .settings(libraryDependencies ++= Seq(_scalaXml, _h2, _fusionJdbc, _fusionJsonJackson) ++ _akkaHttps)
 
 lazy val massCommon = _project("mass-common")
   .settings(Publishing.publishing: _*)
-  .settings(
-    libraryDependencies ++= Seq(
-        "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-        _akkaSerializationJackson,
-        _fusionCore))
+  .settings(libraryDependencies ++= Seq(_akkaSerializationJackson, _fusionCore))
 
 def _project(name: String, _base: String = null) =
   Project(id = name, base = file(if (_base eq null) name else _base))

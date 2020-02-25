@@ -1,15 +1,13 @@
 package mass.job.route
 
 import akka.http.scaladsl.server.Route
-import fusion.http.server.AbstractRoute
-import mass.Mass
+import fusion.http.server.BaseRoute
+import javax.inject.Inject
 import mass.job.route.api.{ ApiRoute, MockRoute }
 
-class Routes(mass: Mass) extends AbstractRoute {
-  private implicit val system = mass.system
-
+class Routes @Inject() (apiRoute: ApiRoute, mockRoute: MockRoute) extends BaseRoute {
   def route: Route =
     pathPrefix("job") {
-      new ApiRoute().route
-    } ~ new MockRoute().route
+      apiRoute.route
+    } ~ mockRoute.route
 }

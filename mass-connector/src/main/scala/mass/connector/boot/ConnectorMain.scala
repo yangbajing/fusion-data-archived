@@ -11,5 +11,5 @@ import mass.Mass
 import mass.connector.ConnectorSystem
 
 object ConnectorMain extends App {
-  ConnectorSystem(Mass.fromConfig(ConfigFactory.load()).system)
+  ConnectorSystem(Mass.fromConfig(ConfigFactory.load()).classicSystem)
 }

@@ -1,7 +1,7 @@
 package mass.core.script
 
 import fusion.test.FusionWordSpecLike
-import javax.script.{ ScriptEngineManager, SimpleBindings }
+import javax.script.SimpleBindings
 import mass.core.event.EventData
 
 class ScriptManagerTest extends FusionWordSpecLike {

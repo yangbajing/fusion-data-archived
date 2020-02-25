@@ -3,8 +3,11 @@ package mass.job.route.api
 import akka.http.scaladsl.server.Route
 import fusion.http.server.AbstractRoute
 import fusion.json.jackson.Jackson
+import fusion.json.jackson.http.JacksonSupport
+import javax.inject.{ Inject, Singleton }
 
-class MockRoute extends AbstractRoute {
+@Singleton
+class MockRoute @Inject() (val jacksonSupport: JacksonSupport) extends AbstractRoute {
   override def route: Route = pathPrefix("api") {
     currentUser ~ ruleRoute
   }

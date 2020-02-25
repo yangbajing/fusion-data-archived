@@ -362,7 +362,7 @@ Version 1.0.0-SNAPSHOT
 </ul>
 <p>同时，每个Job在执行成功完成后还可以触发多个依赖Job运行，只需要在Job配置时指定需要依赖运行的Job ID即可。</p>
 <p><em>触发配置（JobTrigger）属性：</em></p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/mass-core/src/main/scala/mass/model/job/JobTrigger.scala#L12-L26" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class JobTrigger(
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/mass-core/src/main/scala/mass/model/job/JobTrigger.scala#L12-L25" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class JobTrigger(
     triggerType: TriggerType,
     triggerEvent: String = &quot;&quot;,
     startTime: Option[OffsetDateTime] = None,
@@ -372,7 +372,6 @@ Version 1.0.0-SNAPSHOT
     // 每次重复间隔
     interval: FiniteDuration = JobConstants.TRIGGER_INTERVAL,
     cronExpress: String = &quot;&quot;,
-    description: Option[String] = None,
     failedRetries: Int = 0,
     timeout: FiniteDuration = JobConstants.RUN_TIMEOUT,
     alarmEmails: Seq[String] = Nil)

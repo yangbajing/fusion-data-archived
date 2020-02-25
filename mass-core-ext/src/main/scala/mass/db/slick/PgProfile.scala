@@ -19,7 +19,7 @@ import slick.jdbc.{ GetResult, JdbcCapabilities, JdbcType, SetParameter }
 
 import scala.concurrent.duration.FiniteDuration
 
-trait SlickProfile
+trait PgProfile
     extends ExPostgresProfile
     with PgAggFuncSupport
     with PgDate2Support
@@ -117,8 +117,6 @@ trait SlickProfile
       MappedColumnType.base[JobItem, JsonNode](Jackson.valueToTree, Jackson.treeToValue[JobItem])
     implicit val jobTriggerColumnType: JdbcType[JobTrigger] =
       MappedColumnType.base[JobTrigger, JsonNode](Jackson.valueToTree, Jackson.treeToValue[JobTrigger])
-    implicit val jobLogColumnType: JdbcType[TriggerLog] =
-      MappedColumnType.base[TriggerLog, JsonNode](Jackson.valueToTree, Jackson.treeToValue[TriggerLog])
     implicit val objectIdColumnType: JdbcType[ObjectId] =
       MappedColumnType.base[ObjectId, String](_.toString(), ObjectId.apply)
 
@@ -164,4 +162,4 @@ trait SlickProfile
   override val columnOptions: ColumnOptions = new ColumnOptions {}
 }
 
-object SlickProfile extends SlickProfile
+object PgProfile extends PgProfile

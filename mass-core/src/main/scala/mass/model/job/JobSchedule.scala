@@ -36,13 +36,13 @@ case class JobSchedule(
     creator: String = "",
     createdAt: OffsetDateTime = OffsetDateTime.now(),
     // 已执行次数
-    scheduleCount: Long = 1,
-    // 最新执行日志
-    triggerLog: Option[TriggerLog] = None)
+    scheduleCount: Long = 1)
     extends CborSerializable {
-  require(
-    endTime.isDefined && endTime.get.isAfter(startTime),
-    s"The endTime cannot be earlier than startTime, ($startTime, ${endTime.get}).")
+  if (endTime.isDefined) {
+    require(
+      endTime.isDefined && endTime.get.isAfter(startTime),
+      s"The endTime cannot be earlier than startTime, ($startTime, ${endTime.get}).")
+  }
 
   def toJobTrigger: JobTrigger =
     JobTrigger(

@@ -1,42 +1,39 @@
 package mass
 
-import akka.actor.typed.receptionist.Receptionist
 import akka.actor.typed.scaladsl.adapter._
-import akka.actor.typed.{ ActorRef, ActorSystem, Behavior }
+import akka.actor.typed.{ ActorRef, ActorSystem, Behavior, Props }
 import akka.{ actor => classic }
 import com.typesafe.config.Config
 import fusion.common.config.FusionConfigFactory
-import fusion.common.{ FusionActorRefFactory, FusionProtocol }
+import fusion.common.{ ReceptionistFactory, SpawnFactory }
+import fusion.core.extension.FusionCore
 import helloscala.common.Configuration
 import mass.core.Constants
 
-final class Mass private (val system: ActorSystem[FusionProtocol.Command]) extends FusionActorRefFactory {
-  def config: Config = system.settings.config
-  def configuration: Configuration = Configuration(config)
-  def classicSystem: classic.ActorSystem = system.toClassic
+import scala.concurrent.ExecutionContext
 
-  override implicit def typedSystem: ActorSystem[_] = system
+final class Mass private (val classicSystem: classic.ActorSystem) extends SpawnFactory with ReceptionistFactory {
+  implicit def executionContext: ExecutionContext = classicSystem.dispatcher
 
-  override def fusionProtocolRef: ActorRef[FusionProtocol.Command] = system.narrow[FusionProtocol.Command]
+  val configuration: Configuration = FusionCore(classicSystem).configuration
 
-  override def receptionistRef: ActorRef[Receptionist.Command] = system.receptionist
+  override def typedSystem: ActorSystem[_] = classicSystem.toTyped
+
+  override def spawn[T](behavior: Behavior[T], props: Props): ActorRef[T] =
+    classicSystem.spawnAnonymous(behavior, props)
+
+  override def spawn[T](behavior: Behavior[T], name: String, props: Props): ActorRef[T] =
+    classicSystem.spawn(behavior, name, props)
 }
 
 object Mass {
-  def upcast(system: ActorSystem[_]) = new Mass(system.asInstanceOf[ActorSystem[FusionProtocol.Command]])
-
   def fromMergedConfig(config: Config): Mass =
-    fromActorSystem(ActorSystem(apply(), Constants.MASS, config))
+    fromActorSystem(classic.ActorSystem(Constants.MASS, config))
 
-  private[mass] def fromActorSystem(system: ActorSystem[FusionProtocol.Command]): Mass = {
-    Global.registerActorSystem(system)
-    new Mass(system)
-  }
+  private[mass] def fromActorSystem(system: classic.ActorSystem): Mass = new Mass(system)
 
   def fromConfig(originalConfig: Config): Mass = {
     val config = FusionConfigFactory.arrangeConfig(originalConfig, Constants.MASS, Seq("akka"))
     fromMergedConfig(config)
   }
-
-  private def apply(): Behavior[FusionProtocol.Command] = FusionProtocol.behavior
 }

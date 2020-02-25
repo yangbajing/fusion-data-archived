@@ -5,6 +5,8 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
+import scala.language.implicitConversions
+
 /**
  * Hooks up MultiNodeSpec with ScalaTest
  */

@@ -1,8 +1,5 @@
 set names 'utf8mb4';
-create user 'massdata'@'%'
-  identified by 'Massdata.2018';
-create database massdata
-  character set = 'utf8mb4';
+create database massdata character set = 'utf8mb4';
 grant select on mysql.* to 'massdata'@'%';
 
 use massdata;

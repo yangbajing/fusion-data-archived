@@ -3,7 +3,7 @@ package mass.connector
 import java.nio.file.Path
 
 import akka.Done
-import akka.actor.typed.ActorSystem
+import akka.actor.ExtendedActorSystem
 import com.typesafe.scalalogging.StrictLogging
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import fusion.core.extension.FusionCore
@@ -12,7 +12,9 @@ import mass.core.Constants
 import scala.concurrent.Future
 import scala.util.{ Failure, Success }
 
-final class ConnectorSystem private (val system: ActorSystem[_]) extends FusionExtension with StrictLogging {
+final class ConnectorSystem private (override val classicSystem: ExtendedActorSystem)
+    extends FusionExtension
+    with StrictLogging {
   private var _parsers = Map.empty[String, ConnectorParser]
   private var _connectors = Map.empty[String, Connector]
 
@@ -20,20 +22,20 @@ final class ConnectorSystem private (val system: ActorSystem[_]) extends FusionE
 
   private def init(): Unit = {
     configuration.get[Seq[String]](s"${Constants.BASE_CONF}.connector.parsers").foreach { className =>
-      system.dynamicAccess.createInstanceFor[ConnectorParser](className, Nil) match {
+      classicSystem.dynamicAccess.createInstanceFor[ConnectorParser](className, Nil) match {
         case Success(parse) => registerConnectorParser(parse)
         case Failure(e)     => logger.error(s"未知的ConnectorParse", e)
       }
     }
-    FusionCore(system).shutdowns.serviceUnbind("ConnectorSystem") { () =>
+    FusionCore(classicSystem).shutdowns.serviceUnbind("ConnectorSystem") { () =>
       Future {
         connectors.foreach { case (_, c) => c.close() }
         Done
-      }(system.executionContext)
+      }(classicSystem.dispatcher)
     }
   }
 
-  def name: String = system.name
+  def name: String = classicSystem.name
 
   def getConnector(name: String): Option[Connector] = _connectors.get(name)
 
@@ -62,5 +64,5 @@ final class ConnectorSystem private (val system: ActorSystem[_]) extends FusionE
 }
 
 object ConnectorSystem extends FusionExtensionId[ConnectorSystem] {
-  override def createExtension(system: ActorSystem[_]): ConnectorSystem = new ConnectorSystem(system)
+  override def createExtension(system: ExtendedActorSystem): ConnectorSystem = new ConnectorSystem(system)
 }

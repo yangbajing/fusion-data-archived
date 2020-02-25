@@ -1,7 +1,7 @@
 package mass.db.slick
 
 import akka.Done
-import akka.actor.typed.ActorSystem
+import akka.actor.ExtendedActorSystem
 import com.typesafe.scalalogging.StrictLogging
 import com.zaxxer.hikari.HikariDataSource
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
@@ -15,36 +15,36 @@ import scala.util.Failure
 /**
  * Mass系统SQL数据访问管理器
  */
-class SqlSystem private (val system: ActorSystem[_]) extends FusionExtension with StrictLogging {
-  import SlickProfile.api._
+class SqlSystem private (override val classicSystem: ExtendedActorSystem) extends FusionExtension with StrictLogging {
+  import PgProfile.api._
 
-  val profile: SlickProfile.type = SlickProfile
-  val dataSource: HikariDataSource = FusionJdbc(system).component
-  val slickDb: SlickProfile.backend.DatabaseDef = databaseForDataSource(dataSource)
+  val profile: PgProfile = PgProfile
+  val dataSource: HikariDataSource = FusionJdbc(classicSystem).component
+  val db: PgProfile.backend.DatabaseDef = databaseForDataSource(dataSource)
   val jdbcTemplate: JdbcTemplate = JdbcTemplate(dataSource)
-  FusionCore(system).shutdowns.beforeActorSystemTerminate("StopSqlManager") { () =>
+  FusionCore(classicSystem).shutdowns.beforeActorSystemTerminate("StopSqlManager") { () =>
     Future {
-      slickDb.close()
+      db.close()
       Done
-    }(system.executionContext)
+    }(classicSystem.dispatcher)
   }
 
   def runTransaction[R, E <: Effect.Write](a: DBIOAction[R, NoStream, E]): Future[R] =
-    wrapperLogging(slickDb.run(a.transactionally))
+    wrapperLogging(db.run(a.transactionally))
 
-  def run[R](a: DBIOAction[R, NoStream, Nothing]): Future[R] = wrapperLogging(slickDb.run(a))
+  def run[R](a: DBIOAction[R, NoStream, Nothing]): Future[R] = wrapperLogging(db.run(a))
 
-  def stream[T](a: DBIOAction[_, Streaming[T], Nothing]): DatabasePublisher[T] = slickDb.stream(a)
+  def stream[T](a: DBIOAction[_, Streaming[T], Nothing]): DatabasePublisher[T] = db.stream(a)
 
   def streamTransaction[T, E <: Effect.Write](a: DBIOAction[_, Streaming[T], E]): DatabasePublisher[T] =
-    slickDb.stream(a.transactionally)
+    db.stream(a.transactionally)
 
   @inline private def wrapperLogging[T](f: Future[T]): Future[T] =
-    f.andThen { case Failure(e) => logger.warn(s"Slick run error [${e.toString}].") }(slickDb.ioExecutionContext)
+    f.andThen { case Failure(e) => logger.warn(s"Slick run error [${e.toString}].") }(db.ioExecutionContext)
 
-  override def toString = s"SqlManager($dataSource, $jdbcTemplate, $slickDb)"
+  override def toString = s"SqlSystem($dataSource, $jdbcTemplate, $db)"
 }
 
 object SqlSystem extends FusionExtensionId[SqlSystem] {
-  override def createExtension(system: ActorSystem[_]): SqlSystem = new SqlSystem(system)
+  override def createExtension(system: ExtendedActorSystem): SqlSystem = new SqlSystem(system)
 }

@@ -11,6 +11,8 @@ object Dependencies {
   val _fusionJdbc = "com.akka-fusion" %% "fusion-jdbc" % BuildInfo.version
   val _fusionJob = "com.akka-fusion" %% "fusion-job" % BuildInfo.version
   val _fusionHttp = "com.akka-fusion" %% "fusion-http" % BuildInfo.version
+  val _fusionInjectGuice = "com.akka-fusion" %% "fusion-inject-guice" % BuildInfo.version
+  val _fusionInject = "com.akka-fusion" %% "fusion-inject" % BuildInfo.version
   val _fusionCluster = "com.akka-fusion" %% "fusion-cluster" % BuildInfo.version
   val _fusionCore = "com.akka-fusion" %% "fusion-core" % BuildInfo.version
   val _fusionCommon = "com.akka-fusion" %% "fusion-common" % BuildInfo.version
@@ -21,7 +23,9 @@ object Dependencies {
   val _akkaPersistenceTyped = "com.typesafe.akka" %% "akka-persistence-typed" % BuildInfo.versionAkka
   val _akkaPersistenceQuery = "com.typesafe.akka" %% "akka-persistence-query" % BuildInfo.versionAkka
   val _akkaClusterMetrics = "com.typesafe.akka" %% "akka-cluster-metrics" % BuildInfo.versionAkka
-  val _akkaMultiNodeTestkit = "com.typesafe.akka" %% "akka-multi-node-testkit" % BuildInfo.versionAkka
+  val _akkaMultiNodeTestkit = ("com.typesafe.akka" %% "akka-multi-node-testkit" % BuildInfo.versionAkka)
+    .exclude("org.scalatest", "scalatest")
+    .cross(CrossVersion.binary)
 
   val _akkaHttp = ("com.typesafe.akka" %% "akka-http" % BuildInfo.versionAkkaHttp)
     .exclude("com.typesafe.akka", "akka-stream")
@@ -31,6 +35,8 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-stream-testkit")
     .cross(CrossVersion.binary)
     .exclude("com.typesafe.akka", "akka-testkit")
+    .cross(CrossVersion.binary)
+    .exclude("org.scalatest", "scalatest")
     .cross(CrossVersion.binary)
 
   val _akkaHttp2 = ("com.typesafe.akka" %% "akka-http2-support" % BuildInfo.versionAkkaHttp)
@@ -133,6 +139,7 @@ object Dependencies {
   val _slicks = Seq(
     "com.github.tminglei" %% "slick-pg" % BuildInfo.versionSlickPg,
     "com.typesafe.slick" %% "slick" % BuildInfo.versionSlick,
+    "com.typesafe.slick" %% "slick-codegen" % BuildInfo.versionSlick % Test,
     "com.typesafe.slick" %% "slick-testkit" % BuildInfo.versionSlick % Test)
 
   val _pois = Seq(

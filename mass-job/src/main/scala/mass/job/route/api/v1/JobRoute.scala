@@ -1,21 +1,22 @@
 package mass.job.route.api.v1
 
-import akka.actor.typed.ActorSystem
+import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
 import com.typesafe.scalalogging.StrictLogging
-import fusion.common.FusionProtocol
 import fusion.http.server.{ AbstractRoute, JacksonDirectives }
+import fusion.json.jackson.http.JacksonSupport
+import javax.inject.{ Inject, Singleton }
 import mass.common.page.Page
 import mass.extension.MassCore
-import mass.job.service.Services
+import mass.job.service.job.JobService
 import mass.message.job._
 
-class JobRoute()(implicit system: ActorSystem[FusionProtocol.Command])
+@Singleton
+class JobRoute @Inject() (jobService: JobService, val jacksonSupport: JacksonSupport)(implicit system: ActorSystem)
     extends AbstractRoute
     with JacksonDirectives
     with StrictLogging {
   private val pagePDM = ('page.as[Int].?(Page.DEFAULT_PAGE), Symbol("size").as[Int].?(Page.DEFAULT_SIZE), 'key.?)
-  private val jobService = Services(system).jobService
 
   override def route: Route = pathPrefix("job") {
     createJobRoute ~

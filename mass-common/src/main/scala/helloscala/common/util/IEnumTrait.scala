@@ -7,7 +7,7 @@ trait IEnumTrait[V] {
   val companion: IEnumTraitCompanion[V]
   val value: V
   val name: String = StringUtils.dropLast$(this.getClass.getSimpleName)
-  val toValueName: ValueName[V] = new ValueName[V] {
+  def toValueName: ValueName[V] = new ValueName[V] {
     override def value: V = self.value
     override def name: String = self.name
   }

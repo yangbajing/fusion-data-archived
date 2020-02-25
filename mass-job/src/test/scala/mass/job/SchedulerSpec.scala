@@ -1,39 +1,44 @@
 package mass.job
 
 import akka.actor.{ ActorSystem, typed }
-import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.typesafe.config.ConfigFactory
+import akka.http.scaladsl.testkit.{ RouteTestTimeout, ScalatestRouteTest }
 import com.typesafe.scalalogging.StrictLogging
-import fusion.common.FusionProtocol
+import fusion.inject.GuiceApplication
+import fusion.json.jackson.http.JacksonSupport
 import helloscala.common.Configuration
-import mass.Mass
 import mass.extension.MassSystem
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-abstract class SchedulerSpec(val mass: Mass)
+import scala.concurrent.duration._
+
+abstract class SchedulerSpec(val application: GuiceApplication)
     extends AnyWordSpec
     with Matchers
     with BeforeAndAfterAll
     with ScalatestRouteTest
     with StrictLogging {
-  def this() = this(Mass.fromConfig(ConfigFactory.load("application-test.conf")))
+  def this() = this(new GuiceApplication())
 
-  override protected def createActorSystem(): ActorSystem = mass.classicSystem
+  override protected def createActorSystem(): ActorSystem = application.classicSystem
 
-  private[this] var _jobSystem: JobScheduler = _
+  implicit def routeTestTimeout: RouteTestTimeout = RouteTestTimeout(10.seconds)
 
-  protected def typedSystem: typed.ActorSystem[FusionProtocol.Command] = mass.system
+  private[this] var _jobScheduler: JobScheduler = _
 
-  protected def jobSystem: JobScheduler = _jobSystem
+  protected def typedSystem: typed.ActorSystem[_] = application.typedSystem
 
-  protected def massSystem: MassSystem = jobSystem.massSystem
+  protected def jobScheduler: JobScheduler = _jobScheduler
 
-  protected def configuration: Configuration = _jobSystem.configuration
+  protected def massSystem: MassSystem = jobScheduler.massSystem
+
+  protected def configuration: Configuration = _jobScheduler.configuration
+
+  lazy protected val jacksonSupport = application.instance[JacksonSupport]
 
   override protected def beforeAll(): Unit = {
-    _jobSystem = JobScheduler(mass.system)
+    _jobScheduler = JobScheduler(application.classicSystem)
     super.beforeAll()
   }
 

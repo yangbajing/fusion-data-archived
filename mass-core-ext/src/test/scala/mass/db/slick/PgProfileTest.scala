@@ -2,11 +2,11 @@ package mass.db.slick
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import fusion.jdbc.FusionJdbc
-import mass.db.slick.SlickProfile.api._
+import mass.db.slick.PgProfile.api._
 import org.scalatest.wordspec.AnyWordSpecLike
 import slick.sql.SqlStreamingAction
 
-class SlickProfileTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
+class PgProfileTest extends ScalaTestWithActorTestKit with AnyWordSpecLike {
   private val db = databaseForDataSource(FusionJdbc(system).component)
 
   "test" in {

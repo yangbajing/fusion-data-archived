@@ -4,11 +4,11 @@ import fusion.json.jackson.Jackson
 import mass.MassSettings
 import mass.job.JobSettings
 import mass.model.job.{ JobItem, Program }
-import mass.testkit.MassActorTestKit
+import mass.testkit.FusionApplicationTestkit
 import org.scalatest.wordspec.AnyWordSpecLike
 
-class JobRunTest extends MassActorTestKit with AnyWordSpecLike {
-  private val jobSettings = JobSettings(MassSettings(system))
+class JobRunTest extends FusionApplicationTestkit with AnyWordSpecLike {
+  private val jobSettings = JobSettings(MassSettings(config))
 
   "JobRunTest" should {
     "run java" in {

@@ -2,6 +2,6 @@
 
 ## DDL (Postgres)
 
-**调用JobDDL**
+**Job**
 
-@@snip [ddl-pg](../../../../../scripts/software/postgres/init.sql) { #ddl-job }
+@@snip [ddl-pg](../../../../../scripts/software/postgres/job.sql)

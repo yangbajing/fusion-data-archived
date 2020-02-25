@@ -9,18 +9,26 @@ import helloscala.common.util.{ IEnumTrait, IEnumTraitCompanion }
 
 @JsonSerialize(using = classOf[TriggerType.EnumSer])
 @JsonDeserialize(using = classOf[TriggerType.EnumDeser])
-sealed abstract class TriggerType(val value: String, val companion: IEnumTraitCompanion[String])
-    extends IEnumTrait[String]
+sealed trait TriggerType extends IEnumTrait[String]
 
 object TriggerType extends IEnumTraitCompanion[String] {
   self =>
   override type Value = TriggerType
 
-  case object CRON extends TriggerType("cron", self)
-  case object SIMPLE extends TriggerType("simple", self)
-  case object EVENT extends TriggerType("event", self)
+  case object SIMPLE extends TriggerType {
+    override val companion: IEnumTraitCompanion[String] = self
+    override val value: String = "SIMPLE"
+  }
+  case object CRON extends TriggerType {
+    override val companion: IEnumTraitCompanion[String] = self
+    override val value: String = "CRON"
+  }
+  case object EVENT extends TriggerType {
+    override val companion: IEnumTraitCompanion[String] = self
+    override val value: String = "EVENT"
+  }
 
-  val values = Vector(CRON, SIMPLE, EVENT)
+  override val values = Vector(CRON, EVENT, SIMPLE)
 
   class EnumSer extends StdSerializer[TriggerType](classOf[TriggerType]) {
     override def serialize(value: TriggerType, gen: JsonGenerator, provider: SerializerProvider): Unit =
@@ -28,6 +36,6 @@ object TriggerType extends IEnumTraitCompanion[String] {
   }
   class EnumDeser extends StdDeserializer[TriggerType](classOf[TriggerType]) {
     override def deserialize(p: JsonParser, ctxt: DeserializationContext): TriggerType =
-      TriggerType.fromValue(p.getValueAsString)
+      TriggerType.fromValue(p.getValueAsString.toUpperCase())
   }
 }

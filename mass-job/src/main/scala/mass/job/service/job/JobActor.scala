@@ -53,7 +53,7 @@ class JobActor private (context: ActorContext[Command]) extends JobServiceCompon
         case req: JobFindReq         => handleFind(req)
         case req: JobUploadJobReq    => handleUploadJob(req)
         case req: JobListReq         => handleList(req)
-        case req: JobGetAllOptionReq => handleGetAllOption(req)
+        case req: JobGetAllOptionReq => Future(handleGetAllOption(req))
         case req: JobCreateReq       => handleCreateJob(req)
         case req: JobUpdateReq       => handleUpdate(req)
         case req: JobUploadFilesReq  => handleUploadFiles(req)

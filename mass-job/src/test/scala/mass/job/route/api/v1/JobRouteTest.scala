@@ -5,11 +5,11 @@ import mass.job.SchedulerSpec
 import mass.message.job.JobPageResp
 
 class JobRouteTest extends SchedulerSpec {
-  private lazy val route = new JobRoute()(typedSystem).route
+  private lazy val route = application.instance[JobRoute].route
 
   "JobRoute" should {
     "page" in {
-      import fusion.json.jackson.http.JacksonSupport._
+      import jacksonSupport._
       Get("/job/page") ~> route ~> check {
         status shouldBe StatusCodes.OK
         val resp = responseAs[JobPageResp]

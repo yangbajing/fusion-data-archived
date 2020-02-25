@@ -1,13 +1,13 @@
 package mass.job
 
-import com.typesafe.config.ConfigFactory
+import fusion.core.FusionApplication
 import fusion.http.FusionHttpServer
-import mass.Mass
+import fusion.inject.GuiceApplication
 import mass.job.route.Routes
 
 object JobMain {
   def main(args: Array[String]): Unit = {
-    val mass = Mass.fromConfig(ConfigFactory.load())
-    FusionHttpServer(mass.system).component.startAbstractRouteSync(new Routes(mass))
+    val application = FusionApplication.start().asInstanceOf[GuiceApplication]
+    FusionHttpServer(application.classicSystem).component.startBaseRouteSync(application.instance[Routes])
   }
 }

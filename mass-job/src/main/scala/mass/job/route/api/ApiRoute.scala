@@ -1,15 +1,15 @@
 package mass.job.route.api
 
-import akka.actor.typed.ActorSystem
 import akka.http.scaladsl.server.Route
-import fusion.common.FusionProtocol
-import fusion.http.server.AbstractRoute
+import fusion.http.server.{ BaseRoute, HttpDirectives }
+import javax.inject.{ Inject, Singleton }
 import mass.job.route.api.v1.JobRoute
 
-class ApiRoute()(implicit system: ActorSystem[FusionProtocol.Command]) extends AbstractRoute {
+@Singleton
+class ApiRoute @Inject() (jobRoute: JobRoute) extends BaseRoute with HttpDirectives {
   override def route: Route = pathPrefix("api") {
     pathPrefix("v1") {
-      new JobRoute().route
+      jobRoute.route
     }
   }
 }

@@ -1,7 +1,7 @@
 package mass.rdp
 
-import akka.actor.typed.ActorSystem
-import akka.stream.{ Materializer, SystemMaterializer }
+import akka.actor.ExtendedActorSystem
+import akka.stream.Materializer
 import com.typesafe.scalalogging.StrictLogging
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import mass.connector.ConnectorSystem
@@ -18,7 +18,7 @@ trait RdpRefFactory {
   def connectorSystem: ConnectorSystem
 }
 
-private[rdp] class RdpSetup(val system: ActorSystem[_]) extends StrictLogging {
+private[rdp] class RdpSetup(val system: ExtendedActorSystem) extends StrictLogging {
   val massCore = MassCore(system)
 
   val extensions: Vector[RdpModule] =
@@ -54,14 +54,14 @@ private[rdp] class RdpSetup(val system: ActorSystem[_]) extends StrictLogging {
 /**
  * RDP 系统，保存RDP运行所全局需要的各配置、资源
  */
-final class RdpSystem private (val system: ActorSystem[_])
+final class RdpSystem private (override val classicSystem: ExtendedActorSystem)
     extends RdpRefFactory
     with FusionExtension
     with StrictLogging {
-  override val connectorSystem: ConnectorSystem = ConnectorSystem(system)
-  implicit val materializer: Materializer = SystemMaterializer(system).materializer
+  override val connectorSystem: ConnectorSystem = ConnectorSystem(classicSystem)
+  implicit val materializer: Materializer = Materializer.matFromSystem(classicSystem)
 
-  private val setup = new RdpSetup(system)
+  private val setup = new RdpSetup(classicSystem)
 
   protected var _streamFactories: Map[String, EtlStreamFactory] = setup.initialStreamFactories()
 
@@ -82,9 +82,9 @@ final class RdpSystem private (val system: ActorSystem[_])
     _graphParerFactories = _graphParerFactories.updated(b.`type`, b)
   }
   override def settings: MassCore = setup.massCore
-  def name: String = system.name
+  def name: String = classicSystem.name
 }
 
 object RdpSystem extends FusionExtensionId[RdpSystem] {
-  override def createExtension(system: ActorSystem[_]): RdpSystem = new RdpSystem(system)
+  override def createExtension(system: ExtendedActorSystem): RdpSystem = new RdpSystem(system)
 }

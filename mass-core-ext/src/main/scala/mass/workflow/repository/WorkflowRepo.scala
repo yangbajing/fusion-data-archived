@@ -1,6 +1,6 @@
 package mass.workflow.repository
 
-import mass.db.slick.SlickProfile.api._
+import mass.db.slick.PgProfile.api._
 import mass.workflow.model.WfDetail
 import slick.sql.{ FixedSqlAction, FixedSqlStreamingAction }
 

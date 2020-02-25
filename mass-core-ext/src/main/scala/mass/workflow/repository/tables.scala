@@ -2,7 +2,7 @@ package mass.workflow.repository
 
 import java.time.OffsetDateTime
 
-import mass.db.slick.SlickProfile.api._
+import mass.db.slick.PgProfile.api._
 import mass.workflow.model.WfDetail
 
 class WfDetailTable(tag: Tag) extends Table[WfDetail](tag, "wf_detail") {

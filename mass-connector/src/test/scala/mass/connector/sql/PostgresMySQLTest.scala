@@ -8,7 +8,7 @@ import akka.stream.alpakka.csv.scaladsl.{ CsvFormatting, CsvParsing }
 import akka.stream.scaladsl.{ FileIO, Sink }
 import akka.util.ByteString
 import fusion.jdbc.util.JdbcUtils
-import mass.testkit.MassActorTestKit
+import mass.testkit.FusionApplicationTestkit
 import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
@@ -41,7 +41,7 @@ import scala.concurrent.{ Await, Future }
  *   created_at  datetime
  * );
  */
-class PostgresMySQLTest extends MassActorTestKit with AnyWordSpecLike {
+class PostgresMySQLTest extends FusionApplicationTestkit with AnyWordSpecLike {
   "Database" should {
     "Postgres foreach" in {
       val sql =

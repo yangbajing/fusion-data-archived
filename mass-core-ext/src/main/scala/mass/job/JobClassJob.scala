@@ -1,8 +1,8 @@
 package mass.job
 
 import com.typesafe.scalalogging.StrictLogging
+import fusion.core.FusionApplication
 import helloscala.common.util.StringUtils
-import mass.Global
 import mass.core.job.JobConstants
 import org.quartz.{ Job, JobExecutionContext }
 
@@ -15,7 +15,7 @@ private[job] class JobClassJob extends Job with StrictLogging {
       require(StringUtils.isNoneBlank(jobClass), s"Key: ${JobConstants.JOB_CLASS} 不能为空。")
       val data =
         context.getJobDetail.getJobDataMap.asScala.filterNot(_._1 == JobConstants.JOB_CLASS).mapValues(_.toString).toMap
-      val jobSystem = JobScheduler(Global.system)
+      val jobSystem = JobScheduler(FusionApplication.application.classicSystem)
       JobRunner.execute(jobSystem, context.getJobDetail.getKey.getName, data, jobClass)
     } catch {
       case e: Throwable =>

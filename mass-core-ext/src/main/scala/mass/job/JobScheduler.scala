@@ -2,7 +2,7 @@ package mass.job
 
 import java.time.OffsetDateTime
 
-import akka.actor.typed.ActorSystem
+import akka.actor.ExtendedActorSystem
 import com.typesafe.scalalogging.StrictLogging
 import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import fusion.job.{ FusionJob, FusionScheduler }
@@ -15,17 +15,19 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 
 object JobScheduler extends FusionExtensionId[JobScheduler] {
-  override def createExtension(system: ActorSystem[_]): JobScheduler = new JobScheduler(system)
+  override def createExtension(system: ExtendedActorSystem): JobScheduler = new JobScheduler(system)
 }
 
-final class JobScheduler private (val system: ActorSystem[_]) extends FusionExtension with StrictLogging {
+final class JobScheduler private (override val classicSystem: ExtendedActorSystem)
+    extends FusionExtension
+    with StrictLogging {
   import org.quartz._
 
-  val massSystem: MassSystem = MassSystem(system)
+  val massSystem: MassSystem = MassSystem(classicSystem)
 
   val jobSettings: JobSettings = JobSettings(massSystem.core.settings)
 
-  private val scheduler: FusionScheduler = FusionJob(system).component
+  private val scheduler: FusionScheduler = FusionJob(classicSystem).component
 
   /**
    * 事件触发待执行Job队列。当事件发生时，执行任务
@@ -33,9 +35,9 @@ final class JobScheduler private (val system: ActorSystem[_]) extends FusionExte
    */
   private val eventTriggerJobs = mutable.Map[String, Set[String]]()
 
-  def name: String = system.name
+  def name: String = classicSystem.name
 
-  implicit def executionContext: ExecutionContext = system.executionContext
+  implicit def executionContext: ExecutionContext = classicSystem.dispatcher
 
 //  /**
 //   * 直接执行作业
@@ -141,8 +143,8 @@ final class JobScheduler private (val system: ActorSystem[_]) extends FusionExte
     for ((key, value) <- data.getOrElse(item.data)) {
       dataMap.put(key, value)
     }
-    JobBuilder.newJob(classOf[JobClassJob]).withIdentity(JobKey.jobKey(key)).setJobData(dataMap).build()
+    JobBuilder.newJob(classOf[JobClassJob]).withIdentity(JobKey.jobKey(key)).setJobData(dataMap).storeDurably().build()
   }
 
-  override def toString: String = s"JobSystem($name, $system)"
+  override def toString: String = s"JobSystem($name, $classicSystem)"
 }
