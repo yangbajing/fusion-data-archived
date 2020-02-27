@@ -4,28 +4,24 @@ import java.time.OffsetDateTime
 
 import akka.actor.ExtendedActorSystem
 import com.typesafe.scalalogging.StrictLogging
-import fusion.common.extension.{ FusionExtension, FusionExtensionId }
+import fusion.core.extension.FusionCore
 import fusion.job.{ FusionJob, FusionScheduler }
 import helloscala.common.exception.HSBadRequestException
+import javax.inject.{ Inject, Singleton }
 import mass.core.job.{ JobConstants, SchedulerJob }
-import mass.extension.MassSystem
+import mass.db.slick.SqlComponent
+import mass.extension.MassCore
 import mass.model.job.{ JobItem, JobSchedule, JobTrigger, TriggerType }
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 
-object JobScheduler extends FusionExtensionId[JobScheduler] {
-  override def createExtension(system: ExtendedActorSystem): JobScheduler = new JobScheduler(system)
-}
-
-final class JobScheduler private (override val classicSystem: ExtendedActorSystem)
-    extends FusionExtension
-    with StrictLogging {
+@Singleton
+final class JobScheduler @Inject() (val sqlSystem: SqlComponent, val classicSystem: ExtendedActorSystem)
+    extends StrictLogging {
   import org.quartz._
 
-  val massSystem: MassSystem = MassSystem(classicSystem)
-
-  val jobSettings: JobSettings = JobSettings(massSystem.core.settings)
+  val jobSettings: JobSettings = JobSettings(MassCore(classicSystem).settings)
 
   private val scheduler: FusionScheduler = FusionJob(classicSystem).component
 
@@ -36,7 +32,7 @@ final class JobScheduler private (override val classicSystem: ExtendedActorSyste
   private val eventTriggerJobs = mutable.Map[String, Set[String]]()
 
   def name: String = classicSystem.name
-
+  def typedSystem = FusionCore(classicSystem).typedSystem
   implicit def executionContext: ExecutionContext = classicSystem.dispatcher
 
 //  /**

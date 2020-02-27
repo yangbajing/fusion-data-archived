@@ -3,6 +3,7 @@ package mass.job.component
 import java.nio.file.Paths
 
 import com.typesafe.scalalogging.StrictLogging
+import fusion.inject.guice.GuiceApplication
 import mass.core.job._
 import mass.job.JobScheduler
 import mass.message.job.SchedulerJobResult
@@ -11,7 +12,7 @@ import scala.concurrent.Future
 
 class DefaultSchedulerJob extends SchedulerJob with StrictLogging {
   override def run(context: SchedulerContext): Future[JobResult] = {
-    val jobScheduler = JobScheduler(context.system)
+    val jobScheduler = GuiceApplication(context.system).instance[JobScheduler]
     // TODO Use job blocking dispatcher
     val blockingDispatcher = jobScheduler.executionContext
     Future {

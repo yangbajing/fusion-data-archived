@@ -1,6 +1,6 @@
 package mass.connector.sql
 
-import fusion.test.FusionWordSpecLike
+import fusion.testkit.FusionWordSpecLike
 import org.scalatest.BeforeAndAfterAll
 
 import scala.xml.XML

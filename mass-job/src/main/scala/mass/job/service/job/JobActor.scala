@@ -3,6 +3,7 @@ package mass.job.service.job
 import akka.actor.typed.scaladsl.{ ActorContext, Behaviors }
 import akka.actor.typed.{ ActorRef, ActorSystem, Behavior }
 import akka.cluster.typed.{ ClusterSingleton, ClusterSingletonSettings, SingletonActor }
+import fusion.inject.guice.GuiceApplication
 import fusion.json.CborSerializable
 import helloscala.common.IntStatus
 import mass.core.Constants
@@ -30,7 +31,7 @@ object JobActor {
 import mass.job.service.job.JobActor._
 class JobActor private (context: ActorContext[Command]) extends JobServiceComponent {
   import context.executionContext
-  override val jobScheduler: JobScheduler = JobScheduler(context.system)
+  override val jobScheduler: JobScheduler = GuiceApplication(context.system).instance[JobScheduler]
 
   def init(): Behavior[Command] = {
     receive()

@@ -19,11 +19,11 @@ ThisBuild / buildEnv := {
     .getOrElse(BuildEnv.Developement)
 }
 
-ThisBuild / scalaVersion := Dependencies.versionScala
+ThisBuild / scalaVersion := BuildInfo.versionScala213
 
 ThisBuild / scalafmtOnCompile := true
 
-ThisBuild / resolvers ++= Seq(Resolver.bintrayRepo("akka-fusion", "maven"), Resolver.jcenterRepo)
+ThisBuild / resolvers ++= Seq(Resolver.bintrayRepo("helloscala", "maven"), Resolver.jcenterRepo)
 
 lazy val root = Project(id = "fusion-data-root", base = file("."))
   .aggregate(
@@ -72,7 +72,7 @@ lazy val example = _project("example")
   .dependsOn(massCoreExt, massCore % "compile->compile;test->test")
   .enablePlugins(MultiJvmPlugin)
   .configs(MultiJvm)
-  .settings(libraryDependencies ++= Seq(_fusionCluster, _akkaMultiNodeTestkit % Test))
+  .settings(libraryDependencies ++= Seq(fusionCluster, _akkaMultiNodeTestkit % Test))
 
 lazy val massFunctest = _project("mass-functest")
   .dependsOn(massConsole, massCoreExt, massCore % "compile->compile;test->test")
@@ -143,7 +143,7 @@ lazy val massJob = _project("mass-job")
   .enablePlugins(JavaAppPackaging, JavaAgent, MultiJvmPlugin)
   .configs(MultiJvm)
   .settings(Packaging.settings: _*)
-  .settings(mainClass in Compile := Some("mass.job.boot.JobMain"), libraryDependencies ++= Seq())
+  .settings(mainClass in Compile := Some("mass.job.boot.JobMain"), libraryDependencies ++= Seq(fusionJob))
 
 // 统一用户，OAuth 2服务
 lazy val massAuth = _project("mass-auth")
@@ -164,12 +164,12 @@ lazy val massCoreExt = _project("mass-core-ext")
   .settings(Publishing.publishing: _*)
   .dependsOn(massCore % "compile->compile;test->test")
   .settings(libraryDependencies ++= Seq(
-      _fusionInjectGuice,
       _jsch,
       _osLib,
-      _fusionHttp,
-      _fusionJob,
-      _fusionCluster,
+      fusionHttp,
+      fusionJob % Provided,
+      fusionCluster,
+      fusionInjectGuice,
       _akkaPersistenceJdbc,
       _akkaPersistenceTyped,
       _akkaPersistenceQuery,
@@ -179,13 +179,14 @@ lazy val massCore =
   _project("mass-core")
     .dependsOn(massCommon % "compile->compile;test->test")
     .settings(Publishing.publishing: _*)
-    .settings(libraryDependencies ++= Seq(_scalaXml, _h2, _fusionJdbc, _fusionJsonJackson) ++ _akkaHttps)
+    .settings(libraryDependencies ++= Seq(_scalaXml, _h2, fusionJdbc, fusionJsonJackson) ++ _akkaHttps)
 
 lazy val massCommon = _project("mass-common")
   .settings(Publishing.publishing: _*)
-  .settings(libraryDependencies ++= Seq(_akkaSerializationJackson, _fusionCore))
+  .settings(libraryDependencies ++= Seq(_akkaSerializationJackson, fusionCore))
 
 def _project(name: String, _base: String = null) =
   Project(id = name, base = file(if (_base eq null) name else _base))
+    .enablePlugins(FusionPlugin)
     .settings(basicSettings: _*)
-    .settings(skip in publish := true, libraryDependencies ++= Seq(_fusionTestkit % Test))
+    .settings(skip in publish := true, libraryDependencies ++= Seq(fusionInjectGuiceTestkit % Test))

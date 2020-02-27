@@ -1,18 +1,17 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzLocksModel
+
+/** Entity class storing rows of table QrtzLocksModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param lockName Database column lock_name SqlType(varchar), Length(40,true) */
+case class QrtzLocks(schedName: String, lockName: String)
+
 trait QrtzLocksModelTable {
 
   self: QrtzModels =>
 
   import profile.api._
-  import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzLocksModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param lockName Database column lock_name SqlType(varchar), Length(40,true) */
-  case class QrtzLocks(schedName: String, lockName: String)
 
   /** GetResult implicit for fetching QrtzLocks objects using plain SQL queries */
   implicit def GetResultQrtzLocks(implicit e0: GR[String]): GR[QrtzLocks] = GR { prs =>

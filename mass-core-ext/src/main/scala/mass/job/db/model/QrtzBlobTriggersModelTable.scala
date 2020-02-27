@@ -1,5 +1,16 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzBlobTriggersModel
+
+/** Entity class storing rows of table QrtzBlobTriggersModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
+ *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
+ *  @param blobData Database column blob_data SqlType(bytea), Default(None) */
+case class QrtzBlobTriggers(
+    schedName: String,
+    triggerName: String,
+    triggerGroup: String,
+    blobData: Option[Array[Byte]] = None)
+
 trait QrtzBlobTriggersModelTable {
 
   self: QrtzModels =>
@@ -8,17 +19,6 @@ trait QrtzBlobTriggersModelTable {
   import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzBlobTriggersModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
-   *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
-   *  @param blobData Database column blob_data SqlType(bytea), Default(None) */
-  case class QrtzBlobTriggers(
-      schedName: String,
-      triggerName: String,
-      triggerGroup: String,
-      blobData: Option[Array[Byte]] = None)
 
   /** GetResult implicit for fetching QrtzBlobTriggers objects using plain SQL queries */
   implicit def GetResultQrtzBlobTriggers(implicit e0: GR[String], e1: GR[Option[Array[Byte]]]): GR[QrtzBlobTriggers] =

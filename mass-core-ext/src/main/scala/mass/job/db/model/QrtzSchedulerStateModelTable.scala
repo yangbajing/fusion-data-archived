@@ -1,20 +1,20 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzSchedulerStateModel
+
+/** Entity class storing rows of table QrtzSchedulerStateModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param instanceName Database column instance_name SqlType(varchar), Length(200,true)
+ *  @param lastCheckinTime Database column last_checkin_time SqlType(int8)
+ *  @param checkinInterval Database column checkin_interval SqlType(int8) */
+case class QrtzSchedulerState(schedName: String, instanceName: String, lastCheckinTime: Long, checkinInterval: Long)
+
 trait QrtzSchedulerStateModelTable {
 
   self: QrtzModels =>
 
   import profile.api._
-  import slick.model.ForeignKeyAction
+
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzSchedulerStateModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param instanceName Database column instance_name SqlType(varchar), Length(200,true)
-   *  @param lastCheckinTime Database column last_checkin_time SqlType(int8)
-   *  @param checkinInterval Database column checkin_interval SqlType(int8) */
-  case class QrtzSchedulerState(schedName: String, instanceName: String, lastCheckinTime: Long, checkinInterval: Long)
 
   /** GetResult implicit for fetching QrtzSchedulerState objects using plain SQL queries */
   implicit def GetResultQrtzSchedulerState(implicit e0: GR[String], e1: GR[Long]): GR[QrtzSchedulerState] = GR { prs =>

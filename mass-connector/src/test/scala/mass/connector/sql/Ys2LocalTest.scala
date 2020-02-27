@@ -3,11 +3,12 @@ package mass.connector.sql
 import java.util.Properties
 import java.util.concurrent.TimeUnit
 
+import akka.stream.Materializer
 import akka.stream.scaladsl.{ Flow, Keep }
 import com.zaxxer.hikari.HikariDataSource
 import fusion.jdbc.util.JdbcUtils
+import fusion.testkit.FusionApplicationTestkit
 import helloscala.common.util.AsString
-import mass.testkit.FusionApplicationTestkit
 import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.collection.immutable
@@ -15,6 +16,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class Ys2LocalTest extends FusionApplicationTestkit with AnyWordSpecLike {
+  private implicit val mat = Materializer.matFromSystem(typedSystem)
   val localDS = createPGDataSource()
   val ysDS = createYsPGDataSource()
 

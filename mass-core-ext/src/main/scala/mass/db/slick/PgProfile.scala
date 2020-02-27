@@ -3,12 +3,13 @@ package mass.db.slick
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
+import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.tminglei.slickpg._
 import com.github.tminglei.slickpg.agg.PgAggFuncSupport
 import com.github.tminglei.slickpg.str.PgStringSupport
 import com.zaxxer.hikari.HikariDataSource
-import fusion.json.jackson.Jackson
+import fusion.json.jackson.{ JacksonObjectMapperExtension, ScalaObjectMapper }
 import helloscala.common.data.NameValue
 import helloscala.common.types.ObjectId
 import mass.model.CommonStatus
@@ -26,12 +27,12 @@ trait PgProfile
     with PgHStoreSupport
     with ArraySupport
     with PgJacksonJsonSupport
-    with PgStringSupport {
+    with PgStringSupport
+    with Extension {
   override protected def computeCapabilities: Set[Capability] =
     super.computeCapabilities + JdbcCapabilities.insertOrUpdate
 
   override val pgjson = "jsonb"
-
   val plainApi: PlainAPI = new PlainAPI {}
 
   trait PlainAPI
@@ -61,10 +62,10 @@ trait PgProfile
     implicit val setTriggerType: SetParameter[TriggerType] = (v, rp) => rp.setString(v.value)
     implicit val setTriggerTypeOption: SetParameter[Option[TriggerType]] = (v, rp) => rp.setStringOption(v.map(_.value))
 
-    implicit val getFiniteDuration: GetResult[FiniteDuration] =
-      mkGetResult(pr => FiniteDuration(pr.nextDuration().toNanos, TimeUnit.NANOSECONDS).toCoarsest)
-    implicit val getFiniteDurationOption: GetResult[Option[FiniteDuration]] =
-      mkGetResult(pr => pr.nextDurationOption().map(d => FiniteDuration(d.toNanos, TimeUnit.NANOSECONDS).toCoarsest))
+    implicit val getFiniteDuration: GetResult[FiniteDuration] = mkGetResult(
+      pr => FiniteDuration(pr.nextDuration().toNanos, TimeUnit.NANOSECONDS).toCoarsest)
+    implicit val getFiniteDurationOption: GetResult[Option[FiniteDuration]] = mkGetResult(
+      pr => pr.nextDurationOption().map(d => FiniteDuration(d.toNanos, TimeUnit.NANOSECONDS).toCoarsest))
 
     implicit val setFiniteDuration: SetParameter[FiniteDuration] =
       mkSetParameter[FiniteDuration]("interval", fd => Duration.ofNanos(fd.toNanos).toString)
@@ -78,13 +79,12 @@ trait PgProfile
     implicit val setObjectIdOption: SetParameter[Option[ObjectId]] = (v, rp) => rp.setStringOption(v.map(_.stringify))
 
     implicit val getNameValue: GetResult[NameValue] = mkGetResult(
-      pr => Jackson.defaultObjectMapper.treeToValue(pr.nextJson(), classOf[NameValue]))
+      pr => objectMapper.treeToValue(pr.nextJson(), classOf[NameValue]))
     implicit val getNameValueOption: GetResult[Option[NameValue]] = mkGetResult(
-      pr => pr.nextJsonOption().map(Jackson.defaultObjectMapper.treeToValue(_, classOf[NameValue])))
-    implicit val setNameValue: SetParameter[NameValue] =
-      mkSetParameter(pgjson, v => Jackson.defaultObjectMapper.writeValueAsString(v))
+      pr => pr.nextJsonOption().map(objectMapper.treeToValue(_, classOf[NameValue])))
+    implicit val setNameValue: SetParameter[NameValue] = mkSetParameter(pgjson, v => objectMapper.stringify(v))
     implicit val setNameValueOption: SetParameter[Option[NameValue]] =
-      mkOptionSetParameter(pgjson, v => Jackson.defaultObjectMapper.writeValueAsString(v))
+      mkOptionSetParameter(pgjson, v => objectMapper.stringify(v))
   }
 
   override val api: API = new API {}
@@ -114,9 +114,11 @@ trait PgProfile
     implicit val jobStatusColumnType: JdbcType[RunStatus] =
       MappedColumnType.base[RunStatus, Int](_.getValue, RunStatus.fromValue)
     implicit val jobItemColumnType: JdbcType[JobItem] =
-      MappedColumnType.base[JobItem, JsonNode](Jackson.valueToTree, Jackson.treeToValue[JobItem])
+      MappedColumnType
+        .base[JobItem, JsonNode](objectMapper.valueToTree, node => objectMapper.treeToValue[JobItem](node))
     implicit val jobTriggerColumnType: JdbcType[JobTrigger] =
-      MappedColumnType.base[JobTrigger, JsonNode](Jackson.valueToTree, Jackson.treeToValue[JobTrigger])
+      MappedColumnType
+        .base[JobTrigger, JsonNode](objectMapper.valueToTree, node => objectMapper.treeToValue[JobTrigger](node))
     implicit val objectIdColumnType: JdbcType[ObjectId] =
       MappedColumnType.base[ObjectId, String](_.toString(), ObjectId.apply)
 
@@ -162,4 +164,12 @@ trait PgProfile
   override val columnOptions: ColumnOptions = new ColumnOptions {}
 }
 
-object PgProfile extends PgProfile
+//object PgProfile extends PgProfile
+
+object PgProfileExtension extends ExtensionId[PgProfile] with ExtensionIdProvider {
+  override def createExtension(system: ExtendedActorSystem): PgProfile = new PgProfile {
+    override def objectMapper: ScalaObjectMapper = JacksonObjectMapperExtension(system).objectMapperJson
+  }
+
+  override def lookup(): ExtensionId[_ <: Extension] = PgProfileExtension
+}

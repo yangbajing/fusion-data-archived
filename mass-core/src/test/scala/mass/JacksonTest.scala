@@ -1,31 +1,33 @@
 package mass
 
-import fusion.json.jackson.Jackson
-import fusion.test.FusionWordSpecLike
+import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
+import fusion.json.jackson.JacksonObjectMapperExtension
+import fusion.testkit.FusionWordSpecLike
 import mass.message.job.JobCreateReq
 import mass.model.job.Program
 
 case class TestProgram(program: Program, number: Int)
 
-class JacksonTest extends FusionWordSpecLike {
+class JacksonTest extends ScalaTestWithActorTestKit with FusionWordSpecLike {
+  private val objectMapper = JacksonObjectMapperExtension(system).objectMapperJson
   "Program" should {
     "field" in {
-      Jackson.stringify(Program.SCALA) shouldBe """"scala""""
-      Jackson.defaultObjectMapper.readValue(""""scala"""", classOf[Program]) shouldBe Program.SCALA
+      objectMapper.stringify(Program.SCALA) shouldBe """"scala""""
+      objectMapper.readValue(""""scala"""", classOf[Program]) shouldBe Program.SCALA
     }
 
     "object" in {
       val o = TestProgram(Program.JAVA, 2)
       val text = """{"program":"java","number":2}"""
-      Jackson.stringify(o) shouldBe text
-      Jackson.defaultObjectMapper.readValue(text, classOf[TestProgram]) shouldBe o
+      objectMapper.stringify(o) shouldBe text
+      objectMapper.readValue(text, classOf[TestProgram]) shouldBe o
     }
 
     "array" in {
       val arr = Vector(Program.JAVA, Program.SCALA)
       val text = """["java","scala"]"""
-      Jackson.stringify(arr) shouldBe text
-      Jackson.defaultObjectMapper.readValue[Vector[Program]](text) shouldBe arr
+      objectMapper.stringify(arr) shouldBe text
+      objectMapper.readValue[Vector[Program]](text) shouldBe arr
     }
   }
 
@@ -34,22 +36,22 @@ class JacksonTest extends FusionWordSpecLike {
       val jsonCreateJob =
         """{"item":{"programVersion":"2.12","key":"ddd","program":"java","programOptions":[],"programMain":"test.Main","programArgs":[]},"trigger":{"triggerType":"simple","key":"ddd","startTime":null,"endTime":null,"interval":"PT24H"}}"""
 
-      val jsonNode = Jackson.readTree(jsonCreateJob)
+      val jsonNode = objectMapper.readTree(jsonCreateJob)
       println(jsonNode)
-      val req = Jackson.treeToValue[JobCreateReq](jsonNode)
+      val req = objectMapper.treeToValue[JobCreateReq](jsonNode)
       println(req)
-      println(Jackson.prettyStringify(req))
+      println(objectMapper.prettyStringify(req))
     }
 
     "jackson" in {
       import scala.compat.java8.DurationConverters._
       import scala.concurrent.duration._
       val d = 3.days
-      println(Jackson.valueToTree(d))
-      println(Jackson.stringify(d))
+      println(objectMapper.valueToTree(d))
+      println(objectMapper.stringify(d))
 
-      val node = Jackson.readTree("69")
-      val jd = Jackson.treeToValue[java.time.Duration](node)
+      val node = objectMapper.readTree("69")
+      val jd = objectMapper.treeToValue[java.time.Duration](node)
       println(jd)
       println(jd.toScala)
     }

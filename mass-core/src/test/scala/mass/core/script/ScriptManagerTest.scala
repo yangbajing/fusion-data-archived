@@ -1,6 +1,6 @@
 package mass.core.script
 
-import fusion.test.FusionWordSpecLike
+import fusion.testkit.FusionWordSpecLike
 import javax.script.SimpleBindings
 import mass.core.event.EventData
 

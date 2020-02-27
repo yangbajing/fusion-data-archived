@@ -3,12 +3,12 @@ package mass.connector.sql
 import java.nio.file.Paths
 import java.sql.{ ResultSet, Timestamp }
 
-import akka.stream.IOResult
 import akka.stream.alpakka.csv.scaladsl.{ CsvFormatting, CsvParsing }
 import akka.stream.scaladsl.{ FileIO, Sink }
+import akka.stream.{ IOResult, Materializer }
 import akka.util.ByteString
 import fusion.jdbc.util.JdbcUtils
-import mass.testkit.FusionApplicationTestkit
+import fusion.testkit.FusionApplicationTestkit
 import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
@@ -42,6 +42,8 @@ import scala.concurrent.{ Await, Future }
  * );
  */
 class PostgresMySQLTest extends FusionApplicationTestkit with AnyWordSpecLike {
+  private implicit val mat = Materializer.matFromSystem(typedSystem)
+
   "Database" should {
     "Postgres foreach" in {
       val sql =
@@ -111,7 +113,7 @@ class PostgresMySQLTest extends FusionApplicationTestkit with AnyWordSpecLike {
           conn.prepareStatement(
             "insert into t_book(id, isbn, title, description, publish_at, created_at) values (?, ?, ?, ?, ?, ?);"),
         (values, pstmt) => {
-          val id :: isbn :: title :: description :: publishAt :: createdAt :: Nil = values
+          val id :: isbn :: title :: description :: publishAt :: createdAt :: _ = values
           println(values)
           JdbcUtils.setStatementParameters(
             pstmt,

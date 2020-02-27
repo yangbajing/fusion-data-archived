@@ -2,16 +2,16 @@ package mass.job.repository
 
 import java.time.OffsetDateTime
 
+import javax.inject.{ Inject, Singleton }
 import mass.db.slick.PgProfile
-import mass.db.slick.PgProfile.api._
-import mass.job.db.model.QrtzModels
+import mass.job.db.model.{ QrtzModels, QrtzTriggerLog }
 import mass.model.job._
 import slick.sql.FixedSqlAction
-import mass.job.db.model.QrtzModels._
 
-import scala.concurrent.ExecutionContext
-
-object JobRepo {
+@Singleton
+class JobRepo @Inject() (val profile: PgProfile, qrtzModels: QrtzModels) {
+  import profile.api._
+  import qrtzModels._
 //  def listJob(req: JobListReq): FixedSqlStreamingAction[Seq[JobSchedule], JobSchedule, Effect.Read] = {
 //    tJobSchedule
 //      .filter(t => dynamicFilterOr(Seq(StringUtils.option(req.key).map(key => t.key.? ilike s"$key%"))))
@@ -70,16 +70,15 @@ object JobRepo {
 //
   def insertJobLog(jobLog: QrtzTriggerLog): FixedSqlAction[Int, NoStream, Effect.Write] = {
 //    DBIO.seq(tJobLog += jobLog, updateJobTriggerLog(jobLog.jobKey, jobLog))
-    QrtzModels.QrtzTriggerLogModel += jobLog
+    QrtzTriggerLogModel += jobLog
   }
 
   def completionJobLog(
       id: String,
       completionTime: OffsetDateTime,
       completionStatus: RunStatus,
-      completionValue: String)(
-      implicit ec: ExecutionContext): DBIOAction[Int, PgProfile.api.NoStream, Effect.Write with Effect.Read] = {
-    val u = QrtzModels.QrtzTriggerLogModel
+      completionValue: String): FixedSqlAction[Int, NoStream, Effect.Write] = {
+    val u = QrtzTriggerLogModel
       .filter(_.id === id)
       .map(r => (r.completionTime, r.completionStatus, r.completionValue))
       .update((Some(completionTime), completionStatus, Some(completionValue)))

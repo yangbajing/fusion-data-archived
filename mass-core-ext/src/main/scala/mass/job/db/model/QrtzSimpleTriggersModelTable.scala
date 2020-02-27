@@ -1,5 +1,20 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzSimpleTriggersModel
+
+/** Entity class storing rows of table QrtzSimpleTriggersModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
+ *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
+ *  @param repeatCount Database column repeat_count SqlType(int8)
+ *  @param repeatInterval Database column repeat_interval SqlType(int8)
+ *  @param timesTriggered Database column times_triggered SqlType(int8) */
+case class QrtzSimpleTriggers(
+    schedName: String,
+    triggerName: String,
+    triggerGroup: String,
+    repeatCount: Long,
+    repeatInterval: Long,
+    timesTriggered: Long)
+
 trait QrtzSimpleTriggersModelTable {
 
   self: QrtzModels =>
@@ -8,21 +23,6 @@ trait QrtzSimpleTriggersModelTable {
   import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzSimpleTriggersModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
-   *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
-   *  @param repeatCount Database column repeat_count SqlType(int8)
-   *  @param repeatInterval Database column repeat_interval SqlType(int8)
-   *  @param timesTriggered Database column times_triggered SqlType(int8) */
-  case class QrtzSimpleTriggers(
-      schedName: String,
-      triggerName: String,
-      triggerGroup: String,
-      repeatCount: Long,
-      repeatInterval: Long,
-      timesTriggered: Long)
 
   /** GetResult implicit for fetching QrtzSimpleTriggers objects using plain SQL queries */
   implicit def GetResultQrtzSimpleTriggers(implicit e0: GR[String], e1: GR[Long]): GR[QrtzSimpleTriggers] = GR { prs =>

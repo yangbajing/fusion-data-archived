@@ -1,12 +1,12 @@
 package mass.db.slick
 
 import akka.Done
-import akka.actor.ExtendedActorSystem
+import akka.actor.ActorSystem
 import com.typesafe.scalalogging.StrictLogging
 import com.zaxxer.hikari.HikariDataSource
-import fusion.common.extension.{ FusionExtension, FusionExtensionId }
 import fusion.core.extension.FusionCore
 import fusion.jdbc.{ FusionJdbc, JdbcTemplate }
+import javax.inject.{ Inject, Singleton }
 import slick.basic.DatabasePublisher
 
 import scala.concurrent.Future
@@ -15,12 +15,11 @@ import scala.util.Failure
 /**
  * Mass系统SQL数据访问管理器
  */
-class SqlSystem private (override val classicSystem: ExtendedActorSystem) extends FusionExtension with StrictLogging {
-  import PgProfile.api._
-
-  val profile: PgProfile = PgProfile
+@Singleton
+class SqlComponent @Inject() (val profile: PgProfile, classicSystem: ActorSystem) extends StrictLogging {
+  import profile.api._
   val dataSource: HikariDataSource = FusionJdbc(classicSystem).component
-  val db: PgProfile.backend.DatabaseDef = databaseForDataSource(dataSource)
+  val db = databaseForDataSource(dataSource)
   val jdbcTemplate: JdbcTemplate = JdbcTemplate(dataSource)
   FusionCore(classicSystem).shutdowns.beforeActorSystemTerminate("StopSqlManager") { () =>
     Future {
@@ -43,8 +42,4 @@ class SqlSystem private (override val classicSystem: ExtendedActorSystem) extend
     f.andThen { case Failure(e) => logger.warn(s"Slick run error [${e.toString}].") }(db.ioExecutionContext)
 
   override def toString = s"SqlSystem($dataSource, $jdbcTemplate, $db)"
-}
-
-object SqlSystem extends FusionExtensionId[SqlSystem] {
-  override def createExtension(system: ExtendedActorSystem): SqlSystem = new SqlSystem(system)
 }

@@ -1,14 +1,14 @@
 package mass.job
 
-import mass.testkit.FusionApplicationTestkit
+import fusion.inject.guice.testkit.GuiceApplicationTestkit
 import org.scalatest.wordspec.AnyWordSpecLike
 
-class JobSchedulerTest extends FusionApplicationTestkit with AnyWordSpecLike {
-  private val jobSystem: JobScheduler = JobScheduler(classicSystem)
+class JobSchedulerTest extends GuiceApplicationTestkit with AnyWordSpecLike {
+  private val jobScheduler = injectInstance[JobScheduler]
 
   "JobSystem" should {
     "toString" in {
-      println(jobSystem)
+      println(jobScheduler)
     }
   }
 }

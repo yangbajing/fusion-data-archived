@@ -1,19 +1,18 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzCalendarsModel
+
+/** Entity class storing rows of table QrtzCalendarsModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param calendarName Database column calendar_name SqlType(varchar), Length(200,true)
+ *  @param calendar Database column calendar SqlType(bytea) */
+case class QrtzCalendars(schedName: String, calendarName: String, calendar: Array[Byte])
+
 trait QrtzCalendarsModelTable {
 
   self: QrtzModels =>
 
   import profile.api._
-  import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzCalendarsModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param calendarName Database column calendar_name SqlType(varchar), Length(200,true)
-   *  @param calendar Database column calendar SqlType(bytea) */
-  case class QrtzCalendars(schedName: String, calendarName: String, calendar: Array[Byte])
 
   /** GetResult implicit for fetching QrtzCalendars objects using plain SQL queries */
   implicit def GetResultQrtzCalendars(implicit e0: GR[String], e1: GR[Array[Byte]]): GR[QrtzCalendars] = GR { prs =>

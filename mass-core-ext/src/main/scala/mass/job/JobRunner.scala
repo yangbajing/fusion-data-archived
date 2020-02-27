@@ -5,39 +5,31 @@ import java.time.OffsetDateTime
 import com.typesafe.scalalogging.StrictLogging
 import helloscala.common.types.ObjectId
 import helloscala.common.util.StringUtils
+import javax.inject.{ Inject, Singleton }
 import mass.core.job.{ SchedulerContext, SchedulerJob }
-import mass.job.db.model.QrtzModels
+import mass.job.db.model.QrtzTriggerLog
 import mass.job.repository.JobRepo
 import mass.model.job.RunStatus
 
 import scala.concurrent.ExecutionContext
 import scala.util.{ Failure, Success }
 
-object JobRunner extends StrictLogging {
+@Singleton
+class JobRunner @Inject() (jobRepo: JobRepo) extends StrictLogging {
   def execute(jobSystem: JobScheduler, key: String, extData: Map[String, String], jobClass: String): Unit = {
     implicit val ec: ExecutionContext = jobSystem.executionContext
-    val db = jobSystem.massSystem.sqlSystem
+    val db = jobSystem.sqlSystem
     val logId = ObjectId.getString()
     val createdAt = OffsetDateTime.now()
 
     val log =
-      QrtzModels.QrtzTriggerLog(
-        logId,
-        key,
-        "DEFAULT",
-        key,
-        "DEFAULT",
-        createdAt,
-        None,
-        RunStatus.JOB_RUNNING,
-        None,
-        createdAt)
+      QrtzTriggerLog(logId, key, "DEFAULT", key, "DEFAULT", createdAt, None, RunStatus.JOB_RUNNING, None, createdAt)
     logger.info(s"Job start execution，log id is '$logId'.")
-    db.runTransaction(JobRepo.insertJobLog(log))
+    db.runTransaction(jobRepo.insertJobLog(log))
 
     val clz = Class.forName(jobClass)
     if (classOf[SchedulerJob].isAssignableFrom(clz)) {
-//      db.run(JobRepo.findJob(key))
+//      db.run(jobRepo.findJob(key))
 //        .flatMap {
 //          case Some(schedule) =>
 //            val data = schedule.data ++ extData
@@ -57,17 +49,17 @@ object JobRunner extends StrictLogging {
         v match {
           case Success(msg) =>
             logger.info(s"Job executed successfully，log id is '$logId'.")
-            db.runTransaction(JobRepo.completionJobLog(logId, completionTime, RunStatus.JOB_OK, msg.toString))
+            db.runTransaction(jobRepo.completionJobLog(logId, completionTime, RunStatus.JOB_OK, msg.toString))
           case Failure(e) =>
             logger.error(s"Job execution failed，log id is '$logId'. The exception thrown is [${e.toString}].")
             db.runTransaction(
-              JobRepo.completionJobLog(logId, completionTime, RunStatus.JOB_FAILURE, StringUtils.toString(e)))
+              jobRepo.completionJobLog(logId, completionTime, RunStatus.JOB_FAILURE, StringUtils.toString(e)))
         }
       }
     } else {
       val msg = s"Unknown job type: '$jobClass', subtype of '${classOf[SchedulerJob].getName}' required."
       logger.error(msg)
-      db.runTransaction(JobRepo.completionJobLog(logId, OffsetDateTime.now(), RunStatus.JOB_FAILURE, msg))
+      db.runTransaction(jobRepo.completionJobLog(logId, OffsetDateTime.now(), RunStatus.JOB_FAILURE, msg))
     }
   }
 }

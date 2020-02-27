@@ -97,9 +97,9 @@ class MassProcessBuilder(
     case (name, value) => name -> StringUtils.option(System.getenv(name)).map(v => s"$value:$v").getOrElse(value)
   }
 
-  logger.debug("PATH: " + System.getenv("PATH"))
+  logger.trace("PATH: " + System.getenv("PATH"))
 
-  logger.info(s"$commands\t$dist\t$envs\t$start\t$outPath\t$errPath")
+  logger.debug(s"Process: $commands\t$dist\t$envs\t$start\t$outPath\t$errPath")
 
   private val p = Process(commands, dist.toFile, envs: _*).run(ProcessLogger(fout => {
     outWriter.write(fout)
@@ -110,6 +110,7 @@ class MassProcessBuilder(
   }))
 
   override def isAlive(): Boolean = p.isAlive()
+
   override def exitValue(): Int = p.exitValue()
 
   override def destroy(): Unit = {

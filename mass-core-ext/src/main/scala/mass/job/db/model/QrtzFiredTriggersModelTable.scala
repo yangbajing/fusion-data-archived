@@ -1,42 +1,41 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzFiredTriggersModel
+
+/** Entity class storing rows of table QrtzFiredTriggersModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param entryId Database column entry_id SqlType(varchar), Length(95,true)
+ *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
+ *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
+ *  @param instanceName Database column instance_name SqlType(varchar), Length(200,true)
+ *  @param firedTime Database column fired_time SqlType(int8)
+ *  @param schedTime Database column sched_time SqlType(int8)
+ *  @param priority Database column priority SqlType(int4)
+ *  @param state Database column state SqlType(varchar), Length(16,true)
+ *  @param jobName Database column job_name SqlType(varchar), Length(200,true), Default(None)
+ *  @param jobGroup Database column job_group SqlType(varchar), Length(200,true), Default(None)
+ *  @param isNonconcurrent Database column is_nonconcurrent SqlType(bool), Default(None)
+ *  @param requestsRecovery Database column requests_recovery SqlType(bool), Default(None) */
+case class QrtzFiredTriggers(
+    schedName: String,
+    entryId: String,
+    triggerName: String,
+    triggerGroup: String,
+    instanceName: String,
+    firedTime: Long,
+    schedTime: Long,
+    priority: Int,
+    state: String,
+    jobName: Option[String] = None,
+    jobGroup: Option[String] = None,
+    isNonconcurrent: Option[Boolean] = None,
+    requestsRecovery: Option[Boolean] = None)
+
 trait QrtzFiredTriggersModelTable {
 
   self: QrtzModels =>
 
   import profile.api._
-  import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzFiredTriggersModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param entryId Database column entry_id SqlType(varchar), Length(95,true)
-   *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
-   *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
-   *  @param instanceName Database column instance_name SqlType(varchar), Length(200,true)
-   *  @param firedTime Database column fired_time SqlType(int8)
-   *  @param schedTime Database column sched_time SqlType(int8)
-   *  @param priority Database column priority SqlType(int4)
-   *  @param state Database column state SqlType(varchar), Length(16,true)
-   *  @param jobName Database column job_name SqlType(varchar), Length(200,true), Default(None)
-   *  @param jobGroup Database column job_group SqlType(varchar), Length(200,true), Default(None)
-   *  @param isNonconcurrent Database column is_nonconcurrent SqlType(bool), Default(None)
-   *  @param requestsRecovery Database column requests_recovery SqlType(bool), Default(None) */
-  case class QrtzFiredTriggers(
-      schedName: String,
-      entryId: String,
-      triggerName: String,
-      triggerGroup: String,
-      instanceName: String,
-      firedTime: Long,
-      schedTime: Long,
-      priority: Int,
-      state: String,
-      jobName: Option[String] = None,
-      jobGroup: Option[String] = None,
-      isNonconcurrent: Option[Boolean] = None,
-      requestsRecovery: Option[Boolean] = None)
 
   /** GetResult implicit for fetching QrtzFiredTriggers objects using plain SQL queries */
   implicit def GetResultQrtzFiredTriggers(

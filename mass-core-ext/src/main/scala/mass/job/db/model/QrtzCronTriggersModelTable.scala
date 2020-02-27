@@ -1,5 +1,18 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzCronTriggersModel
+
+/** Entity class storing rows of table QrtzCronTriggersModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
+ *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
+ *  @param cronExpression Database column cron_expression SqlType(varchar), Length(120,true)
+ *  @param timeZoneId Database column time_zone_id SqlType(varchar), Length(80,true), Default(None) */
+case class QrtzCronTriggers(
+    schedName: String,
+    triggerName: String,
+    triggerGroup: String,
+    cronExpression: String,
+    timeZoneId: Option[String] = None)
+
 trait QrtzCronTriggersModelTable {
 
   self: QrtzModels =>
@@ -8,19 +21,6 @@ trait QrtzCronTriggersModelTable {
   import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzCronTriggersModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
-   *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
-   *  @param cronExpression Database column cron_expression SqlType(varchar), Length(120,true)
-   *  @param timeZoneId Database column time_zone_id SqlType(varchar), Length(80,true), Default(None) */
-  case class QrtzCronTriggers(
-      schedName: String,
-      triggerName: String,
-      triggerGroup: String,
-      cronExpression: String,
-      timeZoneId: Option[String] = None)
 
   /** GetResult implicit for fetching QrtzCronTriggers objects using plain SQL queries */
   implicit def GetResultQrtzCronTriggers(implicit e0: GR[String], e1: GR[Option[String]]): GR[QrtzCronTriggers] = GR {

@@ -7,13 +7,10 @@ import helloscala.common.data.{ IntValueName, StringValueName }
 import helloscala.common.types.ObjectId
 import helloscala.common.util.DigestUtils
 import mass.core.ProgramVersion
-import mass.db.slick.SqlSystem
+import mass.db.slick.SqlComponent
 import mass.job.JobScheduler
 import mass.job.component.DefaultSchedulerJob
-import mass.job.repository.JobRepo
-import mass.job.util.JobUtils
 import mass.message.job._
-import mass.model.CommonStatus
 import mass.model.job._
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -22,7 +19,7 @@ trait JobServiceComponent extends StrictLogging {
   val jobScheduler: JobScheduler
 
   protected val JOB_CLASS_NAME: String = classOf[DefaultSchedulerJob].getName
-  private def db: SqlSystem = jobScheduler.massSystem.sqlSystem
+  private def db: SqlComponent = jobScheduler.sqlSystem
 
   def triggerJob(event: JobTriggerEvent)(implicit ec: ExecutionContext): Unit = {
 //    db.run(JobRepo.findJob(event.key)).foreach {

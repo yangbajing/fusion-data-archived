@@ -1,18 +1,17 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzPausedTriggerGrpsModel
+
+/** Entity class storing rows of table QrtzPausedTriggerGrpsModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true) */
+case class QrtzPausedTriggerGrps(schedName: String, triggerGroup: String)
+
 trait QrtzPausedTriggerGrpsModelTable {
 
   self: QrtzModels =>
 
   import profile.api._
-  import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzPausedTriggerGrpsModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true) */
-  case class QrtzPausedTriggerGrps(schedName: String, triggerGroup: String)
 
   /** GetResult implicit for fetching QrtzPausedTriggerGrps objects using plain SQL queries */
   implicit def GetResultQrtzPausedTriggerGrps(implicit e0: GR[String]): GR[QrtzPausedTriggerGrps] = GR { prs =>

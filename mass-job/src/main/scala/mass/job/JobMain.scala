@@ -2,7 +2,7 @@ package mass.job
 
 import fusion.core.FusionApplication
 import fusion.http.FusionHttpServer
-import fusion.inject.GuiceApplication
+import fusion.inject.guice.GuiceApplication
 import mass.job.route.Routes
 
 object JobMain {

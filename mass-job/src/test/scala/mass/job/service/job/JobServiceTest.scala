@@ -1,18 +1,21 @@
 package mass.job.service.job
 
+import fusion.inject.guice.testkit.GuiceApplicationTestkit
+import javax.inject.{ Inject, Singleton }
 import mass.core.ProgramVersion
 import mass.job.JobScheduler
 import mass.message.job._
 import mass.model.job.{ JobItem, JobTrigger, Program, TriggerType }
-import mass.testkit.FusionApplicationTestkit
 import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.concurrent.duration._
 
-class JobServiceMock(val jobScheduler: JobScheduler) extends JobServiceComponent
+@Singleton
+class JobServiceMock @Inject() (val jobScheduler: JobScheduler) extends JobServiceComponent
 
-class JobServiceTest extends FusionApplicationTestkit with AnyWordSpecLike {
-  lazy val jobService = new JobServiceMock(JobScheduler(classicSystem))
+class JobServiceTest extends GuiceApplicationTestkit with AnyWordSpecLike {
+  private implicit val ec = typedSystem.executionContext
+  private val jobService = injectInstance[JobServiceMock]
 
   "JobServiceTest" should {
     val item = JobItem(

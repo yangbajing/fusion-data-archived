@@ -3,17 +3,17 @@ package mass.job.util
 import java.nio.charset.StandardCharsets
 import java.nio.file.{ Files, Paths }
 
-import com.typesafe.config.ConfigFactory
-import fusion.json.jackson.Jackson
-import fusion.test.{ FusionScalaFutures, FusionWordSpecLike }
+import fusion.inject.guice.testkit.GuiceApplicationTestkit
+import fusion.json.jackson.ScalaObjectMapper
 import mass.MassSettings
 import mass.job.JobSettings
 import mass.message.job.JobUploadJobReq
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class JobUtilsTest extends FusionWordSpecLike with FusionScalaFutures {
-  import scala.concurrent.ExecutionContext.Implicits.global
-
-  private val jobSettings = JobSettings(MassSettings(ConfigFactory.load("application-test.conf")))
+class JobUtilsTest extends GuiceApplicationTestkit with AnyWordSpecLike {
+  private implicit val ec = typedSystem.executionContext
+  private val objectMapper = injectInstance[ScalaObjectMapper]
+  private val jobSettings = JobSettings(MassSettings(configuration))
 
   "JobService" should {
     "uploadJob" in {
@@ -22,7 +22,7 @@ class JobUtilsTest extends FusionWordSpecLike with FusionScalaFutures {
         Paths.get(sys.props.get("user.dir").get + "/mass-job/src/universal/examples/sample-job/" + fileName)
       val file2 = originalFile.getParent.resolve("hello2.zip")
       Files.copy(originalFile, file2)
-      println("file json string: " + Jackson.stringify(file2))
+      println("file json string: " + objectMapper.stringify(file2))
       val result =
         JobUtils.uploadJob(jobSettings, JobUploadJobReq(file2, fileName, StandardCharsets.UTF_8)).futureValue
       println(result)

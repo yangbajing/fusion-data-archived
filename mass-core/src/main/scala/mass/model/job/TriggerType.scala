@@ -9,26 +9,21 @@ import helloscala.common.util.{ IEnumTrait, IEnumTraitCompanion }
 
 @JsonSerialize(using = classOf[TriggerType.EnumSer])
 @JsonDeserialize(using = classOf[TriggerType.EnumDeser])
-sealed trait TriggerType extends IEnumTrait[String]
+sealed abstract class TriggerType extends IEnumTrait[String] {
+  override val value: String = name
+}
 
 object TriggerType extends IEnumTraitCompanion[String] {
   self =>
   override type Value = TriggerType
 
-  case object SIMPLE extends TriggerType {
-    override val companion: IEnumTraitCompanion[String] = self
-    override val value: String = "SIMPLE"
-  }
-  case object CRON extends TriggerType {
-    override val companion: IEnumTraitCompanion[String] = self
-    override val value: String = "CRON"
-  }
-  case object EVENT extends TriggerType {
-    override val companion: IEnumTraitCompanion[String] = self
-    override val value: String = "EVENT"
-  }
+  case object SIMPLE extends TriggerType
+  case object CRON extends TriggerType
+  case object EVENT extends TriggerType
 
   override val values = Vector(CRON, EVENT, SIMPLE)
+
+  override def optionFromValue(value: String): Option[TriggerType] = super.optionFromValue(value.toUpperCase())
 
   class EnumSer extends StdSerializer[TriggerType](classOf[TriggerType]) {
     override def serialize(value: TriggerType, gen: JsonGenerator, provider: SerializerProvider): Unit =

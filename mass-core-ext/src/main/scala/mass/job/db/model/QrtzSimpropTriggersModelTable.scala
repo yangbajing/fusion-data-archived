@@ -1,5 +1,36 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzSimpropTriggersModel
+
+/** Entity class storing rows of table QrtzSimpropTriggersModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
+ *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
+ *  @param strProp1 Database column str_prop_1 SqlType(varchar), Length(512,true), Default(None)
+ *  @param strProp2 Database column str_prop_2 SqlType(varchar), Length(512,true), Default(None)
+ *  @param strProp3 Database column str_prop_3 SqlType(varchar), Length(512,true), Default(None)
+ *  @param intProp1 Database column int_prop_1 SqlType(int4), Default(None)
+ *  @param intProp2 Database column int_prop_2 SqlType(int4), Default(None)
+ *  @param longProp1 Database column long_prop_1 SqlType(int8), Default(None)
+ *  @param longProp2 Database column long_prop_2 SqlType(int8), Default(None)
+ *  @param decProp1 Database column dec_prop_1 SqlType(numeric), Default(None)
+ *  @param decProp2 Database column dec_prop_2 SqlType(numeric), Default(None)
+ *  @param boolProp1 Database column bool_prop_1 SqlType(bool), Default(None)
+ *  @param boolProp2 Database column bool_prop_2 SqlType(bool), Default(None) */
+case class QrtzSimpropTriggers(
+    schedName: String,
+    triggerName: String,
+    triggerGroup: String,
+    strProp1: Option[String] = None,
+    strProp2: Option[String] = None,
+    strProp3: Option[String] = None,
+    intProp1: Option[Int] = None,
+    intProp2: Option[Int] = None,
+    longProp1: Option[Long] = None,
+    longProp2: Option[Long] = None,
+    decProp1: Option[scala.math.BigDecimal] = None,
+    decProp2: Option[scala.math.BigDecimal] = None,
+    boolProp1: Option[Boolean] = None,
+    boolProp2: Option[Boolean] = None)
+
 trait QrtzSimpropTriggersModelTable {
 
   self: QrtzModels =>
@@ -8,37 +39,6 @@ trait QrtzSimpropTriggersModelTable {
   import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzSimpropTriggersModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
-   *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
-   *  @param strProp1 Database column str_prop_1 SqlType(varchar), Length(512,true), Default(None)
-   *  @param strProp2 Database column str_prop_2 SqlType(varchar), Length(512,true), Default(None)
-   *  @param strProp3 Database column str_prop_3 SqlType(varchar), Length(512,true), Default(None)
-   *  @param intProp1 Database column int_prop_1 SqlType(int4), Default(None)
-   *  @param intProp2 Database column int_prop_2 SqlType(int4), Default(None)
-   *  @param longProp1 Database column long_prop_1 SqlType(int8), Default(None)
-   *  @param longProp2 Database column long_prop_2 SqlType(int8), Default(None)
-   *  @param decProp1 Database column dec_prop_1 SqlType(numeric), Default(None)
-   *  @param decProp2 Database column dec_prop_2 SqlType(numeric), Default(None)
-   *  @param boolProp1 Database column bool_prop_1 SqlType(bool), Default(None)
-   *  @param boolProp2 Database column bool_prop_2 SqlType(bool), Default(None) */
-  case class QrtzSimpropTriggers(
-      schedName: String,
-      triggerName: String,
-      triggerGroup: String,
-      strProp1: Option[String] = None,
-      strProp2: Option[String] = None,
-      strProp3: Option[String] = None,
-      intProp1: Option[Int] = None,
-      intProp2: Option[Int] = None,
-      longProp1: Option[Long] = None,
-      longProp2: Option[Long] = None,
-      decProp1: Option[scala.math.BigDecimal] = None,
-      decProp2: Option[scala.math.BigDecimal] = None,
-      boolProp1: Option[Boolean] = None,
-      boolProp2: Option[Boolean] = None)
 
   /** GetResult implicit for fetching QrtzSimpropTriggers objects using plain SQL queries */
   implicit def GetResultQrtzSimpropTriggers(

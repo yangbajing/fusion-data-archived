@@ -1,5 +1,42 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzTriggersModel
+
+/** Entity class storing rows of table QrtzTriggersModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
+ *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
+ *  @param jobName Database column job_name SqlType(varchar), Length(200,true)
+ *  @param jobGroup Database column job_group SqlType(varchar), Length(200,true)
+ *  @param description Database column description SqlType(text), Default(None)
+ *  @param nextFireTime Database column next_fire_time SqlType(int8), Default(None)
+ *  @param prevFireTime Database column prev_fire_time SqlType(int8), Default(None)
+ *  @param priority Database column priority SqlType(int4), Default(None)
+ *  @param triggerState Database column trigger_state SqlType(varchar), Length(16,true)
+ *  @param triggerType Database column trigger_type SqlType(varchar), Length(8,true)
+ *  @param startTime Database column start_time SqlType(int8)
+ *  @param endTime Database column end_time SqlType(int8), Default(None)
+ *  @param calendarName Database column calendar_name SqlType(varchar), Length(200,true), Default(None)
+ *  @param misfireInstr Database column misfire_instr SqlType(int2), Default(None)
+ *  @param jobData Database column job_data SqlType(bytea), Default(None)
+ *  @param createdAt Database column created_at SqlType(timestamptz) */
+case class QrtzTriggers(
+    schedName: String,
+    triggerName: String,
+    triggerGroup: String,
+    jobName: String,
+    jobGroup: String,
+    description: Option[String] = None,
+    nextFireTime: Option[Long] = None,
+    prevFireTime: Option[Long] = None,
+    priority: Option[Int] = None,
+    triggerState: String,
+    triggerType: String,
+    startTime: Long,
+    endTime: Option[Long] = None,
+    calendarName: Option[String] = None,
+    misfireInstr: Option[Short] = None,
+    jobData: Option[Array[Byte]] = None,
+    createdAt: java.time.OffsetDateTime)
+
 trait QrtzTriggersModelTable {
 
   self: QrtzModels =>
@@ -8,43 +45,6 @@ trait QrtzTriggersModelTable {
   import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzTriggersModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
-   *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
-   *  @param jobName Database column job_name SqlType(varchar), Length(200,true)
-   *  @param jobGroup Database column job_group SqlType(varchar), Length(200,true)
-   *  @param description Database column description SqlType(text), Default(None)
-   *  @param nextFireTime Database column next_fire_time SqlType(int8), Default(None)
-   *  @param prevFireTime Database column prev_fire_time SqlType(int8), Default(None)
-   *  @param priority Database column priority SqlType(int4), Default(None)
-   *  @param triggerState Database column trigger_state SqlType(varchar), Length(16,true)
-   *  @param triggerType Database column trigger_type SqlType(varchar), Length(8,true)
-   *  @param startTime Database column start_time SqlType(int8)
-   *  @param endTime Database column end_time SqlType(int8), Default(None)
-   *  @param calendarName Database column calendar_name SqlType(varchar), Length(200,true), Default(None)
-   *  @param misfireInstr Database column misfire_instr SqlType(int2), Default(None)
-   *  @param jobData Database column job_data SqlType(bytea), Default(None)
-   *  @param createdAt Database column created_at SqlType(timestamptz) */
-  case class QrtzTriggers(
-      schedName: String,
-      triggerName: String,
-      triggerGroup: String,
-      jobName: String,
-      jobGroup: String,
-      description: Option[String] = None,
-      nextFireTime: Option[Long] = None,
-      prevFireTime: Option[Long] = None,
-      priority: Option[Int] = None,
-      triggerState: String,
-      triggerType: String,
-      startTime: Long,
-      endTime: Option[Long] = None,
-      calendarName: Option[String] = None,
-      misfireInstr: Option[Short] = None,
-      jobData: Option[Array[Byte]] = None,
-      createdAt: java.time.OffsetDateTime)
 
   /** GetResult implicit for fetching QrtzTriggers objects using plain SQL queries */
   implicit def GetResultQrtzTriggers(

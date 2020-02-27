@@ -2,21 +2,9 @@ import fusion.sbt.gen.BuildInfo
 import sbt._
 
 object Dependencies {
-  val versionScala = "2.13.1"
   val versionScalaLib = "2.13"
 
-  val _scalaXml = "org.scala-lang.modules" %% "scala-xml" % "1.2.0"
-
-  val _fusionJsonJackson = "com.akka-fusion" %% "fusion-json-jackson" % BuildInfo.version
-  val _fusionJdbc = "com.akka-fusion" %% "fusion-jdbc" % BuildInfo.version
-  val _fusionJob = "com.akka-fusion" %% "fusion-job" % BuildInfo.version
-  val _fusionHttp = "com.akka-fusion" %% "fusion-http" % BuildInfo.version
-  val _fusionInjectGuice = "com.akka-fusion" %% "fusion-inject-guice" % BuildInfo.version
-  val _fusionInject = "com.akka-fusion" %% "fusion-inject" % BuildInfo.version
-  val _fusionCluster = "com.akka-fusion" %% "fusion-cluster" % BuildInfo.version
-  val _fusionCore = "com.akka-fusion" %% "fusion-core" % BuildInfo.version
-  val _fusionCommon = "com.akka-fusion" %% "fusion-common" % BuildInfo.version
-  val _fusionTestkit = "com.akka-fusion" %% "fusion-testkit" % BuildInfo.version
+  val _scalaXml = "org.scala-lang.modules" %% "scala-xml" % BuildInfo.versionScalaXml
 
   val _akkaDiscovery = "com.typesafe.akka" %% "akka-discovery" % BuildInfo.versionAkka
   val _akkaSerializationJackson = "com.typesafe.akka" %% "akka-serialization-jackson" % BuildInfo.versionAkka

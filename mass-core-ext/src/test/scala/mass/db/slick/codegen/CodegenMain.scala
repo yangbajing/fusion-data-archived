@@ -1,8 +1,8 @@
 package mass.db.slick.codegen
 
-import com.typesafe.config.ConfigFactory
+import fusion.core.FusionApplication
+import fusion.inject.guice.GuiceApplication
 import fusion.jdbc.FusionJdbc
-import mass.Mass
 import mass.db.slick.PgProfile
 import slick.codegen.SourceCodeGenerator
 import slick.jdbc.meta.MTable
@@ -13,8 +13,9 @@ import scala.concurrent.duration.Duration
 import scala.util.control.NonFatal
 
 object CodegenMain extends App {
-  val mass = Mass.fromConfig(ConfigFactory.load())
-  import mass.classicSystem.dispatcher
+  val application = FusionApplication.start().asInstanceOf[GuiceApplication]
+  val pgProfile: PgProfile = application.instance[PgProfile]
+  implicit val ec = application.typedSystem.executionContext
 
   try {
     codegenWrite(
@@ -27,13 +28,13 @@ object CodegenMain extends App {
     case NonFatal(e) =>
       e.printStackTrace()
   } finally {
-    mass.classicSystem.terminate()
+    application.classicSystem.terminate()
   }
 
-  private def codegenWrite(profile: String, folder: String, pkg: String, container: String, fileName: String) = {
-    val db = PgProfile.api.databaseForDataSource(FusionJdbc(mass.classicSystem).component)
+  private def codegenWrite(profile: String, folder: String, pkg: String, container: String, fileName: String): Unit = {
+    val db = pgProfile.api.databaseForDataSource(FusionJdbc(application.classicSystem).component)
 
-    val modelAction = PgProfile.createModel(Some(MTable.getTables(None, None, Some("qrtz_%"), Some(Seq("TABLE")))))
+    val modelAction = pgProfile.createModel(Some(MTable.getTables(None, None, Some("qrtz_%"), Some(Seq("TABLE")))))
     val modelFuture = db.run(modelAction)
 
     val codegenFuture = modelFuture.map { tableModel =>

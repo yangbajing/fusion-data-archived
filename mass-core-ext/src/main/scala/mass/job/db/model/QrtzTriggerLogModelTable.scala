@@ -1,36 +1,35 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzTriggerLogModel
+
+/** Entity class storing rows of table QrtzTriggerLogModel
+ *  @param id Database column id SqlType(bpchar), PrimaryKey, Length(24,false)
+ *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
+ *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
+ *  @param jobName Database column job_name SqlType(varchar), Length(200,true)
+ *  @param jobGroup Database column job_group SqlType(varchar), Length(200,true)
+ *  @param startTime Database column start_time SqlType(timestamptz)
+ *  @param completionTime Database column completion_time SqlType(timestamptz), Default(None)
+ *  @param completionStatus Database column completion_status SqlType(int4)
+ *  @param completionValue Database column completion_value SqlType(text), Default(None)
+ *  @param createdAt Database column created_at SqlType(timestamptz) */
+case class QrtzTriggerLog(
+    id: String,
+    triggerName: String,
+    triggerGroup: String,
+    jobName: String,
+    jobGroup: String,
+    startTime: java.time.OffsetDateTime,
+    completionTime: Option[java.time.OffsetDateTime] = None,
+    completionStatus: mass.model.job.RunStatus,
+    completionValue: Option[String] = None,
+    createdAt: java.time.OffsetDateTime)
+
 trait QrtzTriggerLogModelTable {
 
   self: QrtzModels =>
 
   import profile.api._
-  import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzTriggerLogModel
-   *  @param id Database column id SqlType(bpchar), PrimaryKey, Length(24,false)
-   *  @param triggerName Database column trigger_name SqlType(varchar), Length(200,true)
-   *  @param triggerGroup Database column trigger_group SqlType(varchar), Length(200,true)
-   *  @param jobName Database column job_name SqlType(varchar), Length(200,true)
-   *  @param jobGroup Database column job_group SqlType(varchar), Length(200,true)
-   *  @param startTime Database column start_time SqlType(timestamptz)
-   *  @param completionTime Database column completion_time SqlType(timestamptz), Default(None)
-   *  @param completionStatus Database column completion_status SqlType(int4)
-   *  @param completionValue Database column completion_value SqlType(text), Default(None)
-   *  @param createdAt Database column created_at SqlType(timestamptz) */
-  case class QrtzTriggerLog(
-      id: String,
-      triggerName: String,
-      triggerGroup: String,
-      jobName: String,
-      jobGroup: String,
-      startTime: java.time.OffsetDateTime,
-      completionTime: Option[java.time.OffsetDateTime] = None,
-      completionStatus: mass.model.job.RunStatus,
-      completionValue: Option[String] = None,
-      createdAt: java.time.OffsetDateTime)
 
   /** GetResult implicit for fetching QrtzTriggerLog objects using plain SQL queries */
   implicit def GetResultQrtzTriggerLog(

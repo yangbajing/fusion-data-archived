@@ -1,38 +1,37 @@
 package mass.job.db.model
-// AUTO-GENERATED Slick data model for table QrtzJobDetailsModel
+
+/** Entity class storing rows of table QrtzJobDetailsModel
+ *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
+ *  @param jobName Database column job_name SqlType(varchar), Length(200,true)
+ *  @param jobGroup Database column job_group SqlType(varchar), Length(200,true)
+ *  @param description Database column description SqlType(text), Default(None)
+ *  @param jobClassName Database column job_class_name SqlType(varchar), Length(250,true)
+ *  @param isDurable Database column is_durable SqlType(bool)
+ *  @param isNonconcurrent Database column is_nonconcurrent SqlType(bool)
+ *  @param isUpdateData Database column is_update_data SqlType(bool)
+ *  @param requestsRecovery Database column requests_recovery SqlType(bool)
+ *  @param jobData Database column job_data SqlType(bytea), Default(None)
+ *  @param createdAt Database column created_at SqlType(timestamptz) */
+case class QrtzJobDetails(
+    schedName: String,
+    jobName: String,
+    jobGroup: String,
+    description: Option[String] = None,
+    jobClassName: String,
+    isDurable: Boolean,
+    isNonconcurrent: Boolean,
+    isUpdateData: Boolean,
+    requestsRecovery: Boolean,
+    jobData: Option[Array[Byte]] = None,
+    createdAt: java.time.OffsetDateTime)
+
 trait QrtzJobDetailsModelTable {
 
   self: QrtzModels =>
 
   import profile.api._
-  import slick.model.ForeignKeyAction
   // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
   import slick.jdbc.{ GetResult => GR }
-
-  /** Entity class storing rows of table QrtzJobDetailsModel
-   *  @param schedName Database column sched_name SqlType(varchar), Length(120,true)
-   *  @param jobName Database column job_name SqlType(varchar), Length(200,true)
-   *  @param jobGroup Database column job_group SqlType(varchar), Length(200,true)
-   *  @param description Database column description SqlType(text), Default(None)
-   *  @param jobClassName Database column job_class_name SqlType(varchar), Length(250,true)
-   *  @param isDurable Database column is_durable SqlType(bool)
-   *  @param isNonconcurrent Database column is_nonconcurrent SqlType(bool)
-   *  @param isUpdateData Database column is_update_data SqlType(bool)
-   *  @param requestsRecovery Database column requests_recovery SqlType(bool)
-   *  @param jobData Database column job_data SqlType(bytea), Default(None)
-   *  @param createdAt Database column created_at SqlType(timestamptz) */
-  case class QrtzJobDetails(
-      schedName: String,
-      jobName: String,
-      jobGroup: String,
-      description: Option[String] = None,
-      jobClassName: String,
-      isDurable: Boolean,
-      isNonconcurrent: Boolean,
-      isUpdateData: Boolean,
-      requestsRecovery: Boolean,
-      jobData: Option[Array[Byte]] = None,
-      createdAt: java.time.OffsetDateTime)
 
   /** GetResult implicit for fetching QrtzJobDetails objects using plain SQL queries */
   implicit def GetResultQrtzJobDetails(

@@ -2,7 +2,6 @@ package mass.job.route.api
 
 import akka.http.scaladsl.server.Route
 import fusion.http.server.AbstractRoute
-import fusion.json.jackson.Jackson
 import fusion.json.jackson.http.JacksonSupport
 import javax.inject.{ Inject, Singleton }
 
@@ -12,12 +11,12 @@ class MockRoute @Inject() (val jacksonSupport: JacksonSupport) extends AbstractR
     currentUser ~ ruleRoute
   }
 
-  def ruleRoute = pathGet("rule") {
-    objectComplete(Jackson.createArrayNode)
+  def ruleRoute: Route = pathGet("rule") {
+    objectComplete(jacksonSupport.objectMapper.createArrayNode)
   }
 
-  def currentUser = pathGet("currentUser") {
-    objectComplete(Jackson.defaultObjectMapper.readTree(Mock.currentUser))
+  def currentUser: Route = pathGet("currentUser") {
+    objectComplete(jacksonSupport.objectMapper.readTree(Mock.currentUser))
   }
 }
 
