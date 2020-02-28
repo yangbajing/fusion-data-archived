@@ -1,7 +1,6 @@
 package mass.connector.sql.schema
 
-import helloscala.common.types._
-import helloscala.common.util.StringUtils
+import helloscala.common.util._
 
 import scala.collection.immutable
 

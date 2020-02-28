@@ -7,10 +7,9 @@
 package mass.connector.boot
 
 import com.typesafe.config.ConfigFactory
-import mass.Global
+import mass.Mass
 import mass.connector.ConnectorSystem
 
 object ConnectorMain extends App {
-  val system = Global.registerActorSystem(ConfigFactory.load())
-  ConnectorSystem(system)
+  ConnectorSystem(Mass.fromConfig(ConfigFactory.load()).classicSystem)
 }

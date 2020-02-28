@@ -1,97 +1,55 @@
 package mass.job.service.job
 
-import java.nio.file.{ Files, Paths, StandardCopyOption }
-import java.time.OffsetDateTime
+import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.{ Files, Path }
 
-import com.typesafe.scalalogging.StrictLogging
-import helloscala.common.util.DigestUtils
-import mass.core.protobuf.ProtoUtils
-import mass.job.JobSystem
-import mass.job.component.DefaultSchedulerJob
-import mass.job.model.{ JobUploadFilesReq, JobUploadJobReq }
-import mass.job.repository.JobRepo
-import mass.job.util.{ JobUtils, ProgramVersion }
-import mass.message.job.JobGetAllOptionResp.ProgramVersionItem
+import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.AskPattern._
+import akka.http.scaladsl.server.directives.FileInfo
+import akka.util.Timeout
+import fusion.inject.builtin.TypedActorSystemWrapper
+import javax.inject.{ Inject, Singleton }
+import mass.job.service.job.JobActor.CommandReply
 import mass.message.job._
-import mass.data.job._
-import mass.data.{ IdValue, TitleValue }
-import mass.slick.SqlManager
 
+import scala.collection.immutable
+import scala.concurrent.duration._
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.reflect.ClassTag
 
-trait JobService extends StrictLogging {
-  val jobSystem: JobSystem
+@Singleton
+class JobService @Inject() (typedActorSystemWrapper: TypedActorSystemWrapper) {
+  implicit val system = typedActorSystemWrapper.system
+  implicit val timeout: Timeout = Timeout(10.seconds)
+  val jobActor: ActorRef[JobActor.Command] = JobActor.init(system)
 
-  protected val JOB_CLASS_NAME: String = classOf[DefaultSchedulerJob].getName
-  protected lazy val db: SqlManager = jobSystem.massSystem.sqlManager
+  def listOption(): Future[JobGetAllOptionResp] = askToJob[JobGetAllOptionResp](JobGetAllOptionReq())
 
-  def executionJob(event: JobExecuteEvent)(implicit ec: ExecutionContext): Unit = {
-    db.run(JobRepo.findJob(event.key)).foreach {
-      case Some(schedule) => jobSystem.triggerJob(schedule.key)
-      case None           => logger.error(s"作业未找到，jobKey: ${event.key}")
+  def uploadFiles(list: immutable.Seq[(FileInfo, File)])(implicit ec: ExecutionContext): Future[JobUploadFilesResp] = {
+    askToJob[JobUploadFilesResp](JobUploadFilesReq(list)).andThen {
+      case _ => list.foreach { case (_, file) => Files.deleteIfExists(file.toPath) }
     }
   }
 
-  def handleList(req: JobListReq)(implicit ec: ExecutionContext): Future[JobListResp] = {
-    db.run(JobRepo.listJob(req)).map(list => JobListResp(list))
+  def uploadJobOnZip(fileInfo: FileInfo, file: Path)(implicit ec: ExecutionContext): Future[JobUploadJobResp] = {
+    val req = JobUploadJobReq(
+      file,
+      fileInfo.fileName,
+      fileInfo.contentType.charsetOption.map(_.nioCharset()).getOrElse(StandardCharsets.UTF_8))
+    askToJob[JobUploadJobResp](req).andThen { case _ => Files.deleteIfExists(file) }
   }
 
-  def handlePage(req: JobPageReq)(implicit ec: ExecutionContext): Future[JobPageResp] = db.run(JobRepo.page(req))
+  def updateTrigger(req: JobUpdateReq): Future[JobSchedulerResp] = askToJob[JobSchedulerResp](req)
 
-  def handleFind(req: JobFindReq)(implicit ec: ExecutionContext): Future[JobFindResp] = {
-    db.run(JobRepo.findJob(req.key)).map(maybe => JobFindResp(maybe))
-  }
+  def page(req: JobPageReq): Future[JobPageResp] = askToJob[JobPageResp](req)
 
-  def handleUploadJob(req: JobUploadJobReq)(implicit ec: ExecutionContext): Future[JobUploadJobResp] =
-    JobUtils
-      .uploadJob(jobSystem.jobSettings, req)
-      .flatMap(jobZip => db.runTransaction(JobRepo.save(jobZip)(db.executionContext)))
-      .map { list =>
-        val results = list.map(schedule => JobCreateResp(Option(schedule)))
-        JobUploadJobResp(results)
-      }
+  def findItemByKey(key: String): Future[JobSchedulerResp] = askToJob[JobSchedulerResp](JobFindReq(key = key))
 
-  def handleGetAllOption(req: JobGetAllOptionReq)(implicit ec: ExecutionContext): Future[JobGetAllOptionResp] = Future {
-    val programs = ProtoUtils.enumToTitleIdValues(Program.values.filterNot(_.isUnkown))
-    val triggerType = ProtoUtils.enumToTitleIdValues(TriggerType.values.filterNot(_.isTriggerUnknown))
-    val programVersion = ProgramVersion.values
-      .groupBy(_.NAME)
-      .map {
-        case (program, versions) =>
-          ProgramVersionItem(program.value, versions.map(p => TitleValue(p.VERSION, p.VERSION)))
-      }
-      .toList
-    val jobStatus = ProtoUtils.enumToTitleIdValues(RunStatus)
-    JobGetAllOptionResp(programs, triggerType, programVersion, jobStatus)
-  }
+  def createJob(req: JobCreateReq): Future[JobCreateResp] = askToJob[JobCreateResp](req)
 
-  def handleCreateJob(req: JobCreateReq)(implicit ec: ExecutionContext): Future[JobCreateResp] = {
-    db.runTransaction(JobRepo.save(req)).map { schedule =>
-      JobCreateResp(Option(schedule))
-    }
-  }
+  def updateJob(req: JobUpdateReq): Future[JobSchedulerResp] = askToJob[JobSchedulerResp](req)
 
-  def handleUpdate(req: JobUpdateReq)(implicit ec: ExecutionContext): Future[JobFindResp] = {
-    db.runTransaction(JobRepo.updateJobSchedule(req)).map { schedule =>
-      schedulerJob(schedule)
-      JobFindResp(Option(schedule))
-    }
-  }
-
-  def handleUploadFiles(req: JobUploadFilesReq)(implicit ec: ExecutionContext): Future[JobUploadFilesResp] = Future {
-    val jobSettings = jobSystem.jobSettings
-    val resources = req.items.zipWithIndex.map {
-      case ((fileInfo, file), idx) =>
-        val sha256 = DigestUtils.sha256HexFromPath(file.toPath)
-        val relativePath = Paths.get(sha256.take(2), sha256, fileInfo.fileName)
-        val dist = jobSettings.jobSavedDir.resolve(relativePath)
-        Files.move(file.toPath, dist, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
-        IdValue(idx, relativePath.toString)
-    }
-    JobUploadFilesResp(resources)
-  }
-
-  private def schedulerJob(schedule: JobSchedule): OffsetDateTime = {
-    jobSystem.scheduleJob(schedule.key, schedule.item.get, schedule.trigger.get, JOB_CLASS_NAME, None)
-  }
+  @inline private def askToJob[RESP](req: JobMessage)(implicit tag: ClassTag[RESP]): Future[RESP] =
+    jobActor.ask[JobResponse](replyTo => CommandReply(req, replyTo)).mapTo[RESP]
 }

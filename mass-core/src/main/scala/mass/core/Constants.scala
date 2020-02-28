@@ -8,7 +8,9 @@ package mass.core
 
 object Constants {
   val BASE_CONF = "mass"
-
+  val MASS = "mass"
+  val JACKSON_JSON = "jackson-json"
+  val JACKSON_CBOR = "jackson-cbor"
   val SHA256_HEX_LENGTH = 64
 
   val STATUS_DISABLE = 0

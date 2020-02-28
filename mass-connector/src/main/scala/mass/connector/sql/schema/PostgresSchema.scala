@@ -3,7 +3,7 @@ package mass.connector.sql.schema
 import com.zaxxer.hikari.HikariDataSource
 import fusion.jdbc.JdbcTemplate
 import fusion.jdbc.util.JdbcUtils
-import helloscala.common.types.AsBoolean
+import helloscala.common.util.AsBoolean
 
 import scala.collection.immutable
 import scala.util.control.NonFatal

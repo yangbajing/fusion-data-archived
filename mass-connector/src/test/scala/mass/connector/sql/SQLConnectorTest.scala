@@ -1,11 +1,11 @@
 package mass.connector.sql
 
-import helloscala.common.test.HelloscalaSpec
+import fusion.testkit.FusionWordSpecLike
 import org.scalatest.BeforeAndAfterAll
 
 import scala.xml.XML
 
-class SQLConnectorTest extends HelloscalaSpec with BeforeAndAfterAll {
+class SQLConnectorTest extends FusionWordSpecLike with BeforeAndAfterAll {
   val postgresConfig =
     """        <connector id="postgres" type="jdbc">
       |            <props>

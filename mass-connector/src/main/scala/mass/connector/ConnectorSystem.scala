@@ -2,38 +2,40 @@ package mass.connector
 
 import java.nio.file.Path
 
-import akka.actor.{ ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
+import akka.Done
+import akka.actor.ExtendedActorSystem
 import com.typesafe.scalalogging.StrictLogging
-import helloscala.common.Configuration
+import fusion.common.extension.{ FusionExtension, FusionExtensionId }
+import fusion.core.extension.FusionCore
 import mass.core.Constants
-import mass.extension.MassCore
 
-object ConnectorSystem extends ExtensionId[ConnectorSystem] with ExtensionIdProvider {
-  override def createExtension(system: ExtendedActorSystem): ConnectorSystem = new ConnectorSystem(system)
-  override def lookup(): ExtensionId[_ <: Extension] = ConnectorSystem
-}
+import scala.concurrent.Future
+import scala.util.{ Failure, Success }
 
-final class ConnectorSystem private (val system: ActorSystem) extends Extension with StrictLogging {
+final class ConnectorSystem private (override val classicSystem: ExtendedActorSystem)
+    extends FusionExtension
+    with StrictLogging {
   private var _parsers = Map.empty[String, ConnectorParser]
   private var _connectors = Map.empty[String, Connector]
-  val settings = MassCore(system)
+
   init()
 
   private def init(): Unit = {
-    settings.configuration.get[Seq[String]](s"${Constants.BASE_CONF}.connector.parsers").foreach { className =>
-      Class.forName(className).newInstance() match {
-        case parse: ConnectorParser => registerConnectorParser(parse)
-        case unknown                => logger.error(s"未知的ConnectorParse: $unknown")
+    configuration.get[Seq[String]](s"${Constants.BASE_CONF}.connector.parsers").foreach { className =>
+      classicSystem.dynamicAccess.createInstanceFor[ConnectorParser](className, Nil) match {
+        case Success(parse) => registerConnectorParser(parse)
+        case Failure(e)     => logger.error(s"未知的ConnectorParse", e)
       }
     }
-    system.registerOnTermination {
-      connectors.foreach { case (_, c) => c.close() }
+    FusionCore(classicSystem).shutdowns.serviceUnbind("ConnectorSystem") { () =>
+      Future {
+        connectors.foreach { case (_, c) => c.close() }
+        Done
+      }(classicSystem.dispatcher)
     }
   }
 
-  def name: String = system.name
-
-  def configuration: Configuration = settings.configuration
+  def name: String = classicSystem.name
 
   def getConnector(name: String): Option[Connector] = _connectors.get(name)
 
@@ -59,4 +61,8 @@ final class ConnectorSystem private (val system: ActorSystem) extends Extension 
     val maybeParser = parsers.get(node.attr("type"))
     maybeParser.map(cp => cp.parseFromXML(node))
   }
+}
+
+object ConnectorSystem extends FusionExtensionId[ConnectorSystem] {
+  override def createExtension(system: ExtendedActorSystem): ConnectorSystem = new ConnectorSystem(system)
 }

@@ -317,42 +317,233 @@ Version 1.0.0-SNAPSHOT
 <div class="small-12 column" id="docs">
 <h1><a href="#配置" name="配置" class="anchor"><span class="anchor-link"></span></a>配置</h1>
 <h2><a href="#ddl-postgres-" name="ddl-postgres-" class="anchor"><span class="anchor-link"></span></a>DDL (Postgres)</h2>
-<p><strong>调用JobDDL</strong></p>
-<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/scripts/software/postgres/init.sql#L35-L69" target="_blank" title="Go to snippet source"></a><code class="language-sql">drop table if exists public.job_schedule;
-create table public.job_schedule
-(
-  key                 varchar(128) not null,
-  job            jsonb not null,
-  trigger        jsonb not null,
-  description        text         not null,
-  run_status             int          not null default 1,
-  status             int          not null default 1,
-  creator varchar(24) not null,
-  created_at         timestamptz  not null,
-  schedule_count      bigint      not null default 0,
-  last_schedule_start timestamptz,
-  last_scheduled_at   timestamptz,
-  constraint job_schedule_pk primary key (key)
-);
-comment on table public.job_schedule
-  is &#39;作业，job_item与job_trigger关联后实际执行&#39;;
-comment on column public.job_schedule.status
-  is &#39;作业状态：0 未启用，1 启用&#39;;
+<p><strong>Job</strong></p>
+<pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/yangbajing/fusion-data/tree/master/scripts/software/postgres/job.sql" target="_blank" title="Go to snippet source"></a><code class="language-sql">-- thanks to patrick lightbody for submitting this...
+--
+-- in your quartz properties file, you&#39;ll need to set
+-- org.quartz.jobstore.driverdelegateclass = org.quartz.impl.jdbcjobstore.postgresqldelegate
+set timezone to &#39;Asia/Chongqing&#39;;
 
-drop table if exists public.job_log;
-create table public.job_log
+drop table if exists qrtz_fired_triggers;
+drop table if exists qrtz_paused_trigger_grps;
+drop table if exists qrtz_scheduler_state;
+drop table if exists qrtz_locks;
+drop table if exists qrtz_simple_triggers;
+drop table if exists qrtz_cron_triggers;
+drop table if exists qrtz_simprop_triggers;
+drop table if exists qrtz_blob_triggers;
+drop table if exists qrtz_triggers;
+drop table if exists qrtz_job_details;
+drop table if exists qrtz_calendars;
+
+create table qrtz_job_details
 (
-  id                char(24)     not null,
-  job_key           varchar(128), -- FK job_item.key
-  start_time        timestamptz  not null,
-  completion_time   timestamptz,
-  completion_status int,
-  completion_value  text,
-  created_at   timestamptz,
-  constraint job_log_pk primary key (id)
+    sched_name        varchar(120) not null,
+    job_name          varchar(200) not null,
+    job_group         varchar(200) not null,
+    description       text         null,
+    job_class_name    varchar(250) not null,
+    is_durable        bool         not null,
+    is_nonconcurrent  bool         not null,
+    is_update_data    bool         not null,
+    requests_recovery bool         not null,
+    job_data          bytea        null,
+    created_at        timestamptz  not null default now(),
+    primary key (sched_name, job_name, job_group)
 );
-create index job_log_job_key_idx
-  on job_log (job_key);</code></pre>
+
+create table qrtz_triggers
+(
+    sched_name     varchar(120) not null,
+    trigger_name   varchar(200) not null,
+    trigger_group  varchar(200) not null,
+    job_name       varchar(200) not null,
+    job_group      varchar(200) not null,
+    description    text         null,
+    next_fire_time bigint       null,
+    prev_fire_time bigint       null,
+    priority       integer      null,
+    trigger_state  varchar(16)  not null,
+    trigger_type   varchar(8)   not null,
+    start_time     bigint       not null,
+    end_time       bigint       null,
+    calendar_name  varchar(200) null,
+    misfire_instr  smallint     null,
+    job_data       bytea        null,
+    created_at     timestamptz  not null default now(),
+    primary key (sched_name, trigger_name, trigger_group),
+    foreign key (sched_name, job_name, job_group)
+        references qrtz_job_details (sched_name, job_name, job_group)
+);
+
+create table qrtz_simple_triggers
+(
+    sched_name      varchar(120) not null,
+    trigger_name    varchar(200) not null,
+    trigger_group   varchar(200) not null,
+    repeat_count    bigint       not null,
+    repeat_interval bigint       not null,
+    times_triggered bigint       not null,
+    primary key (sched_name, trigger_name, trigger_group),
+    foreign key (sched_name, trigger_name, trigger_group)
+        references qrtz_triggers (sched_name, trigger_name, trigger_group)
+);
+
+create table qrtz_cron_triggers
+(
+    sched_name      varchar(120) not null,
+    trigger_name    varchar(200) not null,
+    trigger_group   varchar(200) not null,
+    cron_expression varchar(120) not null,
+    time_zone_id    varchar(80),
+    primary key (sched_name, trigger_name, trigger_group),
+    foreign key (sched_name, trigger_name, trigger_group)
+        references qrtz_triggers (sched_name, trigger_name, trigger_group)
+);
+
+create table qrtz_simprop_triggers
+(
+    sched_name    varchar(120)   not null,
+    trigger_name  varchar(200)   not null,
+    trigger_group varchar(200)   not null,
+    str_prop_1    varchar(512)   null,
+    str_prop_2    varchar(512)   null,
+    str_prop_3    varchar(512)   null,
+    int_prop_1    int            null,
+    int_prop_2    int            null,
+    long_prop_1   bigint         null,
+    long_prop_2   bigint         null,
+    dec_prop_1    numeric(13, 4) null,
+    dec_prop_2    numeric(13, 4) null,
+    bool_prop_1   bool           null,
+    bool_prop_2   bool           null,
+    primary key (sched_name, trigger_name, trigger_group),
+    foreign key (sched_name, trigger_name, trigger_group)
+        references qrtz_triggers (sched_name, trigger_name, trigger_group)
+);
+
+create table qrtz_blob_triggers
+(
+    sched_name    varchar(120) not null,
+    trigger_name  varchar(200) not null,
+    trigger_group varchar(200) not null,
+    blob_data     bytea        null,
+    primary key (sched_name, trigger_name, trigger_group),
+    foreign key (sched_name, trigger_name, trigger_group)
+        references qrtz_triggers (sched_name, trigger_name, trigger_group)
+);
+
+create table qrtz_calendars
+(
+    sched_name    varchar(120) not null,
+    calendar_name varchar(200) not null,
+    calendar      bytea        not null,
+    primary key (sched_name, calendar_name)
+);
+
+
+create table qrtz_paused_trigger_grps
+(
+    sched_name    varchar(120) not null,
+    trigger_group varchar(200) not null,
+    primary key (sched_name, trigger_group)
+);
+
+create table qrtz_fired_triggers
+(
+    sched_name        varchar(120) not null,
+    entry_id          varchar(95)  not null,
+    trigger_name      varchar(200) not null,
+    trigger_group     varchar(200) not null,
+    instance_name     varchar(200) not null,
+    fired_time        bigint       not null,
+    sched_time        bigint       not null,
+    priority          integer      not null,
+    state             varchar(16)  not null,
+    job_name          varchar(200) null,
+    job_group         varchar(200) null,
+    is_nonconcurrent  bool         null,
+    requests_recovery bool         null,
+    primary key (sched_name, entry_id)
+);
+
+create table qrtz_scheduler_state
+(
+    sched_name        varchar(120) not null,
+    instance_name     varchar(200) not null,
+    last_checkin_time bigint       not null,
+    checkin_interval  bigint       not null,
+    primary key (sched_name, instance_name)
+);
+
+create table qrtz_locks
+(
+    sched_name varchar(120) not null,
+    lock_name  varchar(40)  not null,
+    primary key (sched_name, lock_name)
+);
+
+create index idx_qrtz_j_req_recovery
+    on qrtz_job_details (sched_name, requests_recovery);
+create index idx_qrtz_j_grp
+    on qrtz_job_details (sched_name, job_group);
+
+create index idx_qrtz_t_j
+    on qrtz_triggers (sched_name, job_name, job_group);
+create index idx_qrtz_t_jg
+    on qrtz_triggers (sched_name, job_group);
+create index idx_qrtz_t_c
+    on qrtz_triggers (sched_name, calendar_name);
+create index idx_qrtz_t_g
+    on qrtz_triggers (sched_name, trigger_group);
+create index idx_qrtz_t_state
+    on qrtz_triggers (sched_name, trigger_state);
+create index idx_qrtz_t_n_state
+    on qrtz_triggers (sched_name, trigger_name, trigger_group, trigger_state);
+create index idx_qrtz_t_n_g_state
+    on qrtz_triggers (sched_name, trigger_group, trigger_state);
+create index idx_qrtz_t_next_fire_time
+    on qrtz_triggers (sched_name, next_fire_time);
+create index idx_qrtz_t_nft_st
+    on qrtz_triggers (sched_name, trigger_state, next_fire_time);
+create index idx_qrtz_t_nft_misfire
+    on qrtz_triggers (sched_name, misfire_instr, next_fire_time);
+create index idx_qrtz_t_nft_st_misfire
+    on qrtz_triggers (sched_name, misfire_instr, next_fire_time, trigger_state);
+create index idx_qrtz_t_nft_st_misfire_grp
+    on qrtz_triggers (sched_name, misfire_instr, next_fire_time, trigger_group, trigger_state);
+
+create index idx_qrtz_ft_trig_inst_name
+    on qrtz_fired_triggers (sched_name, instance_name);
+create index idx_qrtz_ft_inst_job_req_rcvry
+    on qrtz_fired_triggers (sched_name, instance_name, requests_recovery);
+create index idx_qrtz_ft_j_g
+    on qrtz_fired_triggers (sched_name, job_name, job_group);
+create index idx_qrtz_ft_jg
+    on qrtz_fired_triggers (sched_name, job_group);
+create index idx_qrtz_ft_t_g
+    on qrtz_fired_triggers (sched_name, trigger_name, trigger_group);
+create index idx_qrtz_ft_tg
+    on qrtz_fired_triggers (sched_name, trigger_group);
+
+drop table if exists qrtz_trigger_log;
+create table qrtz_trigger_log
+(
+    id                char(24)     NOT NULL PRIMARY KEY,
+    trigger_name      varchar(200) not null,
+    trigger_group     varchar(200) not null,
+    job_name          varchar(200) not null,
+    job_group         varchar(200) not null,
+    start_time        timestamptz  NOT NULL,
+    completion_time   timestamptz,
+    completion_status INTEGER      NOT NULL,
+    completion_value  text,
+    created_at        timestamptz  NOT NULL
+);
+create index qrtz_trigger_log_t_g on qrtz_trigger_log(trigger_name, trigger_group);
+create index qrtz_trigger_log_j_g on qrtz_trigger_log(job_name, job_group);
+
+commit;</code></pre>
 </div>
 </article>
 <div class="row">

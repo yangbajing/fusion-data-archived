@@ -1,27 +1,13 @@
 package mass.workflow.etl
 
-import akka.actor.ActorSystem
-import akka.testkit.TestKit
-import helloscala.common.test.HelloscalaSpec
-import mass.job.JobSystem
+import fusion.inject.guice.testkit.GuiceApplicationTestkit
+import mass.job.JobScheduler
 import mass.rdp.RdpSystem
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class EtlSchedulerWorkflowTest extends TestKit(ActorSystem("etl-test")) with HelloscalaSpec with BeforeAndAfterAll {
-  var rdpSystem: RdpSystem = _
-  var jobSystem: JobSystem = _
-  //  var etlWorkflow: EtlWorkflow = _
-
-  override protected def beforeAll(): Unit = {
-    super.beforeAll()
-    rdpSystem = RdpSystem(system)
-    jobSystem = JobSystem(system)
-    //    etlWorkflow = EtlWorkflow.fromXML(TestStub.graphXmlConfig, rdpSystem).get
-  }
-
-  override protected def afterAll(): Unit =
-    //    etlWorkflow.close()
-    super.afterAll()
+class EtlSchedulerWorkflowTest extends GuiceApplicationTestkit with AnyWordSpecLike {
+  private val rdpSystem: RdpSystem = injectInstance[RdpSystem]
+  private val jobSystem: JobScheduler = injectInstance[JobScheduler]
 
   "EtlSchedulerWorkflowTest" should {
     "scheduler" in {

@@ -19,7 +19,7 @@
 
 *Job配置（JobItem）属性：*
 
-@@snip [JobItem](../../../../../mass-core/src/main/protobuf/mass/data/job/job.proto) { #JobItem }
+@@snip [JobItem](../../../../../mass-core/src/main/scala/mass/model/job/JobItem.scala) { #JobItem }
 
 ## 调度类型
 
@@ -34,7 +34,7 @@ MassData提供完善的Job调度功能，支持简单调度（时间间隔）、
 
 *触发配置（JobTrigger）属性：*
 
-@@snip [JobItem](../../../../../mass-core/src/main/protobuf/mass/data/job/job.proto) { #JobTrigger }
+@@snip [JobItem](../../../../../mass-core/src/main/scala/mass/model/job/JobTrigger.scala) { #JobTrigger }
 
 ## 创建Job
 

@@ -6,7 +6,7 @@
 <configuration scan="false" debug="false">
 
     <conversionRule conversionWord="traceID" converterClass="kamon.logback.LogbackTraceIDConverter" />
-    <conversionRule conversionWord="coloredLevel" converterClass="helloscala.common.logback.ColoredLevel"/>
+    <conversionRule conversionWord="coloredLevel" converterClass="fusion.common.logback.ColoredLevel"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

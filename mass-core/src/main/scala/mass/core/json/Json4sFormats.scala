@@ -1,8 +1,8 @@
 //package mass.core.json
 //
 //import com.fasterxml.jackson.databind.ObjectMapper
-//import helloscala.common.jackson.Jackson
-//import mass.data.CommonStatus
+//import fusion.json.jackson.Jackson
+//import mass.model.CommonStatus
 //import org.json4s.JsonAST.JInt
 //import org.json4s.jackson.JsonMethods
 //import org.json4s.{CustomSerializer, DefaultFormats, Serializer}

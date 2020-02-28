@@ -3,21 +3,20 @@ package mass.connector.sql
 import java.util.Properties
 import java.util.concurrent.TimeUnit
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import akka.stream.scaladsl.{ Flow, Keep }
 import com.zaxxer.hikari.HikariDataSource
 import fusion.jdbc.util.JdbcUtils
-import helloscala.common.types.AsString
-import org.scalatest.{ BeforeAndAfterAll, MustMatchers, WordSpec }
+import fusion.testkit.FusionApplicationTestkit
+import helloscala.common.util.AsString
+import org.scalatest.wordspec.AnyWordSpecLike
 
 import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
-  implicit val system = ActorSystem()
-  implicit val mat = ActorMaterializer()
+class Ys2LocalTest extends FusionApplicationTestkit with AnyWordSpecLike {
+  private implicit val mat = Materializer.matFromSystem(typedSystem)
   val localDS = createPGDataSource()
   val ysDS = createYsPGDataSource()
 
@@ -67,13 +66,15 @@ class Ys2LocalTest extends WordSpec with MustMatchers with BeforeAndAfterAll {
     println(s"从 155 导 reg_name_baninfo 表的 ${result.count} 条数据到本地共花费时间：$costTime")
   }
 
-  override protected def beforeAll(): Unit =
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
     TimeUnit.SECONDS.sleep(3) // JVM预热
+  }
 
   override protected def afterAll(): Unit = {
     localDS.close()
     ysDS.close()
-    system.terminate()
+    super.afterAll()
   }
 
   private def createPGDataSource(): HikariDataSource = {

@@ -8,9 +8,13 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 3307:3306
+      - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: Massdata.2018
+      MYSQL_USER: massdata
+      MYSQL_PASSWORD: Massdata.2018
+    networks:
+      - mass-backend
 
   mass-postgres:
     container_name: mass-postgres
@@ -19,21 +23,25 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 5433:5432
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: Massdata.2018
+    networks:
+      - mass-backend
 
-#  mass-sqlserver:
-#    container_name: mass-sqlserver
-#    build:
-#      context: ./scripts/software/sqlserver
-#      dockerfile: Dockerfile
-#    restart: always
-#    ports:
-#      - 1434:1433
-#    environment:
-#      ACCEPT_EULA: Y
-#      SA_PASSWORD: Massdata.2018
+  mass-sqlserver:
+    container_name: mass-sqlserver
+    build:
+      context: ./scripts/software/sqlserver
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 1433:1433
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Massdata.2018
+    networks:
+      - mass-backend
 
 #  mass-dameng:
 #    container_name: mass-dameng
@@ -45,7 +53,31 @@ services:
 #      - 5237:5236
 #    environment:
 #      SYSDBA_PWD: Massdata.2018
+#    networks:
+#      - mass-backend
 
-#networks:
-#  mass-backend:
-#    driver: docker0
+  # Container Accounts
+  #   root/pivotal gpadmin/pivotal
+  # Using psql in the Container
+  #   psql -h hongka-greenplum -p 5532 -U gp -d postgres
+  mass-greenplum:
+    container_name: mass-greenplum
+    image: datagrip/greenplum:6.1
+    #restart: always
+    ports:
+      - 5532:5432
+    networks:
+      - mass-backend
+
+  mass-oracle:
+    container_name: mass-oracle
+    image: datagrip/oracle:12.2.0.1-se2-directio
+    #restart: always
+    ports:
+      - 1521:1521
+      - 5500:5500
+    networks:
+      - mass-backend
+
+networks:
+  mass-backend:

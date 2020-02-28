@@ -1,49 +1,54 @@
 package mass.job.util
 
-import java.io.File
 import java.nio.charset.StandardCharsets
+import java.nio.file.{ Files, Paths }
 
-import com.typesafe.config.ConfigFactory
-import helloscala.common.Configuration
-import helloscala.common.test.HelloscalaSpec
+import fusion.inject.guice.testkit.GuiceApplicationTestkit
+import fusion.json.jackson.ScalaObjectMapper
+import mass.MassSettings
 import mass.job.JobSettings
-import mass.job.model.JobUploadJobReq
-import mass.server.MassSettings
+import mass.message.job.JobUploadJobReq
+import org.scalatest.wordspec.AnyWordSpecLike
 
-class JobUtilsTest extends HelloscalaSpec {
-  import scala.concurrent.ExecutionContext.Implicits.global
-
-  val configuration = Configuration.load()
-  val schedulerConf = JobSettings(MassSettings(configuration))
+class JobUtilsTest extends GuiceApplicationTestkit with AnyWordSpecLike {
+  private implicit val ec = typedSystem.executionContext
+  private val objectMapper = injectInstance[ScalaObjectMapper]
+  private val jobSettings = JobSettings(MassSettings(configuration))
 
   "JobService" should {
     "uploadJob" in {
-      val fileName = "job.zip"
-      val file =
-        new File(sys.props.get("user.dir").get + "/mass-scheduler/src/universal/examples/sample-job/" + fileName)
+      val fileName = "hello.zip"
+      val originalFile =
+        Paths.get(sys.props.get("user.dir").get + "/mass-job/src/universal/examples/sample-job/" + fileName)
+      val file2 = originalFile.getParent.resolve("hello2.zip")
+      Files.copy(originalFile, file2)
+      println("file json string: " + objectMapper.stringify(file2))
       val result =
-        JobUtils.uploadJob(schedulerConf, JobUploadJobReq(file, fileName, StandardCharsets.UTF_8)).futureValue
+        JobUtils.uploadJob(jobSettings, JobUploadJobReq(file2, fileName, StandardCharsets.UTF_8)).futureValue
       println(result)
     }
   }
 
   "conf" should {
-    val str = """
-                |  name = "Job名字"
+    val str = """#key=sample
+                |item {
+                |  name = "Hello world!"
                 |  program = "java" # Job程序类型，当前支持Java，sh（bash），python
-                |  program-main = "example.Main" # 可执行Java主类名字，[需要将程序打成Jar包。job-program为java时有效
-                |  program-version = "python2.7" # Python程序。可选，默认使用python2.7。job-program为python时有效
+                |  program-main = "hello.Hello" # 可执行Java主类名字，[需要将程序打成Jar包。job-program为java时有效
+                |}
+                |trigger {
                 |  trigger-type = "cron" # Job类型，当前支持：simple、cron、event三种
-                |  start-time = "yyyy-MM-dd HH:mm:ss" # Job开始执行时间（可选）
-                |  end-time = "yyyy-MM-dd HH:mm:ss" # Job结束时间（可选）
+                |  start-time = "2020-03-03 10:10:10" # Job开始执行时间（可选）
+                |  end-time = "2020-03-13 10:10:10" # Job结束时间（可选）
                 |  repeat = 4 # Job重复次数，job-type为simple时有效
                 |  duration = 120.seconds # 两次Job之间的时间间隔，job-type为simple时有效
                 |  cron-express = "1 0 0 * * ?" # 基于CRON的日历调度配置，job-type为cron时有效
-                |""".stripMargin
+                |}""".stripMargin
     "parse" in {
-      val conf = Configuration(ConfigFactory.parseString(str))
-      println(conf)
-      conf.getString("name") mustBe "Job名字"
+      val either = JobUtils.parseJobConf(str)
+      println(either)
+      val req = either.toOption.value
+      req.item.name shouldBe Some("Hello world!")
     }
   }
 }
