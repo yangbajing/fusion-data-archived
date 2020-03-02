@@ -2,8 +2,6 @@ import fusion.sbt.gen.BuildInfo
 import sbt._
 
 object Dependencies {
-  val versionScalaLib = "2.13"
-
   val _scalaXml = "org.scala-lang.modules" %% "scala-xml" % BuildInfo.versionScalaXml
 
   val _akkaDiscovery = "com.typesafe.akka" %% "akka-discovery" % BuildInfo.versionAkka

@@ -20,4 +20,4 @@ addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.7-1")
 addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.5")
 
 resolvers += Resolver.bintrayIvyRepo("helloscala", "ivy")
-addSbtPlugin("com.helloscala.fusion" % "fusion-sbt-plugin" % "2.0.5")
+addSbtPlugin("com.helloscala.fusion" % "fusion-sbt-plugin" % "2.0.6")
