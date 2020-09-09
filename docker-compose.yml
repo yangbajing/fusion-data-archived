@@ -57,13 +57,17 @@ services:
 #      - mass-backend
 
   # Container Accounts
-  #   root/pivotal gpadmin/pivotal
+  #   Linux: root/pivotal gpadmin/pivotal
+  #   GP:    gpadmin/pivotal tester/pivotal guest/guest
   # Using psql in the Container
-  #   psql -h hongka-greenplum -p 5532 -U gp -d postgres
+  #   psql -h hongka-greenplum -p 5532 -U tester -d postgres
   mass-greenplum:
     container_name: mass-greenplum
     image: datagrip/greenplum:6.1
     #restart: always
+    privileged: true
+    security_opt:
+      - seccomp:unconfined
     ports:
       - 5532:5432
     networks:

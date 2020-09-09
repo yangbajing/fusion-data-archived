@@ -96,13 +96,6 @@ object Dependencies {
     _alpakkaFtp,
     _alpakkaUnixDomainSocket)
 
-  val _alpakkaNoSQLs = Seq(
-    _alpakkaMongodb,
-    _alpakkaCassandra,
-    //                           _alpakkaHbase,
-    //                           _alpakksHdfs,
-    _alpakkaElasticsearch)
-
   val _akkaPersistenceCassandras = Seq(
     "com.typesafe.akka" %% "akka-persistence-cassandra" % BuildInfo.versionAkkaPersistenceCassandra,
     "com.typesafe.akka" %% "akka-persistence-cassandra-launcher" % BuildInfo.versionAkkaPersistenceCassandra % Test)

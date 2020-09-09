@@ -33,6 +33,8 @@ lazy val root = Project(id = "fusion-data-root", base = file("."))
     massRdi,
     massRdiCli,
     massRdiCore,
+    massConnectorElastic,
+    massConnectorMssql,
     massConnector,
     massGovernance,
     massJob,
@@ -152,12 +154,20 @@ lazy val massAuth = _project("mass-auth")
   .settings(Packaging.settings: _*)
   .settings(mainClass in Compile := Some("mass.auth.boot.AuthMain"), libraryDependencies ++= Seq())
 
+lazy val massConnectorElastic = _connectors("mass-connector-elastic")
+  .dependsOn(massConnector, massCore % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Seq(fusionElasticsearch, _alpakkaElasticsearch))
+
+lazy val massConnectorMssql = _connectors("mass-connector-mssql")
+  .dependsOn(massConnector, massCore % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Seq(_mssql))
+
 // 数据组件（采集、存储）
 lazy val massConnector = _project("mass-connector")
   .dependsOn(massCore % "compile->compile;test->test")
   .settings(
     mainClass in Compile := Some("mass.connector.boot.ConnectorMain"),
-    libraryDependencies ++= Seq(_akkaStreamKafka, _mssql, _mysql, _postgresql) ++ _alpakkas ++ _alpakkaNoSQLs)
+    libraryDependencies ++= Seq(_akkaStreamKafka, _mysql, _postgresql) ++ _alpakkas)
 
 // 管理程序公共库
 lazy val massCoreExt = _project("mass-core-ext")
@@ -185,8 +195,10 @@ lazy val massCommon = _project("mass-common")
   .settings(Publishing.publishing: _*)
   .settings(libraryDependencies ++= Seq(_akkaSerializationJackson, fusionCore))
 
+def _connectors(name: String) = _project(name, "connectors")
+
 def _project(name: String, _base: String = null) =
-  Project(id = name, base = file(if (_base eq null) name else _base))
+  Project(id = name, base = file(if (_base eq null) name else s"${_base}/$name"))
     .enablePlugins(FusionPlugin)
     .settings(basicSettings: _*)
     .settings(skip in publish := true, libraryDependencies ++= Seq(fusionInjectGuiceTestkit % Test))
